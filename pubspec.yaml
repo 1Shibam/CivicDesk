@@ -42,6 +42,8 @@ dependencies:
   flutter_screenutil: ^5.9.3
   go_router: ^14.8.1
   flutter_native_splash: ^2.4.4
+  google_sign_in: ^6.2.2
+  flutter_svg: ^2.0.17
 
 dev_dependencies:
   flutter_test:

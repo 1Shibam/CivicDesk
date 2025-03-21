@@ -16,6 +16,7 @@ class ComplaintsApp extends StatelessWidget {
         return MaterialApp.router(
           routerConfig: appRoutes,
           theme: appTheme,
+          debugShowCheckedModeBanner: false,
         );
       },
     );
