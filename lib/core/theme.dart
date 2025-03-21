@@ -7,9 +7,9 @@ ThemeData get appTheme => ThemeData(
     inputDecorationTheme: inputDecorationTheme,
     appBarTheme: appBarTheme);
 
-const AppBarTheme appBarTheme = AppBarTheme(
-  backgroundColor: Colors.transparent,
-);
+AppBarTheme appBarTheme = AppBarTheme(
+    backgroundColor: Colors.transparent,
+    iconTheme: IconThemeData(color: AppColors.textColor, size: 32.sp));
 //Text field input decoraiton theme
 final inputDecorationTheme = InputDecorationTheme(
   border: OutlineInputBorder(

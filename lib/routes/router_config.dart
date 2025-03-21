@@ -2,7 +2,7 @@ import 'package:complaints/presentation/screens/admin_home_screen.dart';
 import 'package:complaints/presentation/screens/admin_login_screen.dart';
 import 'package:complaints/presentation/screens/decide_screen.dart';
 import 'package:complaints/presentation/screens/user_home_screen.dart';
-import 'package:complaints/presentation/screens/user_login_scree.dart';
+import 'package:complaints/presentation/screens/user_login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

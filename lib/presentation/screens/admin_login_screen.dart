@@ -1,7 +1,6 @@
+import 'package:complaints/presentation/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-
 import 'package:complaints/core/constants.dart';
-import 'package:complaints/presentation/screens/decide_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -55,4 +54,3 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     );
   }
 }
-

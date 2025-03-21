@@ -1,8 +1,8 @@
 import 'package:complaints/core/constants.dart';
+import 'package:complaints/presentation/widgets/custom_button.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class DecideScreen extends StatelessWidget {
@@ -72,47 +72,4 @@ class DecideScreen extends StatelessWidget {
   }
 }
 
-class CustomButton extends StatelessWidget {
-  const CustomButton(
-      {super.key,
-      required this.onTap,
-      required this.buttonText,
-      required this.imageUrl});
-  final VoidCallback onTap;
-  final String buttonText;
-  final String imageUrl;
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-            color: AppColors.darkPinkAccent,
-            borderRadius: BorderRadius.circular(20.r)),
-        padding: EdgeInsets.all(20.r),
-        child: Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SvgPicture.asset(
-                imageUrl,
-                width: 40.sp,
-                height: 40.sp,
-              ),
-              const Expanded(
-                child: VerticalDivider(
-                  color: AppColors.lightGrey,
-                ),
-              ),
-              Text(
-                buttonText,
-                style: AppTextStyles.medium(24),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
