@@ -89,7 +89,14 @@ class ComplaintDetailScreen extends StatelessWidget {
                 ),
               ],
             )),
-            SizedBox(height: 8.h),
+            SizedBox(height: 40.h),
+            // CustomButton(
+            //     onTap: () {
+            //       //Approve the complaint
+            //     },
+            //     buttonText: 'Approve',
+            //     imageUrl:
+            //         'asets/images/approve-basic-checklist-svgrepo-com copy.svg')
           ],
         ),
       ),

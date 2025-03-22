@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
@@ -14,7 +15,7 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  String userName = "User Name"; // Replace with actual user data
+  String userName = "Hemant Singh"; // Replace with actual user data
   final List<ComplaintModel> complaints = [
     ComplaintModel(
       complaintId: '1',
@@ -63,6 +64,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           actions: [
             IconButton(
               icon: Icon(
+                Icons.notifications,
+                color: AppColors.textColor,
+                size: 32.sp,
+              ),
+              onPressed: () {
+                context.push(RouterNames.userProfile);
+              },
+            ),
+            IconButton(
+              icon: Icon(
                 Icons.account_circle,
                 color: AppColors.textColor,
                 size: 32.sp,
@@ -80,12 +91,30 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: AppColors.darkPink),
-              child: Text(userName, style: AppTextStyles.bold(20)),
+              decoration: BoxDecoration(
+                  color: AppColors.darkPinkAccent.withOpacity(0.5)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 50.r,
+                    backgroundImage: const CachedNetworkImageProvider(
+                        'https://i.imgur.com/PcvwDlW.png',
+                        maxHeight: 200,
+                        maxWidth: 200),
+                  ),
+                  Text(userName, style: AppTextStyles.bold(20)),
+                ],
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.home, color: AppColors.textColor),
               title: Text("Home", style: AppTextStyles.medium(16)),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings, color: AppColors.textColor),
+              title: Text("About", style: AppTextStyles.medium(16)),
               onTap: () {},
             ),
             ListTile(
@@ -110,10 +139,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 'File and Issue/Complaint',
                 style: AppTextStyles.bold(20),
               ),
-              subtitle: Text(
-                'Enter necessary details about the situation and submit',
-                style: AppTextStyles.regular(16),
-              ),
               tileColor: AppColors.darkPink,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r)),
@@ -129,7 +154,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               thickness: 2,
             ),
             SizedBox(height: 20.h),
-            Text("Recent Complaints",
+            Text("My Recent Complaints",
                 style: AppTextStyles.bold(18, color: AppColors.textColor)),
             SizedBox(height: 10.h),
             Expanded(

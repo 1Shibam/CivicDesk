@@ -3,6 +3,7 @@ import 'package:complaints/presentation/screens/admin/admin_login_screen.dart';
 import 'package:complaints/presentation/screens/admin/admin_profile_page.dart';
 import 'package:complaints/presentation/screens/user/complaint_form_screen.dart';
 import 'package:complaints/presentation/screens/decide_screen.dart';
+import 'package:complaints/presentation/screens/user/notificaitons_screen.dart';
 import 'package:complaints/presentation/screens/user/user_profile_page.dart';
 import 'package:complaints/presentation/screens/spalsh_screen.dart';
 import 'package:complaints/presentation/screens/user/user_home_screen.dart';
@@ -146,6 +147,22 @@ GoRouter appRoutes = GoRouter(initialLocation: '/', routes: [
         transitionDuration: const Duration(milliseconds: 500),
         key: state.pageKey,
         child: const AdminProfilePage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      );
+    },
+  ),
+  GoRoute(
+    path: '/notificationScreen',
+    pageBuilder: (context, state) {
+      return CustomTransitionPage(
+        transitionDuration: const Duration(milliseconds: 500),
+        key: state.pageKey,
+        child: const NotificaitonsScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,
