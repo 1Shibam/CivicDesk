@@ -2,6 +2,7 @@ import 'package:complaints/core/constants.dart';
 import 'package:complaints/presentation/widgets/circular_loader.dart';
 import 'package:complaints/presentation/widgets/custom_button.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/services/firebase_auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +50,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
               imageUrl: 'asets/images/google icon.svg',
               onTap: () async {
                 ciruclarLoader(context);
-                // await FirebaseAuthServices().sigupWithGoogle(context);
+                await FirebaseAuthServices().sigupWithGoogle(context);
                 await Future.delayed(const Duration(seconds: 2));
                 if (context.mounted) {
                   context.pop();

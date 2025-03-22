@@ -1,5 +1,6 @@
 import 'package:complaints/presentation/widgets/custome_snackbar.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/services/firestore_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -38,6 +39,7 @@ class FirebaseAuthServices {
       await FirebaseAuth.instance.currentUser?.reload(); // Force refresh
 
       if (userCredential.user != null) {
+        await FirestoreServices().createUserProfile();
         if (context.mounted) {
           customSnackbar(
               context: context,

@@ -6,18 +6,17 @@ class UserModel {
   final String profileUrl;
   final String joinedAt;
 
-  UserModel({
-    required this.id,
-    required this.name,
-    required this.role,
-    required this.email,
-    required this.profileUrl,
-    required this.joinedAt
-  });
+  UserModel(
+      {required this.id,
+      required this.name,
+      required this.role,
+      required this.email,
+      required this.profileUrl,
+      required this.joinedAt});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-        id: json['id'],
+        id: json['user_id'],
         name: json['name'],
         role: json['role'],
         email: json['email'],

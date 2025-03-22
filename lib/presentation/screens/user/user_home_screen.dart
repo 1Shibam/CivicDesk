@@ -1,7 +1,10 @@
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
+import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
+import 'package:complaints/routes/router_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -25,8 +28,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       status: 'pending',
       isSpam: false,
       adminId: null,
-      submittedAt: DateTime.now().subtract(Duration(days: 2)),
-      updatedAt: DateTime.now().subtract(Duration(days: 1)),
+      submittedAt: DateTime.now().subtract(const Duration(days: 2)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 1)),
       userNotified: false,
       adminNotified: false,
     ),
@@ -42,8 +45,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       status: 'in-progress',
       isSpam: false,
       adminId: null,
-      submittedAt: DateTime.now().subtract(Duration(days: 5)),
-      updatedAt: DateTime.now().subtract(Duration(days: 2)),
+      submittedAt: DateTime.now().subtract(const Duration(days: 5)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 2)),
       userNotified: true,
       adminNotified: true,
     ),
@@ -65,7 +68,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 size: 32.sp,
               ),
               onPressed: () {
-                // Navigate to Profile Page
+                context.push(RouterNames.userProfile);
               },
             ),
           ],
@@ -99,6 +102,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
+              onTap: () {
+                context.push(RouterNames.complaintScreen);
+              },
               contentPadding: EdgeInsets.all(16.r),
               title: Text(
                 'File and Issue/Complaint',
@@ -133,51 +139,66 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   final complaint = complaints[index];
                   return GestureDetector(
                     onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(complaint.title,
-                              style: AppTextStyles.bold(18)),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Category: ${complaint.category}",
-                                  style: AppTextStyles.medium(16)),
-                              SizedBox(height: 8.h),
-                              Text("Status: ${complaint.status}",
-                                  style: AppTextStyles.medium(16)),
-                              SizedBox(height: 8.h),
-                              Text(complaint.description,
-                                  style: AppTextStyles.regular(14)),
-                            ],
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text("Close",
-                                  style: AppTextStyles.medium(16,
-                                      color: AppColors.darkPink)),
-                            ),
-                          ],
-                        ),
-                      );
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ComplaintDetailScreen(complaint: complaint),
+                          ));
                     },
                     child: Card(
                       color: AppColors.darkPinkAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      elevation: 4,
                       child: Padding(
                         padding: EdgeInsets.all(12.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
                           children: [
-                            Text(complaint.title,
-                                style: AppTextStyles.bold(16)),
-                            SizedBox(height: 4.h),
-                            Text("Category: ${complaint.category}",
-                                style: AppTextStyles.medium(14)),
-                            SizedBox(height: 4.h),
-                            Text("Status: ${complaint.status}",
-                                style: AppTextStyles.medium(14)),
+                            Icon(Icons.report_problem,
+                                size: 40.sp, color: Colors.white),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    complaint.title,
+                                    style: AppTextStyles.bold(16),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.category,
+                                          size: 16.sp, color: Colors.white),
+                                      SizedBox(width: 4.w),
+                                      Text("Category: ${complaint.category}",
+                                          style: AppTextStyles.medium(14)),
+                                    ],
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        complaint.status == "Resolved"
+                                            ? Icons.check_circle
+                                            : Icons.pending,
+                                        size: 16.sp,
+                                        color: complaint.status == "Resolved"
+                                            ? Colors.green
+                                            : Colors.yellow,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Text("Status: ${complaint.status}",
+                                          style: AppTextStyles.medium(14)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.arrow_forward_ios,
+                                size: 16.sp, color: Colors.white),
                           ],
                         ),
                       ),

@@ -12,6 +12,9 @@ AppBarTheme appBarTheme = AppBarTheme(
     iconTheme: IconThemeData(color: AppColors.textColor, size: 32.sp));
 //Text field input decoraiton theme
 final inputDecorationTheme = InputDecorationTheme(
+  prefixIconColor: AppColors.textColor,
+  labelStyle: AppTextStyles.medium(16),
+  hintStyle: AppTextStyles.medium(16),
   border: OutlineInputBorder(
     borderRadius: BorderRadius.circular(12.r), // Default less circular
     borderSide: const BorderSide(color: AppColors.lightGrey),
