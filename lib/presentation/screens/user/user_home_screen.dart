@@ -69,7 +69,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 size: 32.sp,
               ),
               onPressed: () {
-                context.push(RouterNames.userProfile);
+                context.push(RouterNames.notificationScreen);
               },
             ),
             IconButton(

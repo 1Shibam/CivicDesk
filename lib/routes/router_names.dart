@@ -8,4 +8,5 @@ class RouterNames {
   static const String userProfile = '/userProfile';
   static const String complaintScreen = '/complaintScreen';
   static const String adminProfile = '/adminProfile';
+  static const String notificationScreen = '/notificationScreen';
 }

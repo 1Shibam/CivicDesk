@@ -95,34 +95,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 : spamComplaints[index];
             return GestureDetector(
               onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text(complaint.title, style: AppTextStyles.bold(18)),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Category: ${complaint.category}",
-                            style: AppTextStyles.medium(16)),
-                        SizedBox(height: 8.h),
-                        Text("Status: ${complaint.status}",
-                            style: AppTextStyles.medium(16)),
-                        SizedBox(height: 8.h),
-                        Text(complaint.description,
-                            style: AppTextStyles.regular(14)),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("Close",
-                            style: AppTextStyles.medium(16,
-                                color: AppColors.darkPink)),
-                      ),
-                    ],
-                  ),
-                );
+                context.push('/');
               },
               child: Card(
                 color: AppColors.darkPinkAccent,

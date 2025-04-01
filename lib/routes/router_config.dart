@@ -162,7 +162,7 @@ GoRouter appRoutes = GoRouter(initialLocation: '/', routes: [
       return CustomTransitionPage(
         transitionDuration: const Duration(milliseconds: 500),
         key: state.pageKey,
-        child: const NotificaitonsScreen(),
+        child: const NotificationScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,
