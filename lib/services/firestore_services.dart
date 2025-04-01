@@ -10,13 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
-
 class FirestoreServices {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Create user profile if it doesn't exist
-  Future<void> createUserProfile() async {
+
+  Future<void> createUserProfile(String role) async {
     final user = _auth.currentUser!;
     final userDocRef = firestore.collection('users').doc(user.uid);
 
@@ -28,8 +28,8 @@ class FirestoreServices {
       id: user.uid,
       name: user.displayName ?? '', // Handle null
       email: user.email ?? '',
-      role: 'user',
-      
+      role: role,
+
       joinedAt: Timestamp.now()
           .toDate()
           .toIso8601String()
@@ -70,7 +70,7 @@ class FirestoreServices {
       }
     } on FirebaseException catch (error) {
       if (context.mounted) {
-        customSnackbar(context:context, messages: 'Error: $error');
+        customSnackbar(context: context, messages: 'Error: $error');
       }
     } catch (e) {
       debugPrint('something must be wrong!!');
@@ -79,5 +79,4 @@ class FirestoreServices {
       }
     }
   }
-
 }

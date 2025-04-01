@@ -39,7 +39,7 @@ class FirebaseAuthServices {
       await FirebaseAuth.instance.currentUser?.reload(); // Force refresh
 
       if (userCredential.user != null) {
-        await FirestoreServices().createUserProfile();
+        await FirestoreServices().createUserProfile('user');
         if (context.mounted) {
           customSnackbar(
               context: context,
@@ -51,6 +51,20 @@ class FirebaseAuthServices {
       if (context.mounted) {
         customSnackbar(
             context: context, messages: 'something went wrong : ${e.message}');
+      }
+    }
+  }
+
+  Future<void> createAdminWithEmail(
+      String email, String password, BuildContext context) async {
+    try {
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      await FirestoreServices().createUserProfile('admin');
+    } on FirebaseAuthException catch (e) {
+      debugPrint(e.message);
+      if (context.mounted) {
+        customSnackbar(context: context, messages: 'Something went wrong!!');
       }
     }
   }
