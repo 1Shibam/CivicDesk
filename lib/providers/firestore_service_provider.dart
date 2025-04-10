@@ -1,9 +1,8 @@
-import 'package:complaints/presentation/widgets/custome_snackbar.dart';
+import 'package:complaints/presentation/widgets/custom_snackbar.dart';
 import 'package:complaints/services/firestore_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-
 
 final firestoreServiceProvider =
     Provider<FirestoreServices>((ref) => FirestoreServices());
@@ -15,7 +14,11 @@ class FirestoreServiceNotifier extends StateNotifier<FirestoreServices> {
     try {
       await state.createUserProfile(role);
       if (context.mounted) {
-        customSnackbar(context:context, messages: 'User creation successfull');
+        customSnackbar(
+            context: context,
+            message: 'User creation successfull',
+            iconName: Icons.check,
+            bgColor: Colors.green);
       }
       return true;
     } catch (e) {
@@ -28,14 +31,17 @@ class FirestoreServiceNotifier extends StateNotifier<FirestoreServices> {
     try {
       await state.updateProfilePicture(userID, imageSource, context);
       if (context.mounted) {
-        customSnackbar(context:context, messages: 'Update successfull');
+        customSnackbar(
+            context: context,
+            message: 'Update successfull',
+            bgColor: Colors.green,
+            iconName: Icons.check);
       }
       return true;
     } catch (e) {
       return false;
     }
   }
-
 
   Future<bool> changeUserData(
       {required BuildContext context,
@@ -49,7 +55,6 @@ class FirestoreServiceNotifier extends StateNotifier<FirestoreServices> {
       return false;
     }
   }
-
 }
 
 final firestoreServiceStateNotifierProvider =
