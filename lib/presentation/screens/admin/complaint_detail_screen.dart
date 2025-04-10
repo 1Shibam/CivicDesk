@@ -32,7 +32,7 @@ class AdminComplaintDetailScreen extends StatelessWidget {
             // Placeholder for attachments
             Container(
               height: 100,
-              color: AppColors.lightGrey.withOpacity(0.3),
+              color: AppColors.lightGrey.withValues(alpha:0.3),
               child: Center(
                   child:
                       Text('No attachments', style: AppTextStyles.regular(14))),

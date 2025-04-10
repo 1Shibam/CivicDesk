@@ -79,4 +79,22 @@ class FirestoreServices {
       }
     }
   }
+
+  //match the admin pass keys to let them sign in --
+
+  Future<bool> validateAdminPasskey(String enteredKey) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+          await firestore.collection('adminPassKeys').get();
+
+      //Extracting all pass keys from the document --
+      List<String> storedPassKeys =
+          snapshot.docs.map((doc) => doc.data()['passkey'].toString()).toList();
+
+      return storedPassKeys.contains(enteredKey);
+    } catch (e) {
+      debugPrint('Error fetching passkeys: $e');
+      return false;
+    }
+  }
 }

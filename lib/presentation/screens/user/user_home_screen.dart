@@ -92,7 +92,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(
-                  color: AppColors.darkPinkAccent.withOpacity(0.5)),
+                  color: AppColors.darkPinkAccent.withValues(alpha: 0.5)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

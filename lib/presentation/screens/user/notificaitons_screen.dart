@@ -57,7 +57,7 @@ class NotificationScreen extends StatelessWidget {
                 style: AppTextStyles.medium(16)),
             subtitle: Text('Tap to view details',
                 style: AppTextStyles.regular(14,
-                    color: AppColors.textColor.withOpacity(0.8))),
+                    color: AppColors.textColor.withValues(alpha:0.8))),
             tileColor: AppColors.darkPinkAccent,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.r)),
