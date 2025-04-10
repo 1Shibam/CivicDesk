@@ -35,7 +35,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     'Other'
   ];
 
-  Future<void> pickImages() async {
+  Future<void> pickImagesfromGallery() async {
     final images = await picker.pickMultiImage();
     if (images.isEmpty) return;
 
@@ -54,6 +54,90 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     ref.read(imageListProvider.notifier).addImages(images);
   }
 
+  Future<void> showImageSourceSheet() async {
+    showModalBottomSheet(
+      backgroundColor: AppColors.darkPink,
+      context: context,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20.r))),
+      builder: (_) => Padding(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            ListTile(
+              leading:
+                  const Icon(Icons.photo_camera, color: AppColors.textColor),
+              title: Text('Take from Camera', style: AppTextStyles.medium(20)),
+              onTap: () async {
+                Navigator.pop(context);
+                final picked =
+                    await picker.pickImage(source: ImageSource.camera);
+                if (picked != null) {
+                  final currentImages = ref.read(imageListProvider);
+                  if (currentImages.length >= 10) {
+                    if (mounted) {
+                      customSnackbar(
+                          context: context,
+                          message: 'You can only upload up to 10 images',
+                          iconName: Icons.image_not_supported);
+                    }
+                    return;
+                  }
+                  ref.read(imageListProvider.notifier).addImages([picked]);
+                }
+              },
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: const Divider(
+                color: AppColors.lightGrey,
+              ),
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.photo_library, color: AppColors.textColor),
+              title:
+                  Text('Choose from Gallery', style: AppTextStyles.medium(20)),
+              onTap: () async {
+                Navigator.pop(context);
+                final images = await picker.pickMultiImage();
+                if (images.isEmpty) return;
+
+                final currentImages = ref.read(imageListProvider);
+                final availableSlots = 10 - currentImages.length;
+
+                if (images.length > availableSlots) {
+                  if (mounted) {
+                    customSnackbar(
+                        context: context,
+                        message: 'You can only upload up to 10 images',
+                        iconName: Icons.image_not_supported);
+                  }
+                }
+
+                final imagesToAdd = images.take(availableSlots).toList();
+                ref.read(imageListProvider.notifier).addImages(imagesToAdd);
+              },
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: const Divider(
+                color: AppColors.lightGrey,
+              ),
+            ),
+            Text(
+              'Upload up to 10 images regarding your complaint or issue.\n\n'
+              '⚠️ Please upload only relevant images.\n'
+              'Unnecessary or inappropriate uploads may lead to blocking or legal actions.',
+              style: AppTextStyles.regular(16, color: AppColors.textColor),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void showImagePreview(File imageFile) {
     showModalBottomSheet(
       context: context,
@@ -64,7 +148,12 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.file(imageFile, fit: BoxFit.contain),
+            Image.file(
+              imageFile,
+              fit: BoxFit.cover,
+              height: 700.h,
+              width: double.infinity,
+            ),
             SizedBox(height: 16.h),
             TextButton(
               child: Text('Close', style: AppTextStyles.regular(24)),
@@ -178,26 +267,34 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
               SizedBox(height: 16.h),
 
               /// Upload Images
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: pickImages,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.darkPink,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r)),
+              /// Upload Images UI
+              Center(
+                child: ElevatedButton.icon(
+                  onPressed: showImageSourceSheet,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.darkPink,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
-                    child: Text('Upload Images',
-                        style: AppTextStyles.medium(14,
-                            color: AppColors.textColor)),
+                    elevation: 4,
                   ),
-                  if (selectedImages.isNotEmpty)
-                    Text('${selectedImages.length} selected',
-                        style: AppTextStyles.medium(14,
-                            color: AppColors.lightGrey)),
-                ],
+                  icon: Icon(Icons.add_a_photo,
+                      color: AppColors.textColor, size: 22.sp),
+                  label: Text('Upload Images',
+                      style:
+                          AppTextStyles.medium(16, color: AppColors.textColor)),
+                ),
               ),
+              if (selectedImages.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.only(top: 12.h),
+                  child: Text('${selectedImages.length} selected',
+                      style:
+                          AppTextStyles.medium(14, color: AppColors.lightGrey)),
+                ),
+
               SizedBox(height: 12.h),
 
               /// Thumbnails Grid
