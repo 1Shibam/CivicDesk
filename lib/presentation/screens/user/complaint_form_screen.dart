@@ -183,6 +183,43 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
           child: SingleChildScrollView(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                'Use voice input to describe the issue—it will auto-fill the title and description.',
+                style: AppTextStyles.regular(16),
+              ),
+              SizedBox(height: 12.h),
+              Center(
+                child: Container(
+                  padding: EdgeInsets.all(10.w),
+                  decoration: BoxDecoration(
+                      color: AppColors.darkPink,
+                      borderRadius: BorderRadius.circular(100.r)),
+                  child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.mic,
+                          size: 40.sp, color: AppColors.textColor)),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                        child: Divider(
+                            color: AppColors.lightGrey,
+                            thickness: 2,
+                            endIndent: 20.w)),
+                    Text('OR', style: AppTextStyles.bold(24)),
+                    Expanded(
+                        child: Divider(
+                            color: AppColors.lightGrey,
+                            thickness: 2,
+                            indent: 20.w)),
+                  ],
+                ),
+              ),
+
               /// Title
               TextFormField(
                 controller: titleController,
@@ -268,25 +305,28 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
 
               /// Upload Images
               /// Upload Images UI
-              Center(
-                child: ElevatedButton.icon(
-                  onPressed: showImageSourceSheet,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.darkPink,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
+              //button only show up if the total selected images are less that 10
+              if (selectedImages.length < 10) ...[
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: showImageSourceSheet,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.darkPink,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.w, vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      elevation: 4,
                     ),
-                    elevation: 4,
+                    icon: Icon(Icons.add_a_photo,
+                        color: AppColors.textColor, size: 22.sp),
+                    label: Text('Upload Images',
+                        style: AppTextStyles.medium(16,
+                            color: AppColors.textColor)),
                   ),
-                  icon: Icon(Icons.add_a_photo,
-                      color: AppColors.textColor, size: 22.sp),
-                  label: Text('Upload Images',
-                      style:
-                          AppTextStyles.medium(16, color: AppColors.textColor)),
                 ),
-              ),
+              ],
               if (selectedImages.isNotEmpty)
                 Padding(
                   padding: EdgeInsets.only(top: 12.h),
@@ -355,44 +395,6 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                 },
                 buttonText: 'Submit',
                 imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg',
-              ),
-
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                        child: Divider(
-                            color: AppColors.lightGrey,
-                            thickness: 2,
-                            endIndent: 20.w)),
-                    Text('OR', style: AppTextStyles.bold(24)),
-                    Expanded(
-                        child: Divider(
-                            color: AppColors.lightGrey,
-                            thickness: 2,
-                            indent: 20.w)),
-                  ],
-                ),
-              ),
-
-              Text(
-                'Use voice input to describe the issue—it will auto-fill the title and description.',
-                style: AppTextStyles.regular(16),
-              ),
-              SizedBox(height: 12.h),
-              Center(
-                child: Container(
-                  padding: EdgeInsets.all(10.w),
-                  decoration: BoxDecoration(
-                      color: AppColors.darkPink,
-                      borderRadius: BorderRadius.circular(100.r)),
-                  child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.mic,
-                          size: 40.sp, color: AppColors.textColor)),
-                ),
               ),
             ]),
           ),
