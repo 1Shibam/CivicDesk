@@ -1,11 +1,8 @@
 import 'dart:io';
-
-import 'package:complaints/core/constants.dart';
-import 'package:complaints/presentation/widgets/custome_snackbar.dart';
+import 'package:complaints/presentation/widgets/custom_snackbar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 
 Future<String?> uploadImageToImgur(BuildContext context, File imageFile) async {
   try {
@@ -54,8 +51,11 @@ Future<String?> uploadImageToImgur(BuildContext context, File imageFile) async {
     }
   } catch (e) {
     if (context.mounted) {
-      customSnackbar(context:context, messages: 'Something went wrong to imgur',
-          bgColor: AppColors.darkPink);
+      customSnackbar(
+          context: context,
+          message: 'Something went wrong to imgur',
+          bgColor: Colors.red,
+          iconName: Icons.error);
     }
     rethrow;
   }

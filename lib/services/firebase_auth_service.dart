@@ -1,4 +1,4 @@
-import 'package:complaints/presentation/widgets/custome_snackbar.dart';
+import 'package:complaints/presentation/widgets/custom_snackbar.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:complaints/services/firestore_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,7 +21,11 @@ class FirebaseAuthServices {
       //? User cancelled the signup process
       if (googleUser == null) {
         if (context.mounted) {
-          customSnackbar(context: context, messages: 'Process Cancelled');
+          customSnackbar(
+              context: context,
+              message: 'Process Cancelled',
+              iconName: Icons.cancel,
+              bgColor: Colors.red);
         }
         return;
       }
@@ -43,14 +47,19 @@ class FirebaseAuthServices {
         if (context.mounted) {
           customSnackbar(
               context: context,
-              messages: 'Welcome , ${userCredential.user!.displayName}!');
+              message: 'Welcome , ${userCredential.user!.displayName}!',
+              iconName: Icons.gpp_good_sharp,
+              bgColor: Colors.blue);
           context.go(RouterNames.userHome);
         }
       }
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
         customSnackbar(
-            context: context, messages: 'something went wrong : ${e.message}');
+            context: context,
+            message: 'something went wrong : ${e.message}',
+            bgColor: Colors.red,
+            iconName: Icons.cancel);
       }
     }
   }
@@ -64,7 +73,11 @@ class FirebaseAuthServices {
     } on FirebaseAuthException catch (e) {
       debugPrint(e.message);
       if (context.mounted) {
-        customSnackbar(context: context, messages: 'Something went wrong!!');
+        customSnackbar(
+            context: context,
+            message: 'Something went wrong!!',
+            bgColor: Colors.red,
+            iconName: Icons.error);
       }
     }
   }

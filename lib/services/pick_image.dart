@@ -1,10 +1,7 @@
 import 'dart:io';
-
-import 'package:complaints/core/constants.dart';
-import 'package:complaints/presentation/widgets/custome_snackbar.dart';
+import 'package:complaints/presentation/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 
 Future<File?> pickImage(ImageSource source, BuildContext context) async {
   try {
@@ -15,7 +12,11 @@ Future<File?> pickImage(ImageSource source, BuildContext context) async {
     return null;
   } catch (e) {
     if (context.mounted) {
-      customSnackbar(context:context, messages: 'Process Cancelled', bgColor: AppColors.darkPink);
+      customSnackbar(
+          context: context,
+          message: 'Process Cancelled',
+          bgColor: Colors.red,
+          iconName: Icons.cancel);
     }
     rethrow;
   }

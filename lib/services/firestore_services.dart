@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/models/user_mode.dart';
-import 'package:complaints/presentation/widgets/custome_snackbar.dart';
+import 'package:complaints/presentation/widgets/custom_snackbar.dart';
 import 'package:complaints/services/pick_image.dart';
 import 'package:complaints/services/upload_image_to_imgur.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -70,7 +70,11 @@ class FirestoreServices {
       }
     } on FirebaseException catch (error) {
       if (context.mounted) {
-        customSnackbar(context: context, messages: 'Error: $error');
+        customSnackbar(
+            context: context,
+            message: 'Error: $error',
+            iconName: Icons.error,
+            bgColor: Colors.red);
       }
     } catch (e) {
       debugPrint('something must be wrong!!');
