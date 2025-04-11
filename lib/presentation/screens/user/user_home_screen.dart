@@ -108,19 +108,58 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.home, color: AppColors.textColor),
+              leading:
+                  const Icon(Icons.home_rounded, color: AppColors.textColor),
               title: Text("Home", style: AppTextStyles.medium(16)),
-              onTap: () {},
+              onTap: () => context.pop(),
             ),
             ListTile(
-              leading: const Icon(Icons.settings, color: AppColors.textColor),
+              leading:
+                  const Icon(Icons.info_rounded, color: AppColors.textColor),
               title: Text("About", style: AppTextStyles.medium(16)),
-              onTap: () {},
+              onTap: () {
+                context.push(RouterNames.aboutPage);
+              },
             ),
             ListTile(
-              leading: const Icon(Icons.settings, color: AppColors.textColor),
-              title: Text("Settings", style: AppTextStyles.medium(16)),
-              onTap: () {},
+              leading: const Icon(Icons.mail_outline_rounded,
+                  color: AppColors.textColor),
+              title: Text("Contact Us", style: AppTextStyles.medium(16)),
+              onTap: () {
+                context.push(RouterNames.contactUs);
+              },
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.article_rounded, color: AppColors.textColor),
+              title: Text("Terms of Use", style: AppTextStyles.medium(16)),
+              onTap: () {
+                context.push(RouterNames.termsOfService);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock_outline_rounded,
+                  color: AppColors.textColor),
+              title: Text("Privacy Policy", style: AppTextStyles.medium(16)),
+              onTap: () {
+                context.push(RouterNames.privacyPolicy);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bug_report_rounded,
+                  color: AppColors.textColor),
+              title: Text("Report a bug", style: AppTextStyles.medium(16)),
+              onTap: () {
+                context.push(RouterNames.reportBugPage);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.help_outline_rounded,
+                  color: AppColors.textColor),
+              title: Text("FAQ's", style: AppTextStyles.medium(16)),
+              onTap: () {
+                context.push(RouterNames.faqpage);
+              },
             ),
           ],
         ),
