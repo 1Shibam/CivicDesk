@@ -1,8 +1,8 @@
 import 'dart:math';
 
+import 'package:complaints/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../core/constants.dart';
 
 class AiChatScreen extends StatefulWidget {
   const AiChatScreen({super.key});
@@ -25,8 +25,9 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
   final List<String> pinnedFaqs = [
     "How to file a complaint?",
-    "Where can I track my complaint status?",
-    "What type of complaints can I submit?",
+    "Where can I track my complaint?",
+    "What complaints are allowed?",
+    "How do I upload evidence?",
   ];
 
   @override
@@ -36,9 +37,6 @@ class _AiChatScreenState extends State<AiChatScreen> {
     messages.add(_Message(
         welcomeMessages[random.nextInt(welcomeMessages.length)],
         isUser: false));
-    for (var faq in pinnedFaqs) {
-      messages.add(_Message("📌 $faq", isUser: false));
-    }
   }
 
   void _sendMessage(String text) {
@@ -47,22 +45,49 @@ class _AiChatScreenState extends State<AiChatScreen> {
       messages.add(_Message(text.trim(), isUser: true));
     });
     _controller.clear();
+    // You can hardcode responses based on questions here.
+  }
+
+  void _onFaqTap(String faq) {
+    _sendMessage(faq);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("AI Help", style: AppTextStyles.bold(18)),
-      ),
+      appBar: AppBar(title: Text("AI Help", style: AppTextStyles.bold(18))),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 12.w),
         child: Column(
           children: [
             SizedBox(height: 10.h),
+            SizedBox(
+              height: 38.h,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: pinnedFaqs.length,
+                separatorBuilder: (_, __) => SizedBox(width: 8.w),
+                itemBuilder: (context, index) {
+                  final faq = pinnedFaqs[index];
+                  return GestureDetector(
+                    onTap: () => _onFaqTap(faq),
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.r),
+                        color: AppColors.lightGrey.withValues(alpha: 0.3),
+                      ),
+                      child: Text(faq, style: AppTextStyles.medium(13)),
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 10.h),
             Expanded(
               child: ListView.builder(
-                reverse: false,
+                padding: EdgeInsets.only(top: 6.h),
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   final msg = messages[index];
@@ -78,7 +103,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                       decoration: BoxDecoration(
                         color: msg.isUser
                             ? AppColors.darkPinkAccent
-                            : AppColors.lightGrey.withValues(alpha: 0.2),
+                            : AppColors.lightGrey.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(16.r),
                           topRight: Radius.circular(16.r),
@@ -87,10 +112,17 @@ class _AiChatScreenState extends State<AiChatScreen> {
                           bottomRight:
                               msg.isUser ? Radius.zero : Radius.circular(16.r),
                         ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: .05),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Text(
                         msg.text,
-                        style: AppTextStyles.medium(15,
+                        style: AppTextStyles.medium(14,
                             color: AppColors.textColor),
                       ),
                     ),
@@ -98,13 +130,13 @@ class _AiChatScreenState extends State<AiChatScreen> {
                 },
               ),
             ),
-            SizedBox(height: 6.h),
+            SizedBox(height: 10.h),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    style: AppTextStyles.medium(15),
+                    style: AppTextStyles.medium(14),
                     decoration: InputDecoration(
                       hintText: "Type your message...",
                       suffixIcon: IconButton(
@@ -124,13 +156,13 @@ class _AiChatScreenState extends State<AiChatScreen> {
                   child: IconButton(
                     icon: const Icon(Icons.mic, color: Colors.white),
                     onPressed: () {
-                      // Handle voice input here lateron --
+                      // add voice feature logic
                     },
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 10.h),
+            SizedBox(height: 12.h),
           ],
         ),
       ),
