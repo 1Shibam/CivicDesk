@@ -175,15 +175,36 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               },
               contentPadding: EdgeInsets.all(16.r),
               title: Text(
-                'File and Issue/Complaint',
-                style: AppTextStyles.bold(20),
+                'File a Issue/Complaint',
+                style: AppTextStyles.bold(18),
               ),
               tileColor: AppColors.darkPink,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r)),
               trailing: Icon(
                 Icons.file_present,
-                size: 52.sp,
+                size: 36.sp,
+                color: AppColors.textColor,
+              ),
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
+            ListTile(
+              onTap: () {
+                context.push(RouterNames.aiChatScreen);
+              },
+              contentPadding: EdgeInsets.all(16.r),
+              title: Text(
+                'Use chat help',
+                style: AppTextStyles.bold(18),
+              ),
+              tileColor: AppColors.darkPink,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.r)),
+              trailing: Icon(
+                Icons.chat_bubble,
+                size: 36.sp,
                 color: AppColors.textColor,
               ),
             ),

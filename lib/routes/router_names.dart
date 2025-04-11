@@ -7,6 +7,7 @@ class RouterNames {
   static const String adminHome = '/adminHome';
   static const String userProfile = '/userProfile';
   static const String complaintScreen = '/complaintScreen';
+  static const String aiChatScreen = '/aiChat';
   static const String adminProfile = '/adminProfile';
   static const String notificationScreen = '/notificationScreen';
   static const String aboutPage = '/aboutPage';

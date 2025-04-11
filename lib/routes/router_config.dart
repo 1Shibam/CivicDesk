@@ -9,6 +9,7 @@ import 'package:complaints/presentation/screens/admin/admin_login_screen.dart';
 import 'package:complaints/presentation/screens/admin/admin_profile_page.dart';
 import 'package:complaints/presentation/screens/decide_screen.dart';
 import 'package:complaints/presentation/screens/spalsh_screen.dart';
+import 'package:complaints/presentation/screens/user/ai_chat_help_screen.dart';
 import 'package:complaints/presentation/screens/user/complaint_form_screen.dart';
 import 'package:complaints/presentation/screens/user/notificaitons_screen.dart';
 import 'package:complaints/presentation/screens/user/user_home_screen.dart';
@@ -39,5 +40,6 @@ GoRouter appRoutes = GoRouter(
     fadeTransitionRoute(RouterNames.termsOfService, const TermsOfServicePage()),
     fadeTransitionRoute(
         RouterNames.notificationScreen, const NotificationScreen()),
+    fadeTransitionRoute(RouterNames.aiChatScreen, const AiChatScreen()),
   ],
 );
