@@ -14,7 +14,7 @@ GoRoute customTransitionRoute(
     path: path,
     pageBuilder: (context, state) {
       return CustomTransitionPage(
-        transitionDuration: const Duration(milliseconds: 500),
+        transitionDuration: const Duration(milliseconds: 300),
         key: state.pageKey,
         child: child,
         transitionsBuilder: (context, animation, secondaryAnimation, child) {

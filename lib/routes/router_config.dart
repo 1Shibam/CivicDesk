@@ -30,9 +30,9 @@ GoRouter appRoutes = GoRouter(
 
     // Authentication screens with scale transition
     customTransitionRoute(RouterNames.userLogin, const UserLoginScreen(),
-        PageTransitionType.scale),
+        PageTransitionType.slide),
     customTransitionRoute(RouterNames.adminLogin, const AdminLoginScreen(),
-        PageTransitionType.scale),
+        PageTransitionType.slide),
 
     // Main screens with slide transition
     customTransitionRoute(
