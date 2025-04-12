@@ -1,33 +1,39 @@
 class AppUser {
+  //basic user info
   final String uid;
   final String name;
   final String email;
   final String profileImage;
   final DateTime joinedAt;
 
+  //ban info
   final bool isBanned;
   final String banReason;
   final DateTime? banUntil;
   final int warnings;
   final DateTime? lastWarningAt;
 
+  //verification info
   final bool isVerified;
   final int reportCount;
   final int resolvedReports;
   final int reputationScore;
 
+  //toxicity info
   final double toxicityScore;
   final int flaggedMessages;
   final DateTime? lastFlaggedAt;
 
+  //login info
   final DateTime lastLogin;
   final int totalComplaints;
   final String? deviceId;
 
+  //ai info (chat)
   final int aiInteractions;
   final String lastAiPrompt;
   final bool mutedInChat;
-
+//constructor 
   AppUser({
     required this.uid,
     required this.name,
@@ -54,6 +60,7 @@ class AppUser {
     this.mutedInChat = false,
   });
 
+  //factory constructor from json
   factory AppUser.fromJson(Map<String, dynamic> json) {
     return AppUser(
       uid: json['uid'],
@@ -82,6 +89,7 @@ class AppUser {
     );
   }
 
+  //to json
   Map<String, dynamic> toJson() {
     return {
       'uid': uid,
