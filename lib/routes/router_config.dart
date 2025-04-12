@@ -22,24 +22,48 @@ import 'package:go_router/go_router.dart';
 GoRouter appRoutes = GoRouter(
   initialLocation: '/',
   routes: [
-    fadeTransitionRoute(RouterNames.splash, const SplashScreen()),
-    fadeTransitionRoute(RouterNames.initial, const DecideScreen()),
-    fadeTransitionRoute(RouterNames.userLogin, const UserLoginScreen()),
-    fadeTransitionRoute(RouterNames.adminLogin, const AdminLoginScreen()),
-    fadeTransitionRoute(RouterNames.userHome, const UserHomeScreen()),
-    fadeTransitionRoute(RouterNames.adminHome, const AdminHomeScreen()),
-    fadeTransitionRoute(RouterNames.userProfile, const UserProfilePage()),
-    fadeTransitionRoute(
-        RouterNames.complaintScreen, const ComplaintFormScreen()),
-    fadeTransitionRoute(RouterNames.adminProfile, const AdminProfilePage()),
-    fadeTransitionRoute(RouterNames.aboutPage, const AboutAppPage()),
-    fadeTransitionRoute(RouterNames.contactUs, const ContactUsPage()),
-    fadeTransitionRoute(RouterNames.faqpage, const FAQPage()),
-    fadeTransitionRoute(RouterNames.privacyPolicy, const PrivacyPolicyPage()),
-    fadeTransitionRoute(RouterNames.reportBugPage, const ReportBugPage()),
-    fadeTransitionRoute(RouterNames.termsOfService, const TermsOfServicePage()),
-    fadeTransitionRoute(
-        RouterNames.notificationScreen, const NotificationScreen()),
-    fadeTransitionRoute(RouterNames.aiChatScreen, const AiChatScreen()),
+    // Splash and initial screens with fade transition
+    customTransitionRoute(
+        RouterNames.splash, const SplashScreen(), PageTransitionType.fade),
+    customTransitionRoute(
+        RouterNames.initial, const DecideScreen(), PageTransitionType.fade),
+
+    // Authentication screens with scale transition
+    customTransitionRoute(RouterNames.userLogin, const UserLoginScreen(),
+        PageTransitionType.scale),
+    customTransitionRoute(RouterNames.adminLogin, const AdminLoginScreen(),
+        PageTransitionType.scale),
+
+    // Main screens with slide transition
+    customTransitionRoute(
+        RouterNames.userHome, const UserHomeScreen(), PageTransitionType.slide),
+    customTransitionRoute(RouterNames.adminHome, const AdminHomeScreen(),
+        PageTransitionType.slide),
+    customTransitionRoute(RouterNames.complaintScreen,
+        const ComplaintFormScreen(), PageTransitionType.slide),
+    customTransitionRoute(RouterNames.aiChatScreen, const AiChatScreen(),
+        PageTransitionType.slide),
+
+    // Profile and notification screens with rotation transition
+    customTransitionRoute(RouterNames.userProfile, const UserProfilePage(),
+        PageTransitionType.rotation),
+    customTransitionRoute(RouterNames.adminProfile, const AdminProfilePage(),
+        PageTransitionType.rotation),
+    customTransitionRoute(RouterNames.notificationScreen,
+        const NotificationScreen(), PageTransitionType.rotation),
+
+    // Information pages with fade transition
+    customTransitionRoute(
+        RouterNames.aboutPage, const AboutAppPage(), PageTransitionType.fade),
+    customTransitionRoute(
+        RouterNames.contactUs, const ContactUsPage(), PageTransitionType.fade),
+    customTransitionRoute(
+        RouterNames.faqpage, const FAQPage(), PageTransitionType.fade),
+    customTransitionRoute(RouterNames.privacyPolicy, const PrivacyPolicyPage(),
+        PageTransitionType.fade),
+    customTransitionRoute(RouterNames.reportBugPage, const ReportBugPage(),
+        PageTransitionType.fade),
+    customTransitionRoute(RouterNames.termsOfService,
+        const TermsOfServicePage(), PageTransitionType.fade),
   ],
 );
