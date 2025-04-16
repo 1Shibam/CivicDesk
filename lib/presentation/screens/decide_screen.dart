@@ -1,5 +1,5 @@
 import 'package:complaints/core/constants.dart';
-import 'package:complaints/presentation/widgets/custom_button.dart';
+import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

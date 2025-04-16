@@ -1,4 +1,4 @@
-import 'package:complaints/presentation/widgets/custom_snackbar.dart';
+import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:complaints/services/firestore_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';

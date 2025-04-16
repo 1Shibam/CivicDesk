@@ -1,4 +1,4 @@
-import 'package:complaints/presentation/widgets/loading_animation.dart';
+import 'package:complaints/widgets/loading_animation.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

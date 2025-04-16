@@ -1,5 +1,5 @@
 import 'package:complaints/presentation/widgets/all_profile_tile.dart';
-import 'package:complaints/presentation/widgets/custom_button.dart';
+import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/presentation/widgets/profile_image_section.dart';
 import 'package:complaints/providers/user_provider.dart';
 import 'package:complaints/routes/router_names.dart';

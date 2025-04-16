@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:complaints/presentation/widgets/custom_snackbar.dart';
+import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 

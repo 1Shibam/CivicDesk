@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/models/user_mode.dart';
-import 'package:complaints/presentation/widgets/custom_snackbar.dart';
+import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/services/pick_image.dart';
 import 'package:complaints/services/upload_image_to_imgur.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -1,4 +1,4 @@
-import 'package:complaints/presentation/widgets/custom_snackbar.dart';
+import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:complaints/core/constants.dart';
