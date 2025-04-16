@@ -1,4 +1,5 @@
 import 'package:complaints/core/constants.dart';
+import 'package:complaints/widgets/custom_text_fields.dart';
 import 'package:flutter/material.dart';
 
 class CreateUserProfile extends StatefulWidget {
@@ -9,6 +10,8 @@ class CreateUserProfile extends StatefulWidget {
 }
 
 class _CreateUserProfileState extends State<CreateUserProfile> {
+  final TextEditingController fullNameController = TextEditingController();
+  final FocusNode fullNameFocusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +29,12 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
             'make sure to fill correct details as you will not be able to change them later',
             style: AppTextStyles.regular(16),
           ),
-          
+          CustomTextFields(
+              labelText: 'Full name',
+              prefixIcon: Icons.person,
+              controller: fullNameController,
+              focusNode: fullNameFocusNode,
+              validator: ValidationType.name)
         ],
       ),
     );

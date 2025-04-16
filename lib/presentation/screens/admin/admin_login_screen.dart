@@ -1,5 +1,6 @@
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/widgets/custom_text_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,7 +17,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController adminKeyController = TextEditingController();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
+  final FocusNode adminKeyFocusNode = FocusNode();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  @override
+  void dispose() {
+    //disposeing the focus nodes and controllers
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+    adminKeyFocusNode.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    adminKeyController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,17 +68,23 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 40.h),
-                TextFormField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(
-                        Icons.email,
-                        color: AppColors.textColor,
-                      )),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Enter your email' : null,
-                ),
+                // TextFormField(
+                //   controller: emailController,
+                //   decoration: const InputDecoration(
+                //       labelText: 'Email',
+                //       prefixIcon: Icon(
+                //         Icons.email,
+                //         color: AppColors.textColor,
+                //       )),
+                //   validator: (value) =>
+                //       value!.isEmpty ? 'Enter your email' : null,
+                // ),
+                CustomTextFields(
+                    labelText: 'Email',
+                    prefixIcon: Icons.email,
+                    controller: emailController,
+                    validator: ValidationType.email,
+                    focusNode: emailFocusNode),
                 SizedBox(height: 16.h),
                 TextFormField(
                   controller: passwordController,
