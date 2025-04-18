@@ -1,3 +1,4 @@
+import 'package:complaints/models/admin_model.dart';
 import 'package:complaints/presentation/pages/about_page.dart';
 import 'package:complaints/presentation/pages/contact_us_page.dart';
 import 'package:complaints/presentation/pages/freequently_asked_quest_page.dart';
@@ -65,5 +66,7 @@ GoRouter appRoutes = GoRouter(
         PageTransitionType.fade),
     customTransitionRoute(RouterNames.termsOfService,
         const TermsOfServicePage(), PageTransitionType.fade),
+    customTransitionRoute(RouterNames.adminProfileCreation,
+        const CreateAdminProfile(), PageTransitionType.fade),
   ],
 );

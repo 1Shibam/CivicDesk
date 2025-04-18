@@ -21,9 +21,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final FocusNode passwordFocusNode = FocusNode();
   final FocusNode adminKeyFocusNode = FocusNode();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   @override
   void dispose() {
-    //disposeing the focus nodes and controllers
     emailFocusNode.dispose();
     passwordFocusNode.dispose();
     adminKeyFocusNode.dispose();
@@ -68,58 +68,37 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 40.h),
-                // TextFormField(
-                //   controller: emailController,
-                //   decoration: const InputDecoration(
-                //       labelText: 'Email',
-                //       prefixIcon: Icon(
-                //         Icons.email,
-                //         color: AppColors.textColor,
-                //       )),
-                //   validator: (value) =>
-                //       value!.isEmpty ? 'Enter your email' : null,
-                // ),
                 CustomTextFields(
-                    labelText: 'Email',
-                    prefixIcon: Icons.email,
-                    controller: emailController,
-                    validator: ValidationType.email,
-                    focusNode: emailFocusNode),
-                SizedBox(height: 16.h),
-                TextFormField(
-                  controller: passwordController,
-                  decoration: const InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: Icon(
-                        Icons.lock,
-                        color: AppColors.textColor,
-                      )),
-                  obscureText: true,
-                  validator: (value) =>
-                      value!.isEmpty ? 'Enter your password' : null,
+                  labelText: 'Email',
+                  prefixIcon: Icons.email,
+                  controller: emailController,
+                  validator: ValidationType.email,
+                  focusNode: emailFocusNode,
                 ),
                 SizedBox(height: 16.h),
-                TextFormField(
+                CustomTextFields(
+                  labelText: 'Password',
+                  prefixIcon: Icons.lock,
+                  controller: passwordController,
+                  focusNode: passwordFocusNode,
+                  validator: ValidationType.password,
+                ),
+                SizedBox(height: 16.h),
+                CustomTextFields(
+                  labelText: 'Admin Key',
+                  prefixIcon: Icons.key,
                   controller: adminKeyController,
-                  decoration: const InputDecoration(
-                      labelText: 'Admin Key',
-                      prefixIcon: Icon(
-                        Icons.key,
-                        color: AppColors.textColor,
-                      )),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Enter admin key' : null,
+                  focusNode: adminKeyFocusNode,
                 ),
                 SizedBox(height: 24.h),
                 CustomButton(
                   imageUrl: 'asets/images/admin-with-cogwheels-svgrepo-com.svg',
                   onTap: () async {
-                    // if (formKey.currentState!.validate()) {
-                    //   // Handle login logic
-                    // }
-                    await Future.delayed(const Duration(seconds: 2));
-                    if (context.mounted) {
-                      context.go(RouterNames.adminHome);
+                    if (formKey.currentState!.validate()) {
+                      await Future.delayed(const Duration(seconds: 2));
+                      if (context.mounted) {
+                        context.go(RouterNames.adminProfileCreation);
+                      }
                     }
                   },
                   buttonText: 'Login',

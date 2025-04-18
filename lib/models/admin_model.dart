@@ -4,7 +4,9 @@ class AdminModel {
   final String uid;
   final String name;
   final String email;
-  final String role; 
+  final String department;
+  final String post;
+  final String role;
   final DateTime createdAt;
   final bool isActive;
 
@@ -14,6 +16,8 @@ class AdminModel {
     required this.email,
     required this.role,
     required this.createdAt,
+    required this.department,
+    required this.post,
     this.isActive = true,
   });
 
@@ -22,6 +26,8 @@ class AdminModel {
       uid: map['uid'] ?? '',
       name: map['name'] ?? '',
       email: map['email'] ?? '',
+      department: map['department'],
+      post: map['post'],
       role: map['role'] ?? 'admin',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       isActive: map['isActive'] ?? true,
@@ -33,6 +39,8 @@ class AdminModel {
       'uid': uid,
       'name': name,
       'email': email,
+      'department': department,
+      'post': post,
       'role': role,
       'createdAt': createdAt,
       'isActive': isActive,
