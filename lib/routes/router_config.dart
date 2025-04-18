@@ -8,6 +8,7 @@ import 'package:complaints/presentation/pages/terms_of_service_page.dart';
 import 'package:complaints/presentation/screens/admin/admin_home_screen.dart';
 import 'package:complaints/presentation/screens/admin/admin_login_screen.dart';
 import 'package:complaints/presentation/screens/admin/admin_profile_page.dart';
+import 'package:complaints/presentation/screens/admin/create_admin_profile.dart';
 import 'package:complaints/presentation/screens/decide_screen.dart';
 import 'package:complaints/presentation/screens/spalsh_screen.dart';
 import 'package:complaints/presentation/screens/user/ai_chat_help_screen.dart';
