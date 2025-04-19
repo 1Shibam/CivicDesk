@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/core/constants.dart';
+import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class CreateAdminProfile extends StatefulWidget {
   const CreateAdminProfile({super.key});
@@ -66,81 +67,165 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
 
     if (mounted) {
       customSnackbar(
-          message: 'Profile creation successfull',
-          context: context,
-          iconName: Icons.check,
-          bgColor: Colors.green);
+        message: 'Profile creation successful',
+        context: context,
+        iconName: Icons.check,
+        bgColor: Colors.green,
+      );
     }
 
-    // Navigate or do something else after submission if needed
+    // You can navigate somewhere here if needed
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkest,
       body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Enter your following details',
-                style: AppTextStyles.bold(20),
-              ),
-              SizedBox(height: 16.h),
-              CustomTextFields(
-                labelText: 'Full Name',
-                prefixIcon: Icons.person,
-                controller: _fullNameController,
-                focusNode: _fullNameFocus,
-              ),
-              SizedBox(height: 16.h),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Department',
-                  border: OutlineInputBorder(),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(20.w),
+          child: Container(
+            padding: EdgeInsets.all(20.w),
+            decoration: BoxDecoration(
+              color: AppColors.darkBlueGrey,
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                  offset: Offset(0, 4),
+                )
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Create Admin Profile',
+                  style: AppTextStyles.bold(22),
+                  textAlign: TextAlign.center,
                 ),
-                value: selectedDepartment,
-                items: departments
-                    .map((dep) => DropdownMenuItem(
-                          value: dep,
-                          child: Text(dep),
-                        ))
-                    .toList(),
-                onChanged: (val) {
-                  setState(() {
-                    selectedDepartment = val;
-                  });
-                },
-              ),
-              SizedBox(height: 16.h),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: 'Post',
-                  border: OutlineInputBorder(),
+                SizedBox(
+                  height: 12.h,
                 ),
-                value: selectedPost,
-                items: posts
-                    .map((post) => DropdownMenuItem(
-                          value: post,
-                          child: Text(post),
-                        ))
-                    .toList(),
-                onChanged: (val) {
-                  setState(() {
-                    selectedPost = val;
-                  });
-                },
-              ),
-              SizedBox(height: 24.h),
-              isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _submitAdminProfile,
-                      child: const Text('Submit'),
+                Text(
+                    'Make sure you fill correct information, You can\'t change it later',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.regular(16)),
+                SizedBox(height: 24.h),
+                CustomTextFields(
+                  labelText: 'Full Name',
+                  prefixIcon: Icons.person,
+                  controller: _fullNameController,
+                  focusNode: _fullNameFocus,
+                ),
+                SizedBox(height: 20.h),
+                DropdownButtonFormField<String>(
+                  borderRadius: BorderRadius.circular(20.r),
+                  decoration: InputDecoration(
+                    label: Text('Department', style: AppTextStyles.regular(16)),
+                    hintText: 'Select Department',
+                    alignLabelWithHint: true,
+                    hintStyle: AppTextStyles.regular(16)
+                        .copyWith(color: AppColors.textColor),
+                    labelStyle: AppTextStyles.regular(16)
+                        .copyWith(color: AppColors.textColor),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: const BorderSide(color: AppColors.textColor),
                     ),
-            ],
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: const BorderSide(color: AppColors.textColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: const BorderSide(
+                        color: AppColors.textColor,
+                      ),
+                    ),
+                  ),
+                  dropdownColor: AppColors.lightGrey,
+                  elevation: 4,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: AppColors.textColor,
+                  ),
+                  iconSize: 28.sp,
+                  value: selectedDepartment,
+                  items: departments
+                      .map((dep) => DropdownMenuItem(
+                            value: dep,
+                            child: Text(dep, style: AppTextStyles.regular(16)),
+                          ))
+                      .toList(),
+                  onChanged: (val) {
+                    setState(() {
+                      selectedDepartment = val;
+                    });
+                  },
+                ),
+                SizedBox(height: 20.h),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Post',
+                    hintText: 'Select Post',
+                    // Add hint style to Post dropdown
+                    hintStyle: AppTextStyles.regular(16)
+                        .copyWith(color: AppColors.textColor),
+                    labelStyle: AppTextStyles.regular(16)
+                        .copyWith(color: AppColors.textColor),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: const BorderSide(color: AppColors.textColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: const BorderSide(color: AppColors.textColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                      borderSide: const BorderSide(
+                        color: AppColors.textColor,
+                      ),
+                    ),
+                  ),
+                  dropdownColor: AppColors.lightGrey,
+                  elevation: 4,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: AppColors.textColor,
+                  ),
+                  iconSize: 28.sp,
+                  value: selectedPost,
+                  items: posts
+                      .map((post) => DropdownMenuItem(
+                            value: post,
+                            child: Text(post, style: AppTextStyles.regular(16)),
+                          ))
+                      .toList(),
+                  onChanged: (val) {
+                    setState(() {
+                      selectedPost = val;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                SizedBox(height: 30.h),
+                isLoading
+                    ? const CircularProgressIndicator()
+                    : CustomButton(
+                        onTap: () {},
+                        buttonText: 'Submit',
+                        imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg')
+              ],
+            ),
           ),
         ),
       ),
