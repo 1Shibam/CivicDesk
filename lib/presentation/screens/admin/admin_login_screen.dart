@@ -1,8 +1,12 @@
+import 'package:complaints/services/firebase_auth_service.dart';
+import 'package:complaints/services/firestore_services.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:complaints/core/constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -91,18 +95,48 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   focusNode: adminKeyFocusNode,
                 ),
                 SizedBox(height: 24.h),
-                CustomButton(
-                  imageUrl: 'asets/images/admin-with-cogwheels-svgrepo-com.svg',
-                  onTap: () async {
-                    if (formKey.currentState!.validate()) {
-                      await Future.delayed(const Duration(seconds: 2));
-                      if (context.mounted) {
-                        context.go(RouterNames.adminProfileCreation);
-                      }
-                    }
+                Consumer(
+                  builder: (context, ref, child) {
+                    return CustomButton(
+                      imageUrl:
+                          'asets/images/admin-with-cogwheels-svgrepo-com.svg',
+                      onTap: () async {
+                        if (formKey.currentState!.validate()) {
+                          try {
+                            final isValid = await ref
+                                .read(firestoreProvider)
+                                .validateAdminPasskey(
+                                    adminKeyController.text, context);
+
+                            if (!isValid && context.mounted) {
+                              customSnackbar(
+                                  message: 'Wrong admin key',
+                                  context: context,
+                                  iconName: Icons.error);
+                              return;
+                            }
+                            if (!context.mounted) return;
+
+                            final isCreated = await ref
+                                .read(firebaseAuthServiceProvider)
+                                .createAdminWithEmail(
+                                    emailController.text.trim().toLowerCase(),
+                                    passwordController.text.trim(),
+                                    context);
+
+                            if (!isCreated || !context.mounted) return;
+
+                            context.go(RouterNames.adminProfileCreation);
+                          } catch (e) {
+                            // optional: show a generic snackbar or log
+                            debugPrint('Admin login error: $e');
+                          }
+                        }
+                      },
+                      buttonText: 'Login',
+                    );
                   },
-                  buttonText: 'Login',
-                ),
+                )
               ],
             ),
           ),

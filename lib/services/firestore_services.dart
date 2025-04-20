@@ -7,6 +7,7 @@ import 'package:complaints/services/pick_image.dart';
 import 'package:complaints/services/upload_image_to_imgur.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -86,7 +87,8 @@ class FirestoreServices {
 
   //match the admin pass keys to let them sign in --
 
-  Future<bool> validateAdminPasskey(String enteredKey) async {
+  Future<bool> validateAdminPasskey(
+      String enteredKey, BuildContext context) async {
     try {
       QuerySnapshot<Map<String, dynamic>> snapshot =
           await firestore.collection('adminPassKeys').get();
@@ -94,11 +96,22 @@ class FirestoreServices {
       //Extracting all pass keys from the document --
       List<String> storedPassKeys =
           snapshot.docs.map((doc) => doc.data()['passkey'].toString()).toList();
+      print(storedPassKeys);
 
       return storedPassKeys.contains(enteredKey);
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      if (context.mounted) {
+        customSnackbar(
+            message: e.message!,
+            context: context,
+            iconName: Icons.error,
+            bgColor: Colors.red);
+      }
       debugPrint('Error fetching passkeys: $e');
       return false;
     }
   }
 }
+
+final firestoreProvider =
+    Provider<FirestoreServices>((ref) => FirestoreServices());

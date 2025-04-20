@@ -3,6 +3,7 @@ import 'package:complaints/routes/router_names.dart';
 import 'package:complaints/services/firestore_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -64,12 +65,13 @@ class FirebaseAuthServices {
     }
   }
 
-  Future<void> createAdminWithEmail(
+  Future<bool> createAdminWithEmail(
       String email, String password, BuildContext context) async {
     try {
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       await FirestoreServices().createUserProfile('admin');
+      return true;
     } on FirebaseAuthException catch (e) {
       debugPrint(e.message);
       if (context.mounted) {
@@ -79,6 +81,10 @@ class FirebaseAuthServices {
             bgColor: Colors.red,
             iconName: Icons.error);
       }
+      return false;
     }
   }
 }
+
+final firebaseAuthServiceProvider =
+    Provider<FirebaseAuthServices>((ref) => FirebaseAuthServices());

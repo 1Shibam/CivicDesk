@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/core/constants.dart';
+import 'package:complaints/routes/router_names.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class CreateAdminProfile extends StatefulWidget {
   const CreateAdminProfile({super.key});
@@ -73,8 +75,9 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
         bgColor: Colors.green,
       );
     }
-
-    // You can navigate somewhere here if needed
+    if (mounted) {
+      context.go(RouterNames.adminHome);
+    }
   }
 
   @override
@@ -221,7 +224,7 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                 isLoading
                     ? const CircularProgressIndicator()
                     : CustomButton(
-                        onTap: () {},
+                        onTap: _submitAdminProfile,
                         buttonText: 'Submit',
                         imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg')
               ],
