@@ -18,4 +18,5 @@ class RouterNames {
   static const String reportBugPage = '/reportBug';
   static const String termsOfService = '/termsConditions';
   static const String adminProfileCreation = '/createAdminProfile';
+  static const String userProfileCreation = '/createUserProfile';
 }

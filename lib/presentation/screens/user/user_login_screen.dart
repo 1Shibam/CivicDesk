@@ -49,7 +49,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                   context.pop();
                 }
                 if (context.mounted) {
-                  context.go(RouterNames.userHome);
+                  context.go(RouterNames.userProfileCreation);
                 }
               },
               buttonText: 'Google Signup',

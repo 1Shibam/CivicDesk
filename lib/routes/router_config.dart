@@ -13,6 +13,7 @@ import 'package:complaints/presentation/screens/decide_screen.dart';
 import 'package:complaints/presentation/screens/spalsh_screen.dart';
 import 'package:complaints/presentation/screens/user/ai_chat_help_screen.dart';
 import 'package:complaints/presentation/screens/user/complaint_form_screen.dart';
+import 'package:complaints/presentation/screens/user/create_user_profile.dart';
 import 'package:complaints/presentation/screens/user/notificaitons_screen.dart';
 import 'package:complaints/presentation/screens/user/user_home_screen.dart';
 import 'package:complaints/presentation/screens/user/user_login_screen.dart';
@@ -71,5 +72,7 @@ GoRouter appRoutes = GoRouter(
         const TermsOfServicePage(), PageTransitionType.fade),
     customTransitionRoute(RouterNames.adminProfileCreation,
         const CreateAdminProfile(), PageTransitionType.fade),
+    customTransitionRoute(RouterNames.userProfileCreation,
+        const CreateUserProfile(), PageTransitionType.fade),
   ],
 );
