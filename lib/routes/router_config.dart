@@ -34,6 +34,8 @@ GoRouter appRoutes = GoRouter(
         PageTransitionType.slide),
     customTransitionRoute(RouterNames.adminLogin, const AdminLoginScreen(),
         PageTransitionType.slide),
+    customTransitionRoute(RouterNames.adminSignup, const AdminLoginScreen(),
+        PageTransitionType.slide),
 
     // Main screens with slide transition
     customTransitionRoute(

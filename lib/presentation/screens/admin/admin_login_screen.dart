@@ -4,6 +4,7 @@ import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -136,6 +137,20 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       buttonText: 'Login',
                     );
                   },
+                ),
+                RichText(
+                  text: TextSpan(
+                      text: 'Don\'t have an account? ',
+                      style: AppTextStyles.regular(12),
+                      children: [
+                        TextSpan(
+                            text: 'Sign Up',
+                            style: AppTextStyles.bold(12)
+                                .copyWith(color: AppColors.darkPink),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap =
+                                  () => context.go(RouterNames.adminSignup))
+                      ]),
                 )
               ],
             ),
