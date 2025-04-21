@@ -7,6 +7,7 @@ import 'package:complaints/presentation/pages/terms_of_service_page.dart';
 import 'package:complaints/presentation/screens/admin/admin_home_screen.dart';
 import 'package:complaints/presentation/screens/admin/admin_login_screen.dart';
 import 'package:complaints/presentation/screens/admin/admin_profile_page.dart';
+import 'package:complaints/presentation/screens/admin/admin_signup_screen.dart';
 import 'package:complaints/presentation/screens/admin/create_admin_profile.dart';
 import 'package:complaints/presentation/screens/decide_screen.dart';
 import 'package:complaints/presentation/screens/spalsh_screen.dart';
@@ -34,7 +35,7 @@ GoRouter appRoutes = GoRouter(
         PageTransitionType.slide),
     customTransitionRoute(RouterNames.adminLogin, const AdminLoginScreen(),
         PageTransitionType.slide),
-    customTransitionRoute(RouterNames.adminSignup, const AdminLoginScreen(),
+    customTransitionRoute(RouterNames.adminSignup, const AdminSignupScreen(),
         PageTransitionType.slide),
 
     // Main screens with slide transition

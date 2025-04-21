@@ -29,7 +29,7 @@ class DecideScreen extends StatelessWidget {
                 onTap: () {
                   context.push(RouterNames.userLogin);
                 },
-                buttonText: 'SignUp as User',
+                buttonText: 'Login as User',
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 32.h),
@@ -62,7 +62,7 @@ class DecideScreen extends StatelessWidget {
                 onTap: () {
                   context.push(RouterNames.adminLogin);
                 },
-                buttonText: 'SignUp as Admin',
+                buttonText: 'Login as Admin',
               )
             ],
           ),
@@ -71,5 +71,3 @@ class DecideScreen extends StatelessWidget {
     );
   }
 }
-
-

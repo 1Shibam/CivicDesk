@@ -49,24 +49,14 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
     return Form(
       key: formKey,
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () => context.pop(),
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              size: 28.sp,
-              color: AppColors.textColor,
-            ),
-          ),
-        ),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 28.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: SingleChildScrollView(
             child: Column(
               children: [
                 Text(
                   'Create Admin Account',
-                  style: AppTextStyles.bold(32),
+                  style: AppTextStyles.bold(28),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 16.h),
@@ -75,7 +65,7 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
                   style: AppTextStyles.medium(18),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 40.h),
+                SizedBox(height: 24.h),
                 CustomTextFields(
                   labelText: 'Email',
                   prefixIcon: Icons.email,
@@ -94,7 +84,7 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
                 SizedBox(height: 16.h),
                 CustomTextFields(
                     labelText: 'Confirm Password',
-                    prefixIcon: Icons.lock_outline,
+                    prefixIcon: Icons.lock,
                     controller: confirmPasswordController,
                     focusNode: confirmPasswordFocusNode,
                     validator: ValidationType.password),
@@ -105,34 +95,73 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
                   controller: adminKeyController,
                   focusNode: adminKeyFocusNode,
                 ),
-                SizedBox(height: 16.h),
-                Row(
-                  children: [
-                    Checkbox(
+                SizedBox(height: 20.h),
+                ListTile(
+                  leading: Transform.scale(
+                    scale: 1.5,
+                    child: Checkbox(
+                      activeColor: AppColors.darkPinkAccent,
+                      checkColor: AppColors.textColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.r)),
+                      side: const BorderSide(
+                          color: AppColors.textColor, width: 1),
                       value: agreeToTerms,
-                      onChanged: (val) {
+                      onChanged: (value) {
                         setState(() {
-                          agreeToTerms = val ?? false;
+                          agreeToTerms = value ?? false;
                         });
                       },
                     ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          // Show terms and conditions page or dialog
-                        },
-                        child: Text(
-                          'I agree to the Terms and Conditions',
-                          style: AppTextStyles.regular(14).copyWith(
-                            decoration: TextDecoration.underline,
-                            color: AppColors.darkPink,
-                          ),
+                  ),
+                  title: RichText(
+                    text: TextSpan(
+                      text: 'I agree to all the ',
+                      style: AppTextStyles.regular(16),
+                      children: [
+                        TextSpan(
+                          text: 'terms and conditions',
+                          style: AppTextStyles.bold(16)
+                              .copyWith(color: AppColors.darkPinkAccent),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  backgroundColor: AppColors.darkBlueGrey,
+                                  title: Text(
+                                    'Terms & Conditions',
+                                    style: AppTextStyles.bold(20),
+                                  ),
+                                  content: SingleChildScrollView(
+                                    child: Text(
+                                      'By signing up as an admin on Civik Desk, you agree to handle user data responsibly, '
+                                      'take necessary actions on complaints, maintain the integrity of the platform, and follow all '
+                                      'legal and ethical guidelines set forth by the organization.',
+                                      style: AppTextStyles.regular(14),
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+                                      child: const Text('Close',
+                                          style: TextStyle(
+                                              color: AppColors.darkPinkAccent)),
+                                    )
+                                  ],
+                                ),
+                              );
+                            },
                         ),
-                      ),
+                        TextSpan(
+                            text: ' related to Civik Desk.',
+                            style: AppTextStyles.regular(16)),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 20.h),
                 Consumer(builder: (context, ref, child) {
                   return CustomButton(
                     imageUrl:
@@ -183,14 +212,17 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
                     },
                   );
                 }),
+                SizedBox(
+                  height: 16.h,
+                ),
                 RichText(
                   text: TextSpan(
                     text: 'Already have an account? ',
-                    style: AppTextStyles.regular(12),
+                    style: AppTextStyles.regular(16),
                     children: [
                       TextSpan(
                         text: 'Login',
-                        style: AppTextStyles.bold(12).copyWith(
+                        style: AppTextStyles.bold(16).copyWith(
                           color: AppColors.darkPink,
                         ),
                         recognizer: TapGestureRecognizer()

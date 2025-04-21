@@ -7,24 +7,37 @@ class CustomTextFields extends StatelessWidget {
   final Widget? suffixIcon;
   final TextEditingController controller;
   final FocusNode focusNode;
+  final FocusNode? nextFocusNode;
   final ValidationType validator;
-  const CustomTextFields(
-      {super.key,
-      required this.labelText,
-      required this.prefixIcon,
-      required this.controller,
-      required this.focusNode,
-      this.validator = ValidationType.none,
-      this.suffixIcon});
+
+  const CustomTextFields({
+    super.key,
+    required this.labelText,
+    required this.prefixIcon,
+    required this.controller,
+    required this.focusNode,
+    this.nextFocusNode,
+    this.validator = ValidationType.none,
+    this.suffixIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      cursorColor: AppColors.textColor,
       style: AppTextStyles.regular(16),
       controller: controller,
       focusNode: focusNode,
-      
       validator: (value) => validateInput(value, validator),
+      textInputAction:
+          nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+      onFieldSubmitted: (_) {
+        if (nextFocusNode != null) {
+          FocusScope.of(context).requestFocus(nextFocusNode);
+        } else {
+          focusNode.unfocus();
+        }
+      },
       decoration: InputDecoration(
         labelText: labelText,
         prefixIcon: Icon(prefixIcon, color: AppColors.textColor),

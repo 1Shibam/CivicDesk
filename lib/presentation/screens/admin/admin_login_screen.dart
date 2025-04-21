@@ -44,16 +44,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       key: formKey,
       child: Scaffold(
         resizeToAvoidBottomInset: true,
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () => context.pop(),
-            icon: Icon(
-              Icons.arrow_back_ios_new,
-              size: 28.sp,
-              color: AppColors.textColor,
-            ),
-          ),
-        ),
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 28.w),
           child: SingleChildScrollView(
@@ -138,14 +128,17 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     );
                   },
                 ),
+                SizedBox(
+                  height: 16.h,
+                ),
                 RichText(
                   text: TextSpan(
                       text: 'Don\'t have an account? ',
-                      style: AppTextStyles.regular(12),
+                      style: AppTextStyles.regular(16),
                       children: [
                         TextSpan(
                             text: 'Sign Up',
-                            style: AppTextStyles.bold(12)
+                            style: AppTextStyles.bold(16)
                                 .copyWith(color: AppColors.darkPink),
                             recognizer: TapGestureRecognizer()
                               ..onTap =
