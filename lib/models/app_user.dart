@@ -2,6 +2,10 @@ class AppUser {
   //basic user info
   final String uid;
   final String name;
+  final String gender;
+  final String dob;
+  final String occupation;
+
   final String email;
   final String profileImage;
   final DateTime joinedAt;
@@ -33,10 +37,13 @@ class AppUser {
   final int aiInteractions;
   final String lastAiPrompt;
   final bool mutedInChat;
-//constructor 
+//constructor
   AppUser({
     required this.uid,
     required this.name,
+    required this.gender,
+    required this.dob,
+    required this.occupation,
     required this.email,
     required this.profileImage,
     required this.joinedAt,
@@ -65,21 +72,29 @@ class AppUser {
     return AppUser(
       uid: json['uid'],
       name: json['name'],
+      gender: json['gender'],
+      dob: json['dob'],
+      occupation: json['occupation'],
       email: json['email'],
       profileImage: json['profileImage'],
       joinedAt: DateTime.parse(json['joinedAt']),
       isBanned: json['isBanned'] ?? false,
       banReason: json['banReason'] ?? '',
-      banUntil: json['banUntil'] != null ? DateTime.parse(json['banUntil']) : null,
+      banUntil:
+          json['banUntil'] != null ? DateTime.parse(json['banUntil']) : null,
       warnings: json['warnings'] ?? 0,
-      lastWarningAt: json['lastWarningAt'] != null ? DateTime.parse(json['lastWarningAt']) : null,
+      lastWarningAt: json['lastWarningAt'] != null
+          ? DateTime.parse(json['lastWarningAt'])
+          : null,
       isVerified: json['isVerified'] ?? false,
       reportCount: json['reportCount'] ?? 0,
       resolvedReports: json['resolvedReports'] ?? 0,
       reputationScore: json['reputationScore'] ?? 100,
       toxicityScore: json['toxicityScore']?.toDouble() ?? 0.0,
       flaggedMessages: json['flaggedMessages'] ?? 0,
-      lastFlaggedAt: json['lastFlaggedAt'] != null ? DateTime.parse(json['lastFlaggedAt']) : null,
+      lastFlaggedAt: json['lastFlaggedAt'] != null
+          ? DateTime.parse(json['lastFlaggedAt'])
+          : null,
       lastLogin: DateTime.parse(json['lastLogin']),
       totalComplaints: json['totalComplaints'] ?? 0,
       deviceId: json['deviceId'],
@@ -94,6 +109,9 @@ class AppUser {
     return {
       'uid': uid,
       'name': name,
+      'gender': gender,
+      'occupation': occupation,
+      'dob': dob,
       'email': email,
       'profileImage': profileImage,
       'joinedAt': joinedAt.toIso8601String(),
