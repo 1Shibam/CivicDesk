@@ -45,12 +45,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 28.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: 40.h,
+                ),
                 Text(
                   'Admin Panel Login',
                   style: AppTextStyles.bold(32),
