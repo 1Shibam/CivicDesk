@@ -18,22 +18,15 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            size: 28.sp,
-            color: AppColors.textColor,
-          ),
-        ),
-      ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 28.w),
+        padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            SizedBox(
+              height: 40.h,
+            ),
             Text(
               'Welcome to Complaint Portal',
               style: AppTextStyles.bold(32),

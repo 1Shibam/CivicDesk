@@ -34,7 +34,7 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
               prefixIcon: Icons.person,
               controller: fullNameController,
               focusNode: fullNameFocusNode,
-              validator: ValidationType.name)
+              validator: ValidationType.name),
         ],
       ),
     );

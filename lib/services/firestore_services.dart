@@ -96,7 +96,6 @@ class FirestoreServices {
       //Extracting all pass keys from the document --
       List<String> storedPassKeys =
           snapshot.docs.map((doc) => doc.data()['passkey'].toString()).toList();
-      print(storedPassKeys);
 
       return storedPassKeys.contains(enteredKey);
     } on FirebaseException catch (e) {
