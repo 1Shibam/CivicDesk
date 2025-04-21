@@ -65,6 +65,28 @@ class FirebaseAuthServices {
     }
   }
 
+  //admin login with email and password --
+  Future<bool> loginWithEmailAndPassword(
+      String email, String password, BuildContext context) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+      return true;
+    } on FirebaseAuthException catch (e) {
+      debugPrint(e.message);
+      if (context.mounted) {
+        customSnackbar(
+          context: context,
+          message: 'Login failed: ${e.message}',
+          bgColor: Colors.red,
+          iconName: Icons.error,
+        );
+      }
+      return false;
+    }
+  }
+
+//create admin with email and password
   Future<bool> createAdminWithEmail(
       String email, String password, BuildContext context) async {
     try {
