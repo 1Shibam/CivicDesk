@@ -12,12 +12,16 @@ class FirebaseAuthServices {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   //! signup / signin with google with google -
-  Future<void> sigupWithGoogle(BuildContext context) async {
+  Future<void> signupWithGoogle(BuildContext context) async {
     try {
+      // Force sign-out to ensure fresh login
       await GoogleSignIn().signOut();
+      await FirebaseAuth.instance.signOut(); // Add Firebase sign-out
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
+        // User canceled the sign-in flow
         if (context.mounted) {
           customSnackbar(
             context: context,
@@ -31,6 +35,7 @@ class FirebaseAuthServices {
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -43,11 +48,6 @@ class FirebaseAuthServices {
       final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
       if (userCredential.user != null) {
-        if (isNewUser) {
-          // 🔥 Create a new profile for a new user
-          await FirestoreServices().createUserProfile('user');
-        }
-
         if (context.mounted) {
           customSnackbar(
             context: context,
@@ -56,8 +56,11 @@ class FirebaseAuthServices {
             bgColor: Colors.blue,
           );
 
-          // 🔀 Route based on new/returning user if needed
-          context.go(RouterNames.userHome);
+          if (isNewUser) {
+            context.go(RouterNames.userProfileCreation);
+          } else {
+            context.go(RouterNames.userHome);
+          }
         }
       }
     } on FirebaseAuthException catch (e) {

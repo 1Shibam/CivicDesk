@@ -43,6 +43,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     return Form(
       key: formKey,
       child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () => context.pop(),
+              icon: const Icon(Icons.arrow_back_ios_new)),
+        ),
         resizeToAvoidBottomInset: true,
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -145,7 +150,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                                 .copyWith(color: AppColors.darkPink),
                             recognizer: TapGestureRecognizer()
                               ..onTap =
-                                  () => context.go(RouterNames.adminSignup))
+                                  () => context.push(RouterNames.adminSignup))
                       ]),
                 )
               ],

@@ -50,6 +50,11 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
       key: formKey,
       child: SafeArea(
         child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+                onPressed: () => context.pop(),
+                icon: const Icon(Icons.arrow_back_ios_new)),
+          ),
           body: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: SingleChildScrollView(
@@ -233,7 +238,7 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
                             color: AppColors.darkPink,
                           ),
                           recognizer: TapGestureRecognizer()
-                            ..onTap = () => context.go(RouterNames.adminLogin),
+                            ..onTap = () => context.pop(),
                         )
                       ],
                     ),

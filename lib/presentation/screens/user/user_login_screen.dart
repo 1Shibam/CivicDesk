@@ -1,7 +1,6 @@
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/widgets/circular_loader.dart';
 import 'package:complaints/widgets/custom_button.dart';
-import 'package:complaints/routes/router_names.dart';
 import 'package:complaints/services/firebase_auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,6 +17,11 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(Icons.arrow_back_ios_new)),
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
@@ -43,13 +47,10 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
               imageUrl: 'asets/images/google icon.svg',
               onTap: () async {
                 ciruclarLoader(context);
-                await FirebaseAuthServices().sigupWithGoogle(context);
-                await Future.delayed(const Duration(seconds: 2));
+                await FirebaseAuthServices().signupWithGoogle(context);
+                await Future.delayed(const Duration(seconds: 1));
                 if (context.mounted) {
                   context.pop();
-                }
-                if (context.mounted) {
-                  context.go(RouterNames.userProfileCreation);
                 }
               },
               buttonText: 'Google Signup',
