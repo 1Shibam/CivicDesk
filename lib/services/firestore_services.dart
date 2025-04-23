@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:complaints/models/admin_model.dart';
 import 'package:complaints/models/user_model.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/services/pick_image.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
 class FirestoreServices {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -17,30 +19,58 @@ class FirestoreServices {
 
   // Create user profile if it doesn't exist
 
-  Future<void> createUserProfile(
-      {required String username,
-      required int age,
-      required String occupation,
-      required String gender}) async {
+  String formatTimestamp(Timestamp timestamp) {
+    final dateTime = timestamp.toDate();
+    return DateFormat('MMMM d, yyyy – hh:mm a').format(dateTime);
+  }
+
+// Create user profile
+  Future<void> createUserProfile({
+    required String username,
+    required int age,
+    required String occupation,
+    required String gender,
+  }) async {
     final user = _auth.currentUser!;
     final userDocRef = firestore.collection('users').doc(user.uid);
 
-    // Check if user already exists (avoiding an extra function call)
     final userDoc = await userDocRef.get();
     if (userDoc.exists) return;
 
     final userInfo = UserModel(
       id: user.uid,
-      name: user.displayName ?? '', // Handle null
+      name: user.displayName ?? '',
       email: user.email ?? '',
       age: age,
       occupation: occupation,
       gender: gender,
+      joinedAt: formatTimestamp(Timestamp.now()),
+      profileUrl: '',
+    );
 
-      joinedAt: Timestamp.now()
-          .toDate()
-          .toIso8601String()
-          .split('.')[0], // Use Firestore Timestamp
+    await userDocRef.set(userInfo.toJson());
+  }
+
+// Create admin profile
+  Future<void> createAdminProfile({
+    required String name,
+    required String department,
+    required String occupation,
+    required String gender,
+  }) async {
+    final user = _auth.currentUser!;
+    final userDocRef = firestore.collection('admins').doc(user.uid);
+
+    final userDoc = await userDocRef.get();
+    if (userDoc.exists) return;
+
+    final userInfo = AdminModel(
+      uid: user.uid,
+      name: user.displayName ?? '',
+      email: user.email ?? '',
+      department: department,
+      post: occupation,
+      createdAt: formatTimestamp(Timestamp.now()),
       profileUrl: '',
     );
 
@@ -123,6 +153,11 @@ class FirestoreServices {
         await FirebaseFirestore.instance.collection(collection).doc(uid).get();
     return doc.exists;
   }
+}
+
+String formatTimestamp(Timestamp timestamp) {
+  final dateTime = timestamp.toDate();
+  return DateFormat('MMMM d, yyyy – hh:mm a').format(dateTime);
 }
 
 final firestoreProvider =

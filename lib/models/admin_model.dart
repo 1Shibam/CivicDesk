@@ -19,7 +19,7 @@ class AdminModel {
     this.isActive = true,
   });
 
-  factory AdminModel.fromMap(Map<String, dynamic> map) {
+  factory AdminModel.fromJson(Map<String, dynamic> map) {
     return AdminModel(
       uid: map['uid'] ?? '',
       name: map['name'] ?? '',
@@ -32,7 +32,7 @@ class AdminModel {
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'uid': uid,
       'name': name,
