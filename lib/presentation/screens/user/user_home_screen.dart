@@ -24,8 +24,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.h),
         child: AppBar(
+          elevation: 4,
+          shadowColor: AppColors.darkest,
           title: Text(userName, style: AppTextStyles.bold(24)),
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.darkBlueGrey,
           actions: [
             IconButton(
               icon: Icon(
@@ -119,9 +121,32 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             Expanded(
               child: complaints.isEmpty
                   ? Center(
-                      child: Text(
-                        'No Recent Complaints',
-                        style: AppTextStyles.regular(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'No Recent Complaints',
+                            style: AppTextStyles.regular(16),
+                          ),
+                          SizedBox(
+                            height: 8.h,
+                          ),
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.darkPinkAccent,
+                                  elevation: 4,
+                                  shadowColor: AppColors.darkest,
+                                  foregroundColor: AppColors.textColor,
+                                  overlayColor: AppColors.textColor),
+                              onPressed: () {
+                                context.push(RouterNames.complaintScreen);
+                              },
+                              child: Text(
+                                'Make first Complaint',
+                                style: AppTextStyles.regular(16),
+                              ))
+                        ],
                       ),
                     )
                   : ListView.builder(

@@ -53,38 +53,63 @@ class _AiChatScreenState extends State<AiChatScreen> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("AI Help", style: AppTextStyles.bold(18))),
+      appBar: AppBar(
+        title: Text(
+          "Chat Help",
+          style: AppTextStyles.bold(18),
+        ),
+        backgroundColor: AppColors.darkBlueGrey,
+        shadowColor: AppColors.darkest,
+        elevation: 2,
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 12.w),
         child: Column(
           children: [
-            SizedBox(height: 10.h),
-            SizedBox(
-              height: 38.h,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: pinnedFaqs.length,
-                separatorBuilder: (_, __) => SizedBox(width: 8.w),
-                itemBuilder: (context, index) {
-                  final faq = pinnedFaqs[index];
-                  return GestureDetector(
-                    onTap: () => _onFaqTap(faq),
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.r),
-                        color: AppColors.lightGrey.withValues(alpha: 0.3),
-                      ),
-                      child: Text(faq, style: AppTextStyles.medium(13)),
-                    ),
-                  );
-                },
+            SizedBox(height: 12.h),
+
+            // 🔹 FAQ Section
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+              margin: EdgeInsets.only(bottom: 10.h),
+              decoration: BoxDecoration(
+                color: AppColors.lightGrey.withValues(alpha: .1),
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Quick Help", style: AppTextStyles.bold(16)),
+                  SizedBox(height: 8.h),
+                  ...pinnedFaqs.map((faq) => GestureDetector(
+                        onTap: () => _onFaqTap(faq),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 4.h),
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.question_answer,
+                              color: AppColors.textColor,
+                              size: 24,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 2.h, horizontal: 12.w),
+                            tileColor: AppColors.darkPinkAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            title: Text(faq, style: AppTextStyles.regular(14)),
+                          ),
+                        ),
+                      )),
+                ],
               ),
             ),
-            SizedBox(height: 10.h),
+
+            // 🔹 Chat Messages
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.only(top: 6.h),
@@ -103,7 +128,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                       decoration: BoxDecoration(
                         color: msg.isUser
                             ? AppColors.darkPinkAccent
-                            : AppColors.lightGrey.withValues(alpha: 0.15),
+                            : AppColors.lightGrey.withValues(alpha: .15),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(16.r),
                           topRight: Radius.circular(16.r),
@@ -130,7 +155,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
                 },
               ),
             ),
+
             SizedBox(height: 10.h),
+
+            // 🔹 Input Section
             Row(
               children: [
                 Expanded(
@@ -139,6 +167,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
                     style: AppTextStyles.medium(14),
                     decoration: InputDecoration(
                       hintText: "Type your message...",
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: 14.w, vertical: 14.h),
                       suffixIcon: IconButton(
                         icon:
                             const Icon(Icons.send, color: AppColors.textColor),
