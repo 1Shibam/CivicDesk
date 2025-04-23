@@ -36,6 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
           .collection('admins')
           .doc(user.uid)
           .get();
+      if (!mounted) return;
 
       if (adminDoc.exists) {
         context.go(RouterNames.adminHome);
@@ -46,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
           .collection('users')
           .doc(user.uid)
           .get();
-
+      if (!mounted) return;
       if (userDoc.exists) {
         context.go(RouterNames.userHome);
       } else {

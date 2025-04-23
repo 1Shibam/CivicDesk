@@ -125,6 +125,11 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                 }
               },
               icon: const Icon(Icons.arrow_back_ios_new)),
+          actions: [
+            TextButton(
+                onPressed: () => context.go(RouterNames.userHome),
+                child: const Text('S K I P'))
+          ],
         ),
         backgroundColor: AppColors.darkest,
         body: Center(
