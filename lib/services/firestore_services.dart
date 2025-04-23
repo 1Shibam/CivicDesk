@@ -56,8 +56,7 @@ class FirestoreServices {
   Future<void> createAdminProfile({
     required String name,
     required String department,
-    required String occupation,
-    required String gender,
+    required String post,
   }) async {
     final user = _auth.currentUser!;
     final userDocRef = firestore.collection('admins').doc(user.uid);
@@ -70,7 +69,7 @@ class FirestoreServices {
       name: user.displayName ?? '',
       email: user.email ?? '',
       department: department,
-      post: occupation,
+      post: post,
       createdAt: formatTimestamp(Timestamp.now()),
       profileUrl: '',
     );

@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/services/firestore_services.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
@@ -20,8 +20,8 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
   final TextEditingController _fullNameController = TextEditingController();
   final FocusNode _fullNameFocus = FocusNode();
 
-  String? selectedDepartment;
-  String? selectedPost;
+  late String selectedDepartment;
+  late String selectedPost;
 
   final List<String> departments = ['IT', 'HR', 'Finance', 'Maintenance'];
   final List<String> posts = ['Head', 'Manager', 'Staff'];
@@ -32,11 +32,7 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     final email = FirebaseAuth.instance.currentUser?.email;
 
-    if (_fullNameController.text.isEmpty ||
-        selectedDepartment == null ||
-        selectedPost == null ||
-        uid == null ||
-        email == null) {
+    if (_fullNameController.text.isEmpty || uid == null || email == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields.')),
       );
@@ -47,21 +43,10 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
       isLoading = true;
     });
 
-    final adminData = {
-      'uid': uid,
-      'name': _fullNameController.text.trim(),
-      'email': email,
-      'department': selectedDepartment,
-      'post': selectedPost,
-      'role': 'admin',
-      'createdAt': DateTime.now(),
-      'isActive': true,
-    };
-
-    await FirebaseFirestore.instance
-        .collection('admins')
-        .doc(uid)
-        .set(adminData);
+    FirestoreServices().createAdminProfile(
+        name: _fullNameController.text.trim(),
+        department: selectedDepartment,
+        post: selectedPost);
 
     setState(() {
       isLoading = false;
@@ -168,7 +153,9 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                       .toList(),
                   onChanged: (val) {
                     setState(() {
-                      selectedDepartment = val;
+                      if (val != null) {
+                        selectedDepartment = val;
+                      }
                     });
                   },
                 ),
@@ -215,7 +202,9 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                       .toList(),
                   onChanged: (val) {
                     setState(() {
-                      selectedPost = val;
+                      if (val != null) {
+                        selectedPost = val;
+                      }
                     });
                   },
                   borderRadius: BorderRadius.circular(20.r),
