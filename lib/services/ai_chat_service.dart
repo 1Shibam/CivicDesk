@@ -1,7 +1,37 @@
-// open api chat service
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+void streamChatGPT(List<Map<String, String>> messages) async {
+  final url = Uri.parse('https://api.openai.com/v1/chat/completions');
+  final request = http.Request('POST', url);
 
-class AiChatService {
-  final String apiKey = dotenv.env['CHAT_API_KEY'] ?? '';
+  request.headers.addAll({
+    'Authorization': 'Bearer YOUR_OPENAI_API_KEY',
+    'Content-Type': 'application/json',
+  });
+
+  request.body = jsonEncode({
+    "model": "gpt-4",
+    "stream": true,
+    "messages": messages,
+  });
+
+  final streamedResponse = await request.send();
+
+  streamedResponse.stream.transform(utf8.decoder).listen((chunk) {
+    // Each chunk contains multiple data lines like: data: {...}
+    final lines = chunk.split('\n');
+    for (var line in lines) {
+      if (line.startsWith('data: ') && !line.contains('[DONE]')) {
+        final data = line.substring(6).trim();
+        if (data.isNotEmpty) {
+          final jsonData = json.decode(data);
+          final delta = jsonData['choices'][0]['delta'];
+          if (delta.containsKey('content')) {
+            print(delta['content']); // Show token-by-token output
+          }
+        }
+      }
+    }
+  });
 }
