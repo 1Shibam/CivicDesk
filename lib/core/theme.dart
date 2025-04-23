@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 ThemeData get appTheme => ThemeData(
     scaffoldBackgroundColor: AppColors.darkBlueGrey,
     inputDecorationTheme: inputDecorationTheme,
+    primaryColor: AppColors.darkPinkAccent,
     appBarTheme: appBarTheme);
 
 AppBarTheme appBarTheme = AppBarTheme(

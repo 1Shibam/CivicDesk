@@ -31,8 +31,8 @@ class CustomTextFields extends StatelessWidget {
       validator: (value) => validateInput(value, validator),
       textInputAction:
           nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
-      onFieldSubmitted: (_) {
-        if (nextFocusNode != null) {
+      onFieldSubmitted: (value) {
+        if (nextFocusNode != null && value.trim().isNotEmpty) {
           FocusScope.of(context).requestFocus(nextFocusNode);
         } else {
           focusNode.unfocus();

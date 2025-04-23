@@ -1,5 +1,6 @@
 import 'package:complaints/core/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void customSnackbar(
     {required String message,
@@ -11,10 +12,14 @@ void customSnackbar(
     content: ListTile(
       leading: Icon(
         iconName,
-        size: 20,
+        size: 24.sp,
+        color: AppColors.textColor,
       ),
       tileColor: bgColor,
-      title: Text(message),
+      title: Text(
+        message,
+        style: AppTextStyles.regular(16),
+      ),
     ),
     backgroundColor: Colors.transparent,
     duration: Duration(seconds: duration),

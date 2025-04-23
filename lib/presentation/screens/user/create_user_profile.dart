@@ -19,6 +19,9 @@ class CreateUserProfile extends StatefulWidget {
 class _CreateUserProfileState extends State<CreateUserProfile> {
   final TextEditingController fullNameController = TextEditingController();
   final FocusNode fullNameFocusNode = FocusNode();
+  final FocusNode genderFocus = FocusNode();
+  final FocusNode dobFocus = FocusNode();
+  final FocusNode occupationFocus = FocusNode();
 
   String? selectedGender;
   DateTime? selectedDob;
@@ -64,7 +67,7 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
       customSnackbar(
         message: 'Please fill in all fields and accept the consent.',
         context: context,
-        iconName: Icons.warning_amber_rounded,
+        iconName: Icons.error,
       );
       return;
     }
@@ -103,6 +106,16 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
   }
 
   @override
+  void dispose() {
+    fullNameController.dispose();
+    fullNameFocusNode.dispose();
+    genderFocus.dispose();
+    dobFocus.dispose();
+    occupationFocus.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkest,
@@ -138,10 +151,20 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                   prefixIcon: Icons.person,
                   controller: fullNameController,
                   focusNode: fullNameFocusNode,
+                  nextFocusNode: genderFocus,
                 ),
                 SizedBox(height: 20.h),
                 DropdownButtonFormField<String>(
+                  focusNode: genderFocus,
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_outlined,
+                    color: AppColors.darkest,
+                  ),
+                  dropdownColor: AppColors.darkBlueGrey,
+                  borderRadius: BorderRadius.circular(40.r),
+                  elevation: 2,
                   value: selectedGender,
+                  focusColor: AppColors.textColor.withValues(alpha: 0.3),
                   onChanged: (value) {
                     setState(() {
                       selectedGender = value;
@@ -176,6 +199,12 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                 ),
                 SizedBox(height: 20.h),
                 DropdownButtonFormField<String>(
+                  dropdownColor: AppColors.darkBlueGrey,
+                  borderRadius: BorderRadius.circular(40.r),
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_outlined,
+                    color: AppColors.darkest,
+                  ),
                   value: selectedOccupation,
                   onChanged: (value) {
                     setState(() {
@@ -186,7 +215,12 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                   items: occupations
                       .map((occ) => DropdownMenuItem(
                             value: occ,
-                            child: Text(occ, style: AppTextStyles.regular(16)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(occ, style: AppTextStyles.regular(16)),
+                              ],
+                            ),
                           ))
                       .toList(),
                 ),
@@ -227,11 +261,10 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
 
   InputDecoration _dropdownDecoration(String label) {
     return InputDecoration(
-      labelText: label,
       hintText: 'Select $label',
-      hintStyle: AppTextStyles.regular(16).copyWith(color: AppColors.textColor),
-      labelStyle:
-          AppTextStyles.regular(16).copyWith(color: AppColors.textColor),
+      hintStyle: AppTextStyles.regular(16),
+      fillColor: AppColors.textColor,
+      filled: true,
       contentPadding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.r),

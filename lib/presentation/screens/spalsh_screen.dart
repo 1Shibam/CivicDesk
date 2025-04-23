@@ -1,8 +1,9 @@
-import 'package:complaints/widgets/loading_animation.dart';
-import 'package:complaints/routes/router_names.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:complaints/widgets/loading_animation.dart';
+import 'package:complaints/routes/router_names.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -18,50 +19,52 @@ class _SplashScreenState extends State<SplashScreen> {
     _navigate();
   }
 
-  void _navigate() async {
+  Future<void> _navigate() async {
     await Future.delayed(const Duration(seconds: 2));
 
-    if (!mounted) {
-      return; // Ensure widget is still in the tree before navigating
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (!mounted) return;
+
+    if (user == null) {
+      context.go(RouterNames.initial);
+      return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null && user.emailVerified) {
-      context.go(RouterNames.userHome);
-    } else {
+    try {
+      final adminDoc = await FirebaseFirestore.instance
+          .collection('admins')
+          .doc(user.uid)
+          .get();
+
+      if (adminDoc.exists) {
+        context.go(RouterNames.adminHome);
+        return;
+      }
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (userDoc.exists) {
+        context.go(RouterNames.userHome);
+      } else {
+        context.go(RouterNames.userProfileCreation);
+      }
+    } catch (e) {
+      // Optional: Handle error gracefully (e.g., network issue)
+      debugPrint('Error checking user role: $e');
       context.go(RouterNames.initial);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: LoadingAnimation(),
-          );
-        }
-        final user = snapshot.data;
-        if (user != null) {
-          Future.microtask(() async {
-            if (context.mounted) {
-              context.go(RouterNames.userHome);
-            }
-          });
-        } else {
-          Future.microtask(() {
-            if (context.mounted) {
-              context.go(RouterNames.initial);
-            }
-          });
-        }
-        return const Center(
-          child: LoadingAnimation(),
-        );
-      },
-    ));
+    return const Scaffold(
+      body: Center(
+        child: LoadingAnimation(),
+      ),
+    );
   }
 }
