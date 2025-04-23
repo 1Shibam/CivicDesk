@@ -45,7 +45,10 @@ class UserProfilePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           //Image and and image edit section --
-                          ProfileImageSection(userData: userData),
+                          ProfileImageSection(
+                            profileUrl: userData.profileUrl,
+                            uid: userData.id,
+                          ),
                           SizedBox(
                             height: 2.h,
                           ),
@@ -61,7 +64,10 @@ class UserProfilePage extends StatelessWidget {
                           ),
 
                           //profile details tiles- name , username etc..
-                          AllProfileTiles(userData: userData),
+                          AllProfileTiles(
+                            email: userData.email,
+                            name: userData.name,
+                          ),
                           SizedBox(
                             height: 24.h,
                           ),

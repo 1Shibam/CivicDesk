@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:complaints/models/user_mode.dart';
+import 'package:complaints/models/user_model.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/services/pick_image.dart';
 import 'package:complaints/services/upload_image_to_imgur.dart';
@@ -17,7 +17,11 @@ class FirestoreServices {
 
   // Create user profile if it doesn't exist
 
-  Future<void> createUserProfile(String role) async {
+  Future<void> createUserProfile(
+      {required String username,
+      required int age,
+      required String occupation,
+      required String gender}) async {
     final user = _auth.currentUser!;
     final userDocRef = firestore.collection('users').doc(user.uid);
 
@@ -29,7 +33,9 @@ class FirestoreServices {
       id: user.uid,
       name: user.displayName ?? '', // Handle null
       email: user.email ?? '',
-      role: role,
+      age: age,
+      occupation: occupation,
+      gender: gender,
 
       joinedAt: Timestamp.now()
           .toDate()
@@ -109,6 +115,13 @@ class FirestoreServices {
       debugPrint('Error fetching passkeys: $e');
       return false;
     }
+  }
+
+  Future<bool> checkIfProfileExists(String uid, {bool isAdmin = false}) async {
+    final collection = isAdmin ? 'admins' : 'users';
+    final doc =
+        await FirebaseFirestore.instance.collection(collection).doc(uid).get();
+    return doc.exists;
   }
 }
 

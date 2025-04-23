@@ -1,5 +1,5 @@
 import 'package:complaints/core/constants.dart';
-import 'package:complaints/models/user_mode.dart';
+import 'package:complaints/models/admin_model.dart';
 import 'package:complaints/presentation/widgets/all_profile_tile.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/presentation/widgets/profile_image_section.dart';
@@ -14,13 +14,15 @@ class AdminProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Sample admin data (Replace with actual provider later)
-    final adminData = UserModel(
-        id: '101',
+    final adminData = AdminModel(
+        uid: '101',
+        department: '',
+        post: '',
+        isActive: true,
         name: 'Hemant',
-        role: 'Admin',
         email: 'hrs12345678@gmail.com',
         profileUrl: '',
-        joinedAt: DateTime.now().toIso8601String().split('T')[0]);
+        createdAt: DateTime.now().toIso8601String().split('T')[0]);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -42,16 +44,22 @@ class AdminProfilePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Image and Image Edit Section
-              ProfileImageSection(userData: adminData),
+              ProfileImageSection(
+                uid: adminData.uid,
+                profileUrl: adminData.profileUrl,
+              ),
               SizedBox(height: 2.h),
               // Joined Date
               Text(
-                'Joined At: ${adminData.joinedAt}',
+                'Joined At: ${adminData.createdAt}',
                 style: AppTextStyles.regular(24),
               ),
               SizedBox(height: 16.h),
               // Profile Details Tiles
-              AllProfileTiles(userData: adminData),
+              AllProfileTiles(
+                email: adminData.email,
+                name: adminData.name,
+              ),
               SizedBox(height: 24.h),
               CustomButton(
                 onTap: () async {

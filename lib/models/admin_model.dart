@@ -1,23 +1,21 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class AdminModel {
   final String uid;
   final String name;
   final String email;
   final String department;
   final String post;
-  final String role;
-  final DateTime createdAt;
+  final String profileUrl;
+  final String createdAt;
   final bool isActive;
 
   AdminModel({
     required this.uid,
     required this.name,
     required this.email,
-    required this.role,
-    required this.createdAt,
     required this.department,
     required this.post,
+    required this.profileUrl,
+    required this.createdAt,
     this.isActive = true,
   });
 
@@ -28,8 +26,8 @@ class AdminModel {
       email: map['email'] ?? '',
       department: map['department'],
       post: map['post'],
-      role: map['role'] ?? 'admin',
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      profileUrl: map['profileUrl'] ?? '',
+      createdAt: map['createdAt'],
       isActive: map['isActive'] ?? true,
     );
   }
@@ -41,7 +39,7 @@ class AdminModel {
       'email': email,
       'department': department,
       'post': post,
-      'role': role,
+      'profileUrl': profileUrl,
       'createdAt': createdAt,
       'isActive': isActive,
     };

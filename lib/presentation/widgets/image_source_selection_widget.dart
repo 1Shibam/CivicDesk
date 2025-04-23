@@ -1,31 +1,38 @@
 import 'package:complaints/core/constants.dart';
-import 'package:complaints/models/user_mode.dart';
-import 'package:complaints/presentation/widgets/image_source_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
 class ImageSelectionOptionWidget extends ConsumerWidget {
   const ImageSelectionOptionWidget({
     super.key,
-    required this.userData,
+    required this.uid,
+    required this.profileUrl,
+    required this.isAdmin,
   });
 
-  final UserModel userData;
+  final String uid;
+  final String profileUrl;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       onTap: () {
-        _showBottomShett(context: context, userData: userData);
+        _showBottomSheet(
+          context: context,
+          uid: uid,
+          profileUrl: profileUrl,
+          isAdmin: isAdmin,
+        );
       },
       child: Container(
         width: 48.w,
         height: 48.w,
         decoration: BoxDecoration(
-            color: AppColors.darkPinkAccent,
-            borderRadius: BorderRadius.circular(40.r)),
+          color: AppColors.darkPinkAccent,
+          borderRadius: BorderRadius.circular(40.r),
+        ),
         child: const Icon(
           Icons.edit,
           color: AppColors.textColor,
@@ -37,8 +44,12 @@ class ImageSelectionOptionWidget extends ConsumerWidget {
 
 //show bottom sheet on tap of the pencil icon
 
-void _showBottomShett(
-    {required BuildContext context, required UserModel userData}) {
+void _showBottomSheet({
+  required BuildContext context,
+  required String uid,
+  required String profileUrl,
+  required bool isAdmin,
+}) {
   showModalBottomSheet(
     backgroundColor: AppColors.darkPinkAccent,
     elevation: 20,
@@ -47,8 +58,10 @@ void _showBottomShett(
     showDragHandle: true,
     context: context,
     builder: (context) {
-      return ImageSourceOptions(
-        userData: userData,
+      return ImageSelectionOptionWidget(
+        uid: uid,
+        profileUrl: profileUrl,
+        isAdmin: isAdmin,
       );
     },
   );

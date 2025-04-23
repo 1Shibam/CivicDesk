@@ -14,14 +14,12 @@ class FirebaseAuthServices {
   //! signup / signin with google with google -
   Future<void> signupWithGoogle(BuildContext context) async {
     try {
-      // Force sign-out to ensure fresh login
       await GoogleSignIn().signOut();
-      await FirebaseAuth.instance.signOut(); // Add Firebase sign-out
+      await FirebaseAuth.instance.signOut();
 
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
-        // User canceled the sign-in flow
         if (context.mounted) {
           customSnackbar(
             context: context,
@@ -45,22 +43,24 @@ class FirebaseAuthServices {
           await _auth.signInWithCredential(credential);
       await FirebaseAuth.instance.currentUser?.reload();
 
-      final isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+      final user = userCredential.user;
+      if (user != null && context.mounted) {
+        final profileExists =
+            await FirestoreServices().checkIfProfileExists(user.uid);
 
-      if (userCredential.user != null) {
         if (context.mounted) {
           customSnackbar(
             context: context,
-            message: 'Welcome, ${userCredential.user!.displayName}!',
+            message: 'Welcome, ${user.displayName}!',
             iconName: Icons.gpp_good_sharp,
             bgColor: Colors.blue,
           );
-
-          if (isNewUser) {
-            context.go(RouterNames.userProfileCreation);
-          } else {
-            context.go(RouterNames.userHome);
-          }
+        }
+        if (!context.mounted) return;
+        if (profileExists) {
+          context.go(RouterNames.userHome);
+        } else {
+          context.go(RouterNames.userProfileCreation);
         }
       }
     } on FirebaseAuthException catch (e) {
@@ -80,6 +80,18 @@ class FirebaseAuthServices {
       String email, String password, BuildContext context) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+
+      final user = _auth.currentUser;
+      if (user != null && context.mounted) {
+        final profileExists = await FirestoreServices()
+            .checkIfProfileExists(user.uid, isAdmin: true);
+        if (!context.mounted) return false;
+        if (profileExists) {
+          context.go(RouterNames.adminHome);
+        } else {
+          context.go(RouterNames.adminProfileCreation);
+        }
+      }
 
       return true;
     } on FirebaseAuthException catch (e) {
@@ -102,7 +114,7 @@ class FirebaseAuthServices {
     try {
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      await FirestoreServices().createUserProfile('admin');
+      // await FirestoreServices().createUserProfile();
       return true;
     } on FirebaseAuthException catch (e) {
       debugPrint(e.message);

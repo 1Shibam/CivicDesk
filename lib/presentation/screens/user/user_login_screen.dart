@@ -28,17 +28,14 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 40.h,
-            ),
             Text(
-              'Welcome to Complaint Portal',
+              'Welcome to \nCivik Desk',
               style: AppTextStyles.bold(32),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 16.h),
             Text(
-              'As a user, you can submit complaints, track their progress, and get notified when they are resolved. Sign up now to get started!',
+              'As a user, you can submit complaints, track their progress, and get notified when they are resolved. Login now to get started!',
               style: AppTextStyles.medium(18),
               textAlign: TextAlign.center,
             ),
@@ -53,7 +50,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
                   context.pop();
                 }
               },
-              buttonText: 'Google Signup',
+              buttonText: 'Google Login',
             ),
           ],
         ),

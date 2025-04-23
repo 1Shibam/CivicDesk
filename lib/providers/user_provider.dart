@@ -1,12 +1,9 @@
 // Stream provider to fetch user
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:complaints/models/user_mode.dart';
+import 'package:complaints/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-
-
 
 //? current user provider
 final currentUserProvider = StreamProvider.autoDispose<UserModel>((ref) {

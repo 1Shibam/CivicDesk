@@ -1,11 +1,10 @@
 import 'package:complaints/core/constants.dart';
-import 'package:complaints/models/user_mode.dart';
+import 'package:complaints/models/user_model.dart';
 import 'package:complaints/providers/firestore_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-
 
 class ImageSourceOptions extends StatelessWidget {
   const ImageSourceOptions({super.key, required this.userData});
@@ -44,8 +43,8 @@ class ImageSourceOptions extends StatelessWidget {
                             await ref
                                 .read(firestoreServiceStateNotifierProvider
                                     .notifier)
-                                .changeProfilePicture(context, userData.id,
-                                    ImageSource.camera);
+                                .changeProfilePicture(
+                                    context, userData.id, ImageSource.camera);
                           },
                           icon: Icon(
                             Icons.camera_alt_rounded,
@@ -68,8 +67,8 @@ class ImageSourceOptions extends StatelessWidget {
                             await ref
                                 .read(firestoreServiceStateNotifierProvider
                                     .notifier)
-                                .changeProfilePicture(context, userData.id,
-                                    ImageSource.gallery);
+                                .changeProfilePicture(
+                                    context, userData.id, ImageSource.gallery);
                           },
                           icon: Icon(
                             Icons.image,

@@ -60,7 +60,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   height: 40.h,
                 ),
                 Text(
-                  'Admin Panel Login',
+                  'Civik Desk \nAdmin Login',
                   style: AppTextStyles.bold(32),
                   textAlign: TextAlign.center,
                 ),
@@ -147,7 +147,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         TextSpan(
                             text: 'Sign Up',
                             style: AppTextStyles.bold(16)
-                                .copyWith(color: AppColors.darkPink),
+                                .copyWith(color: AppColors.darkPinkAccent),
                             recognizer: TapGestureRecognizer()
                               ..onTap =
                                   () => context.push(RouterNames.adminSignup))

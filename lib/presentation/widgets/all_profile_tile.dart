@@ -1,14 +1,25 @@
-import 'package:complaints/models/user_mode.dart';
 import 'package:complaints/presentation/widgets/profile_tiles.dart';
 import 'package:flutter/material.dart';
 
 class AllProfileTiles extends StatelessWidget {
   const AllProfileTiles({
     super.key,
-    required this.userData,
+    required this.name,
+    required this.email,
+    this.age,
+    this.gender,
+    this.department,
+    this.post,
+    this.isAdmin = false,
   });
 
-  final UserModel userData;
+  final String name;
+  final String email;
+  final int? age;
+  final String? gender;
+  final String? department;
+  final String? post;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +30,38 @@ class AllProfileTiles extends StatelessWidget {
         children: [
           ProfileTile(
             title: 'Username',
-            value: userData.name,
+            value: name,
             disableEditing: true,
           ),
           ProfileTile(
             title: 'Email',
+            value: obscureEmail(email),
             disableEditing: true,
-            value: obscureEmail(userData.email),
           ),
+          if (!isAdmin && age != null)
+            ProfileTile(
+              title: 'Age',
+              value: age.toString(),
+              disableEditing: true,
+            ),
+          if (!isAdmin && gender != null)
+            ProfileTile(
+              title: 'Gender',
+              value: gender!,
+              disableEditing: true,
+            ),
+          if (isAdmin && department != null)
+            ProfileTile(
+              title: 'Department',
+              value: department!,
+              disableEditing: true,
+            ),
+          if (isAdmin && post != null)
+            ProfileTile(
+              title: 'Post',
+              value: post!,
+              disableEditing: true,
+            ),
         ],
       ),
     );
