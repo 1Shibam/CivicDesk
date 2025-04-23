@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -15,14 +17,13 @@ class CreateUserProfile extends StatefulWidget {
 }
 
 class _CreateUserProfileState extends State<CreateUserProfile> {
-  final _formKey = GlobalKey<FormState>();
-
   final TextEditingController fullNameController = TextEditingController();
   final FocusNode fullNameFocusNode = FocusNode();
 
   String? selectedGender;
   DateTime? selectedDob;
   String? selectedOccupation;
+  bool isLoading = false;
   bool consentGiven = false;
 
   final List<String> genders = ['Male', 'Female', 'Other', 'Prefer not to say'];
@@ -49,28 +50,54 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
     }
   }
 
-  void _submitProfile() {
-    if (_formKey.currentState!.validate()) {
-      if (selectedGender == null ||
-          selectedDob == null ||
-          selectedOccupation == null ||
-          !consentGiven) {
-        customSnackbar(
-          message: 'Please complete all fields and accept the consent.',
-          context: context,
-          iconName: Icons.error,
-        );
-        return;
-      }
+  void _submitProfile() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final email = FirebaseAuth.instance.currentUser?.email;
 
-      // Proceed to save this data
-      debugPrint('Name: ${fullNameController.text}');
-      debugPrint('Gender: $selectedGender');
-      debugPrint('DOB: $selectedDob');
-      debugPrint('Occupation: $selectedOccupation');
-      debugPrint('Consent Given: $consentGiven');
+    if (fullNameController.text.isEmpty ||
+        selectedGender == null ||
+        selectedDob == null ||
+        selectedOccupation == null ||
+        uid == null ||
+        email == null ||
+        !consentGiven) {
+      customSnackbar(
+        message: 'Please fill in all fields and accept the consent.',
+        context: context,
+        iconName: Icons.warning_amber_rounded,
+      );
+      return;
+    }
 
-      // Navigate or save to Firestore, etc.
+    setState(() {
+      isLoading = true;
+    });
+
+    final userData = {
+      'uid': uid,
+      'name': fullNameController.text.trim(),
+      'email': email,
+      'gender': selectedGender,
+      'dob': selectedDob,
+      'occupation': selectedOccupation,
+      'role': 'user',
+      'createdAt': DateTime.now(),
+      'isActive': true,
+    };
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).set(userData);
+
+    setState(() {
+      isLoading = false;
+    });
+
+    if (mounted) {
+      customSnackbar(
+        message: 'Profile created successfully',
+        context: context,
+        iconName: Icons.check,
+        bgColor: Colors.green,
+      );
       context.go(RouterNames.userHome);
     }
   }
@@ -78,122 +105,145 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
+      backgroundColor: AppColors.darkest,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(20.w),
+          child: Container(
+            padding: EdgeInsets.all(20.w),
+            decoration: BoxDecoration(
+              color: AppColors.darkBlueGrey,
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                  offset: Offset(0, 4),
+                )
+              ],
+            ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(
-                  height: 40.h,
-                ),
-                Text('Create Profile', style: AppTextStyles.bold(20)),
-                SizedBox(height: 8.h),
-                Text(
-                  'Please enter your details to create your profile',
-                  style: AppTextStyles.regular(16),
-                ),
-                SizedBox(height: 16.h),
+                Text('Create User Profile', style: AppTextStyles.bold(22)),
+                SizedBox(height: 12.h),
+                Text('Please enter your details to create your profile',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.regular(16)),
+                SizedBox(height: 24.h),
                 CustomTextFields(
-                  labelText: 'Full name',
+                  labelText: 'Full Name',
                   prefixIcon: Icons.person,
                   controller: fullNameController,
                   focusNode: fullNameFocusNode,
-                  validator: ValidationType.name,
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 20.h),
                 DropdownButtonFormField<String>(
                   value: selectedGender,
-                  decoration: const InputDecoration(
-                    labelText: 'Gender',
-                    prefixIcon: Icon(Icons.wc),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (val) =>
-                      val == null ? 'Please select a gender' : null,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedGender = value;
+                    });
+                  },
+                  decoration: _dropdownDecoration('Gender'),
                   items: genders
-                      .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                      .map((gender) => DropdownMenuItem(
+                            value: gender,
+                            child:
+                                Text(gender, style: AppTextStyles.regular(16)),
+                          ))
                       .toList(),
-                  onChanged: (val) => setState(() => selectedGender = val),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 20.h),
                 GestureDetector(
                   onTap: _selectDOB,
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Date of Birth',
-                      prefixIcon: Icon(Icons.calendar_today),
-                      border: OutlineInputBorder(),
-                    ),
-                    child: Text(
-                      selectedDob != null
-                          ? "${selectedDob!.day}/${selectedDob!.month}/${selectedDob!.year}"
-                          : 'Select Date',
-                      style: selectedDob != null
-                          ? AppTextStyles.regular(16)
-                          : AppTextStyles.regular(16)
-                              .copyWith(color: Colors.grey),
+                  child: AbsorbPointer(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Date of Birth',
+                        hintText: selectedDob == null
+                            ? 'Select your birth date'
+                            : '${selectedDob!.day}/${selectedDob!.month}/${selectedDob!.year}',
+                        prefixIcon: const Icon(Icons.cake),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                if (selectedDob == null)
-                  Padding(
-                    padding: EdgeInsets.only(top: 4.h, left: 12.w),
-                    child: Text(
-                      'Please select your date of birth',
-                      style: TextStyle(color: Colors.red[700], fontSize: 12),
-                    ),
-                  ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 20.h),
                 DropdownButtonFormField<String>(
                   value: selectedOccupation,
-                  decoration: const InputDecoration(
-                    labelText: 'Occupation',
-                    prefixIcon: Icon(Icons.work),
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (val) =>
-                      val == null ? 'Please select your occupation' : null,
+                  onChanged: (value) {
+                    setState(() {
+                      selectedOccupation = value;
+                    });
+                  },
+                  decoration: _dropdownDecoration('Occupation'),
                   items: occupations
-                      .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+                      .map((occ) => DropdownMenuItem(
+                            value: occ,
+                            child: Text(occ, style: AppTextStyles.regular(16)),
+                          ))
                       .toList(),
-                  onChanged: (val) => setState(() => selectedOccupation = val),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: 20.h),
                 Row(
                   children: [
                     Checkbox(
                       value: consentGiven,
-                      onChanged: (val) =>
-                          setState(() => consentGiven = val ?? false),
+                      onChanged: (value) {
+                        setState(() {
+                          consentGiven = value ?? false;
+                        });
+                      },
                     ),
                     Expanded(
                       child: Text(
-                        'I confirm that the information provided is accurate and cannot be changed later.',
+                        'I confirm that the above information is correct.',
                         style: AppTextStyles.regular(14),
                       ),
                     ),
                   ],
                 ),
-                if (!consentGiven)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12),
-                    child: Text(
-                      'You must accept the consent',
-                      style: TextStyle(color: Colors.red[700], fontSize: 12),
-                    ),
-                  ),
-                SizedBox(height: 20.h),
-                CustomButton(
-                    onTap: _submitProfile,
-                    buttonText: 'Submit',
-                    imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg')
+                SizedBox(height: 30.h),
+                isLoading
+                    ? const CircularProgressIndicator()
+                    : CustomButton(
+                        onTap: _submitProfile,
+                        buttonText: 'Submit',
+                        imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg',
+                      )
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _dropdownDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      hintText: 'Select $label',
+      hintStyle: AppTextStyles.regular(16).copyWith(color: AppColors.textColor),
+      labelStyle:
+          AppTextStyles.regular(16).copyWith(color: AppColors.textColor),
+      contentPadding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.r),
+        borderSide: const BorderSide(color: AppColors.textColor),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.r),
+        borderSide: const BorderSide(color: AppColors.textColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.r),
+        borderSide: const BorderSide(color: AppColors.textColor),
       ),
     );
   }
