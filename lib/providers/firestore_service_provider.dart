@@ -10,22 +10,6 @@ final firestoreServiceProvider =
 class FirestoreServiceNotifier extends StateNotifier<FirestoreServices> {
   FirestoreServiceNotifier(super.services);
 
-  // Future<bool> createProfile(BuildContext context, String role) async {
-  //   try {
-  //     await state.createUserProfile(role);
-  //     if (context.mounted) {
-  //       customSnackbar(
-  //           context: context,
-  //           message: 'User creation successfull',
-  //           iconName: Icons.check,
-  //           bgColor: Colors.green);
-  //     }
-  //     return true;
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // }
-
   Future<bool> changeProfilePicture(
       BuildContext context, String userID, ImageSource imageSource) async {
     try {
