@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/services/firestore_services.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
@@ -26,9 +26,8 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
 
   final FocusNode occupationFocus = FocusNode();
 
-  String? selectedGender;
-  DateTime? selectedDob;
-  String? selectedOccupation;
+  late String selectedGender;
+  late String selectedOccupation;
   bool isLoading = false;
   bool consentGiven = false;
 
@@ -46,9 +45,6 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
     final email = FirebaseAuth.instance.currentUser?.email;
 
     if (fullNameController.text.isEmpty ||
-        selectedGender == null ||
-        selectedDob == null ||
-        selectedOccupation == null ||
         uid == null ||
         email == null ||
         !consentGiven) {
@@ -64,18 +60,11 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
       isLoading = true;
     });
 
-    final userData = {
-      'uid': uid,
-      'name': fullNameController.text.trim(),
-      'email': email,
-      'gender': selectedGender,
-      'dob': selectedDob,
-      'occupation': selectedOccupation,
-      'createdAt': DateTime.now(),
-      'isActive': true,
-    };
-
-    await FirebaseFirestore.instance.collection('users').doc(uid).set(userData);
+    FirestoreServices().createUserProfile(
+        age: int.parse(ageController.text.trim()),
+        gender: selectedGender,
+        occupation: selectedOccupation,
+        username: fullNameController.text.trim());
 
     setState(() {
       isLoading = false;
@@ -187,7 +176,9 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                     decoration: _dropdownDecoration('Gender'),
                     onChanged: (value) {
                       setState(() {
-                        selectedGender = value;
+                        if (value != null) {
+                          selectedGender = value;
+                        }
                       });
                     },
                     items: genders.map((gender) {
@@ -214,7 +205,9 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                     decoration: _dropdownDecoration('Occupation'),
                     onChanged: (value) {
                       setState(() {
-                        selectedOccupation = value;
+                        if (value != null) {
+                          selectedOccupation = value;
+                        }
                       });
                     },
                     items: occupations.map((occ) {
