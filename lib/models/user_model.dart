@@ -7,29 +7,33 @@ class UserModel {
   final String joinedAt;
   final int age;
   final String gender;
+  final int totalComplaints;
+  final int resolvedComplaints;
 
-  UserModel({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.profileUrl,
-    required this.joinedAt,
-    required this.age,
-    required this.occupation,
-    required this.gender,
-  });
+  UserModel(
+      {required this.id,
+      required this.name,
+      required this.email,
+      required this.profileUrl,
+      required this.joinedAt,
+      required this.age,
+      required this.occupation,
+      required this.gender,
+      required this.totalComplaints,
+      required this.resolvedComplaints});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['user_id'],
-      name: json['name'],
-      occupation: json['occupation'],
-      email: json['email'],
-      profileUrl: json['profile_url'],
-      joinedAt: json['joined_at'],
-      age: json['age'],
-      gender: json['gender'],
-    );
+        id: json['user_id'],
+        name: json['name'],
+        occupation: json['occupation'],
+        email: json['email'],
+        profileUrl: json['profile_url'],
+        joinedAt: json['joined_at'],
+        age: json['age'],
+        gender: json['gender'],
+        totalComplaints: json['total_complaints'],
+        resolvedComplaints: json['resolved_complaints']);
   }
 
   Map<String, dynamic> toJson() {
@@ -42,6 +46,8 @@ class UserModel {
       'joined_at': joinedAt,
       'age': age,
       'gender': gender,
+      'total_complaints': totalComplaints,
+      'resolved_complaints': resolvedComplaints
     };
   }
 }

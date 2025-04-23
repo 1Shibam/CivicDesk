@@ -38,15 +38,16 @@ class FirestoreServices {
     if (userDoc.exists) return;
 
     final userInfo = UserModel(
-      id: user.uid,
-      name: user.displayName ?? '',
-      email: user.email ?? '',
-      age: age,
-      occupation: occupation,
-      gender: gender,
-      joinedAt: formatTimestamp(Timestamp.now()),
-      profileUrl: '',
-    );
+        id: user.uid,
+        name: user.displayName ?? '',
+        email: user.email ?? '',
+        age: age,
+        occupation: occupation,
+        gender: gender,
+        joinedAt: formatTimestamp(Timestamp.now()),
+        profileUrl: '',
+        totalComplaints: 0,
+        resolvedComplaints: 0);
 
     await userDocRef.set(userInfo.toJson());
   }
