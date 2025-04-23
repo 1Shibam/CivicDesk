@@ -71,7 +71,6 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
       'gender': selectedGender,
       'dob': selectedDob,
       'occupation': selectedOccupation,
-      'role': 'user',
       'createdAt': DateTime.now(),
       'isActive': true,
     };
