@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
-import 'package:complaints/providers/user_provider.dart';
+import 'package:complaints/providers/current_user_provider.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
