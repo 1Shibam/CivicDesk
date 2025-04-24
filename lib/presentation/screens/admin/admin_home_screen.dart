@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
+import 'package:complaints/providers/current_admin_provider.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,6 +17,7 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   int _selectedIndex = 0;
+  final String emptyProfile = 'https://i.imgur.com/PcvwDlW.png';
 
   final List<ComplaintModel> primaryComplaints = [
     ComplaintModel(
@@ -64,24 +68,84 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _selectedIndex == 0 ? 'Primary Complaints' : 'Possible Spam',
-          style: AppTextStyles.bold(20),
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                context.push(RouterNames.adminProfile);
-              },
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.h),
+        child: AppBar(
+          elevation: 4,
+          shadowColor: AppColors.darkest,
+          title: Consumer(
+            builder: (context, ref, child) {
+              final adminProvider = ref.watch(currentAdminProvider);
+              return adminProvider.when(
+                  data: (admin) {
+                    return Text(admin.name, style: AppTextStyles.bold(20));
+                  },
+                  error: (error, stackTrace) {
+                    return Center(
+                      child: Text(
+                        'No user',
+                        style: AppTextStyles.bold(20),
+                      ),
+                    );
+                  },
+                  loading: () => const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.darkPink,
+                        ),
+                      ));
+            },
+          ),
+          backgroundColor: AppColors.darkBlueGrey,
+          actions: [
+            IconButton(
               icon: Icon(
-                Icons.account_circle,
+                Icons.notifications,
+                color: AppColors.textColor,
                 size: 32.sp,
-              ))
-        ],
-        leading: IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
-        automaticallyImplyLeading: true,
-        backgroundColor: Colors.transparent,
+              ),
+              onPressed: () {
+                context.push(RouterNames.notificationScreen);
+              },
+            ),
+            SizedBox(
+              width: 8.w,
+            ),
+            Consumer(
+              builder: (context, ref, child) {
+                final currentUser = ref.watch(currentAdminProvider);
+                return currentUser.when(
+                    data: (admin) {
+                      String url = admin.profileUrl == ''
+                          ? emptyProfile
+                          : admin.profileUrl;
+                      return GestureDetector(
+                        onTap: () {
+                          context.push(RouterNames.adminProfile);
+                        },
+                        child: CircleAvatar(
+                          radius: 18.r,
+                          backgroundImage: CachedNetworkImageProvider(url),
+                        ),
+                      );
+                    },
+                    error: (error, stackTrace) => Center(
+                          child: Text(
+                            'Something went wrong',
+                            style: AppTextStyles.bold(16),
+                          ),
+                        ),
+                    loading: () => const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.darkPink,
+                          ),
+                        ));
+              },
+            ),
+            SizedBox(
+              width: 8.w,
+            )
+          ],
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.w),
