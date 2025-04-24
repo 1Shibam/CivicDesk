@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
+import 'package:complaints/providers/user_provider.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,8 +17,8 @@ class UserHomeScreen extends StatefulWidget {
 }
 
 class _UserHomeScreenState extends State<UserHomeScreen> {
-  String userName = "Hemant Singh"; // Replace with actual user data
   final List<ComplaintModel> complaints = [];
+  final String emptyProfile = 'https://i.imgur.com/PcvwDlW.png';
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,28 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         child: AppBar(
           elevation: 4,
           shadowColor: AppColors.darkest,
-          title: Text(userName, style: AppTextStyles.bold(24)),
+          title: Consumer(
+            builder: (context, ref, child) {
+              final userProvider = ref.watch(currentUserProvider);
+              return userProvider.when(
+                  data: (user) {
+                    return Text(user.name, style: AppTextStyles.bold(24));
+                  },
+                  error: (error, stackTrace) {
+                    return Center(
+                      child: Text(
+                        'No user',
+                        style: AppTextStyles.bold(20),
+                      ),
+                    );
+                  },
+                  loading: () => const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.darkPink,
+                        ),
+                      ));
+            },
+          ),
           backgroundColor: AppColors.darkBlueGrey,
           actions: [
             IconButton(
@@ -39,16 +62,31 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 context.push(RouterNames.notificationScreen);
               },
             ),
-            IconButton(
-              icon: Icon(
-                Icons.account_circle,
-                color: AppColors.textColor,
-                size: 32.sp,
-              ),
-              onPressed: () {
-                context.push(RouterNames.userProfile);
+            Consumer(
+              builder: (context, ref, child) {
+                final currentUser = ref.watch(currentUserProvider);
+                return currentUser.when(
+                    data: (user) {
+                      String url = user.profileUrl == ''
+                          ? emptyProfile
+                          : user.profileUrl;
+                      return CircleAvatar(
+                        backgroundImage: CachedNetworkImageProvider(url),
+                      );
+                    },
+                    error: (error, stackTrace) => Center(
+                          child: Text(
+                            'Something went wrong',
+                            style: AppTextStyles.bold(16),
+                          ),
+                        ),
+                    loading: () => const Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.darkPink,
+                          ),
+                        ));
               },
-            ),
+            )
           ],
         ),
       ),
@@ -257,11 +295,31 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: Text(
-                    userName,
-                    style: AppTextStyles.bold(20, color: Colors.white),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final user = ref.watch(currentUserProvider);
+                      return user.when(
+                          data: (data) {
+                            return Text(
+                              data.name,
+                              style:
+                                  AppTextStyles.bold(20, color: Colors.white),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            );
+                          },
+                          error: (error, stackTrace) {
+                            return Text(
+                              'NO user',
+                              style: AppTextStyles.bold(20),
+                            );
+                          },
+                          loading: () => const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.darkPink,
+                                ),
+                              ));
+                    },
                   ),
                 ),
               ],
