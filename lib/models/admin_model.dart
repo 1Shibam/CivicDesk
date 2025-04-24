@@ -6,7 +6,6 @@ class AdminModel {
   final String post;
   final String profileUrl;
   final String createdAt;
-  final bool isActive;
 
   AdminModel({
     required this.uid,
@@ -16,7 +15,6 @@ class AdminModel {
     required this.post,
     required this.profileUrl,
     required this.createdAt,
-    this.isActive = true,
   });
 
   factory AdminModel.fromJson(Map<String, dynamic> map) {
@@ -28,7 +26,6 @@ class AdminModel {
       post: map['post'],
       profileUrl: map['profileUrl'] ?? '',
       createdAt: map['createdAt'],
-      isActive: map['isActive'] ?? true,
     );
   }
 
@@ -40,8 +37,7 @@ class AdminModel {
       'department': department,
       'post': post,
       'profileUrl': profileUrl,
-      'createdAt': createdAt,
-      'isActive': isActive,
+      'createdAt': createdAt
     };
   }
 }

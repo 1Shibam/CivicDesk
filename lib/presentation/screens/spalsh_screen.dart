@@ -22,9 +22,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _navigate() async {
     await Future.delayed(const Duration(seconds: 2));
 
-    final user = FirebaseAuth.instance.currentUser;
-
     if (!mounted) return;
+    final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       context.go(RouterNames.initial);
@@ -32,30 +31,40 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     try {
+      // Check ADMIN status first
       final adminDoc = await FirebaseFirestore.instance
-          .collection('admins')
+          .collection('admins') // Double-check spelling ('admins'?)
           .doc(user.uid)
           .get();
       if (!mounted) return;
 
       if (adminDoc.exists) {
         context.go(RouterNames.adminHome);
-        return;
+        return; // Exit after admin handling
+      } else {
+        // User is admin but needs profile creation
+        context.go(RouterNames.adminProfileCreation);
+        return; // 🚨 Critical fix: Add return to prevent further execution
       }
+    } catch (e) {
+      debugPrint('Admin check error: $e');
+    }
 
+    // Only check REGULAR USER if not an admin
+    try {
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .get();
       if (!mounted) return;
+
       if (userDoc.exists) {
         context.go(RouterNames.userHome);
       } else {
         context.go(RouterNames.userProfileCreation);
       }
     } catch (e) {
-      // Optional: Handle error gracefully (e.g., network issue)
-      debugPrint('Error checking user role: $e');
+      debugPrint('User check error: $e');
       context.go(RouterNames.initial);
     }
   }

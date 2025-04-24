@@ -18,7 +18,6 @@ class AdminProfilePage extends StatelessWidget {
         uid: '101',
         department: '',
         post: '',
-        isActive: true,
         name: 'Hemant',
         email: 'hrs12345678@gmail.com',
         profileUrl: '',

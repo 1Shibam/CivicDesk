@@ -5,6 +5,7 @@ import 'package:complaints/services/firestore_services.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -281,7 +282,13 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
                             if (isCreated && context.mounted) {
                               context.go(RouterNames.adminProfileCreation);
                             }
-                          } catch (e) {
+                          } on FirebaseException catch (e) {
+                            if (context.mounted) {
+                              customSnackbar(
+                                  message: e.message.toString(),
+                                  context: context,
+                                  iconName: Icons.error);
+                            }
                             debugPrint('Admin signup error: $e');
                           }
                         }

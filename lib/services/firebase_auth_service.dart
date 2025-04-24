@@ -99,7 +99,7 @@ class FirebaseAuthServices {
       if (context.mounted) {
         customSnackbar(
           context: context,
-          message: 'Login failed: ${e.message}',
+          message: 'Failed: ${e.code}',
           bgColor: Colors.red,
           iconName: Icons.error,
         );

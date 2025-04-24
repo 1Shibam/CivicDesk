@@ -20,19 +20,29 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
   final TextEditingController _fullNameController = TextEditingController();
   final FocusNode _fullNameFocus = FocusNode();
 
-  late String selectedDepartment;
-  late String selectedPost;
+  String? selectedDepartment;
+  String? selectedPost;
 
   final List<String> departments = ['IT', 'HR', 'Finance', 'Maintenance'];
   final List<String> posts = ['Head', 'Manager', 'Staff'];
 
   bool isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with the first department and post as default values
+  }
+
   void _submitAdminProfile() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     final email = FirebaseAuth.instance.currentUser?.email;
 
-    if (_fullNameController.text.isEmpty || uid == null || email == null) {
+    if (_fullNameController.text.isEmpty ||
+        uid == null ||
+        email == null ||
+        selectedDepartment == null ||
+        selectedPost == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields.')),
       );
@@ -43,10 +53,11 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
       isLoading = true;
     });
 
+    // Create the admin profile in Firestore
     FirestoreServices().createAdminProfile(
         name: _fullNameController.text.trim(),
-        department: selectedDepartment,
-        post: selectedPost);
+        department: selectedDepartment!,
+        post: selectedPost!);
 
     setState(() {
       isLoading = false;
@@ -68,6 +79,16 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                context.go(RouterNames.splash);
+              }
+            },
+            icon: const Icon(Icons.arrow_back_ios_new)),
+      ),
       backgroundColor: AppColors.darkest,
       body: Center(
         child: SingleChildScrollView(
@@ -113,13 +134,12 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                 DropdownButtonFormField<String>(
                   borderRadius: BorderRadius.circular(20.r),
                   decoration: InputDecoration(
-                    label: Text('Department', style: AppTextStyles.regular(16)),
+                    fillColor: AppColors.textColor,
+                    filled: true,
                     hintText: 'Select Department',
                     alignLabelWithHint: true,
                     hintStyle: AppTextStyles.regular(16)
-                        .copyWith(color: AppColors.textColor),
-                    labelStyle: AppTextStyles.regular(16)
-                        .copyWith(color: AppColors.textColor),
+                        .copyWith(color: AppColors.darkest),
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
                     border: OutlineInputBorder(
@@ -141,7 +161,7 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                   elevation: 4,
                   icon: const Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: AppColors.textColor,
+                    color: AppColors.darkest,
                   ),
                   iconSize: 28.sp,
                   value: selectedDepartment,
@@ -162,13 +182,11 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                 SizedBox(height: 20.h),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
-                    labelText: 'Post',
+                    fillColor: AppColors.textColor,
+                    filled: true,
                     hintText: 'Select Post',
-                    // Add hint style to Post dropdown
                     hintStyle: AppTextStyles.regular(16)
-                        .copyWith(color: AppColors.textColor),
-                    labelStyle: AppTextStyles.regular(16)
-                        .copyWith(color: AppColors.textColor),
+                        .copyWith(color: AppColors.darkest),
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 14.h, horizontal: 12.w),
                     border: OutlineInputBorder(
@@ -190,7 +208,7 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                   elevation: 4,
                   icon: const Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: AppColors.textColor,
+                    color: AppColors.darkest,
                   ),
                   iconSize: 28.sp,
                   value: selectedPost,

@@ -149,7 +149,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
                             final isCreated = await ref
                                 .read(firebaseAuthServiceProvider)
-                                .createAdminWithEmail(
+                                .loginWithEmailAndPassword(
                                     emailController.text.trim().toLowerCase(),
                                     passwordController.text.trim(),
                                     context);
