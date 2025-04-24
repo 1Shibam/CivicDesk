@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final currentUserProvider = StreamProvider.autoDispose<AdminModel>((ref) {
+final currentAdminProvider = StreamProvider.autoDispose<AdminModel>((ref) {
   try {
     final FirebaseAuth user = FirebaseAuth.instance;
     final String currentUseId = user.currentUser!.uid;
