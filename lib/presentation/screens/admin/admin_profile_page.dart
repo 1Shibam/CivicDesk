@@ -29,7 +29,7 @@ class AdminProfilePage extends ConsumerWidget {
         ),
       ),
       body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 32.w),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.w),
           child: currentAdmin.when(
             data: (adminData) {
               return SingleChildScrollView(
@@ -41,19 +41,18 @@ class AdminProfilePage extends ConsumerWidget {
                     ProfileImageSection(
                       uid: adminData.uid,
                       profileUrl: adminData.profileUrl,
+                      isAdmin: true,
                     ),
-                    SizedBox(height: 2.h),
-                    // Joined Date
-                    Text(
-                      'Joined At: ${adminData.createdAt}',
-                      style: AppTextStyles.regular(24),
-                    ),
+
                     SizedBox(height: 16.h),
                     // Profile Details Tiles
                     AllProfileTiles(
+                      isAdmin: true,
                       email: adminData.email,
                       name: adminData.name,
-                      joinedAt: adminData.createdAt,
+                      joinedAt: adminData.createdAt.toString(),
+                      post: adminData.post,
+                      department: adminData.department,
                     ),
                     SizedBox(height: 24.h),
                     CustomButton(
