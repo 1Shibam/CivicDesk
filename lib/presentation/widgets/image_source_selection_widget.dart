@@ -1,7 +1,9 @@
 import 'package:complaints/core/constants.dart';
+import 'package:complaints/services/firestore_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ImageSelectionOptionWidget extends ConsumerWidget {
   const ImageSelectionOptionWidget({
@@ -58,10 +60,36 @@ void _showBottomSheet({
     showDragHandle: true,
     context: context,
     builder: (context) {
-      return ImageSelectionOptionWidget(
-        uid: uid,
-        profileUrl: profileUrl,
-        isAdmin: isAdmin,
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Choose Image Source',
+              style: AppTextStyles.bold(18),
+            ),
+            SizedBox(height: 16.h),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: AppColors.textColor),
+              title: Text('Camera', style: AppTextStyles.regular(16)),
+              onTap: () async {
+                final firestoreService = FirestoreServices();
+                await firestoreService.updateProfilePicture(
+                    uid, ImageSource.camera, context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo, color: AppColors.textColor),
+              title: Text('Gallery', style: AppTextStyles.regular(16)),
+              onTap: () async {
+                final firestoreService = FirestoreServices();
+                await firestoreService.updateProfilePicture(
+                    uid, ImageSource.gallery, context);
+              },
+            ),
+          ],
+        ),
       );
     },
   );

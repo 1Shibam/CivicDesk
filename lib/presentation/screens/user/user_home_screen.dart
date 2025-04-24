@@ -33,7 +33,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               final userProvider = ref.watch(currentUserProvider);
               return userProvider.when(
                   data: (user) {
-                    return Text(user.name, style: AppTextStyles.bold(24));
+                    return Text(user.name, style: AppTextStyles.bold(20));
                   },
                   error: (error, stackTrace) {
                     return Center(
@@ -62,6 +62,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 context.push(RouterNames.notificationScreen);
               },
             ),
+            SizedBox(
+              width: 8.w,
+            ),
             Consumer(
               builder: (context, ref, child) {
                 final currentUser = ref.watch(currentUserProvider);
@@ -70,8 +73,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       String url = user.profileUrl == ''
                           ? emptyProfile
                           : user.profileUrl;
-                      return CircleAvatar(
-                        backgroundImage: CachedNetworkImageProvider(url),
+                      return GestureDetector(
+                        onTap: () {
+                          context.push(RouterNames.userProfile);
+                        },
+                        child: CircleAvatar(
+                          radius: 18.r,
+                          backgroundImage: CachedNetworkImageProvider(url),
+                        ),
                       );
                     },
                     error: (error, stackTrace) => Center(
@@ -86,6 +95,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                           ),
                         ));
               },
+            ),
+            SizedBox(
+              width: 8.w,
             )
           ],
         ),

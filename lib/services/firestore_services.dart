@@ -26,7 +26,7 @@ class FirestoreServices {
 
 // Create user profile
   Future<void> createUserProfile({
-    required String username,
+    String? username,
     required int age,
     required String occupation,
     required String gender,
@@ -39,7 +39,7 @@ class FirestoreServices {
 
     final userInfo = UserModel(
         id: user.uid,
-        name: user.displayName ?? '',
+        name: capitalizeEachWord(username ?? user.displayName!),
         email: user.email ?? '',
         age: age,
         occupation: occupation,
@@ -115,9 +115,6 @@ class FirestoreServices {
       }
     } catch (e) {
       debugPrint('something must be wrong!!');
-      if (context.mounted) {
-        context.pop();
-      }
     }
   }
 
@@ -158,6 +155,15 @@ class FirestoreServices {
 String formatTimestamp(Timestamp timestamp) {
   final dateTime = timestamp.toDate();
   return DateFormat('MMMM d, yyyy – hh:mm a').format(dateTime);
+}
+
+String capitalizeEachWord(String input) {
+  return input
+      .split(' ')
+      .map((word) => word.isNotEmpty
+          ? word[0].toUpperCase() + word.substring(1).toLowerCase()
+          : '')
+      .join(' ');
 }
 
 final firestoreProvider =

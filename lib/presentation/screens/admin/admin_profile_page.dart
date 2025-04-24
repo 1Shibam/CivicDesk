@@ -59,6 +59,7 @@ class AdminProfilePage extends StatelessWidget {
               AllProfileTiles(
                 email: adminData.email,
                 name: adminData.name,
+                joinedAt: adminData.createdAt,
               ),
               SizedBox(height: 24.h),
               CustomButton(

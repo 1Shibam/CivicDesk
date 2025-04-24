@@ -26,8 +26,9 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
 
   final FocusNode occupationFocus = FocusNode();
 
-  late String selectedGender;
-  late String selectedOccupation;
+  String? selectedGender;
+  String? selectedOccupation;
+
   bool isLoading = false;
   bool consentGiven = false;
 
@@ -43,6 +44,14 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
   void _submitProfile() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     final email = FirebaseAuth.instance.currentUser?.email;
+    if (selectedGender == null || selectedOccupation == null) {
+      customSnackbar(
+        message: 'Please select gender and occupation.',
+        context: context,
+        iconName: Icons.error,
+      );
+      return;
+    }
 
     if (fullNameController.text.isEmpty ||
         uid == null ||
@@ -62,8 +71,8 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
 
     FirestoreServices().createUserProfile(
         age: int.parse(ageController.text.trim()),
-        gender: selectedGender,
-        occupation: selectedOccupation,
+        gender: selectedGender!,
+        occupation: selectedOccupation!,
         username: fullNameController.text.trim());
 
     setState(() {
@@ -113,11 +122,6 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                 }
               },
               icon: const Icon(Icons.arrow_back_ios_new)),
-          actions: [
-            TextButton(
-                onPressed: () => context.go(RouterNames.userHome),
-                child: const Text('S K I P'))
-          ],
         ),
         backgroundColor: AppColors.darkest,
         body: Center(
@@ -166,9 +170,12 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                   SizedBox(height: 20.h),
                   DropdownButtonFormField<String>(
                     value: selectedGender,
+                    hint: Text('Select Gender',
+                        style: AppTextStyles.regular(16)
+                            .copyWith(color: AppColors.darkest)),
                     focusNode: genderFocus,
                     style: AppTextStyles.regular(16)
-                        .copyWith(color: AppColors.darkest), // force white text
+                        .copyWith(color: AppColors.darkest),
                     dropdownColor: AppColors.lightGrey,
                     borderRadius: BorderRadius.circular(12.r),
                     icon: const Icon(Icons.keyboard_arrow_down,
@@ -176,9 +183,7 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                     decoration: _dropdownDecoration('Gender'),
                     onChanged: (value) {
                       setState(() {
-                        if (value != null) {
-                          selectedGender = value;
-                        }
+                        selectedGender = value;
                       });
                     },
                     items: genders.map((gender) {
@@ -186,9 +191,8 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                         value: gender,
                         child: Text(
                           gender,
-                          style: AppTextStyles.regular(16).copyWith(
-                              color:
-                                  AppColors.darkest), // force white inside list
+                          style: AppTextStyles.regular(16)
+                              .copyWith(color: AppColors.darkest),
                         ),
                       );
                     }).toList(),
@@ -196,6 +200,9 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                   SizedBox(height: 20.h),
                   DropdownButtonFormField<String>(
                     value: selectedOccupation,
+                    hint: Text('Select Occupation',
+                        style: AppTextStyles.regular(16)
+                            .copyWith(color: AppColors.darkest)),
                     style: AppTextStyles.regular(16)
                         .copyWith(color: AppColors.darkest),
                     dropdownColor: AppColors.lightGrey,
@@ -205,9 +212,7 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                     decoration: _dropdownDecoration('Occupation'),
                     onChanged: (value) {
                       setState(() {
-                        if (value != null) {
-                          selectedOccupation = value;
-                        }
+                        selectedOccupation = value;
                       });
                     },
                     items: occupations.map((occ) {
@@ -240,7 +245,7 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                       ),
                       Expanded(
                         child: Text(
-                          'I confirm that the above information is correct.',
+                          'I confirm that the information entered is correct and cannot be changed later.',
                           style: AppTextStyles.regular(16),
                         ),
                       ),
