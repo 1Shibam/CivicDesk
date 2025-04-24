@@ -2,6 +2,7 @@ import 'package:complaints/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+//single snackbar widget for handling error and success messages
 void customSnackbar(
     {required String message,
     required BuildContext context,

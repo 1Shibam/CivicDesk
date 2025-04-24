@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
+// basic loading animation
 class LoadingAnimation extends StatelessWidget {
   final double opacity;
   final double? height;

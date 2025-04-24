@@ -1,6 +1,7 @@
 import 'package:complaints/core/constants.dart';
 import 'package:flutter/material.dart';
 
+//custom text field for  more control over all the textfields in the application
 class CustomTextFields extends StatelessWidget {
   final String labelText;
   final IconData prefixIcon;

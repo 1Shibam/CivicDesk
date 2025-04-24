@@ -10,9 +10,11 @@ class ComplaintsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
+      //base design size
       designSize: const Size(375, 812),
       minTextAdapt: true,
       builder: (context, child) {
+        //using go router
         return MaterialApp.router(
           routerConfig: appRoutes,
           theme: appTheme,
