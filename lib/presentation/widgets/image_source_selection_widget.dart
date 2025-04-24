@@ -76,7 +76,7 @@ void _showBottomSheet({
               onTap: () async {
                 final firestoreService = FirestoreServices();
                 await firestoreService.updateProfilePicture(
-                    uid, ImageSource.camera, context);
+                    uid, ImageSource.camera, context, isAdmin);
               },
             ),
             ListTile(
@@ -85,7 +85,7 @@ void _showBottomSheet({
               onTap: () async {
                 final firestoreService = FirestoreServices();
                 await firestoreService.updateProfilePicture(
-                    uid, ImageSource.gallery, context);
+                    uid, ImageSource.gallery, context, isAdmin);
               },
             ),
           ],

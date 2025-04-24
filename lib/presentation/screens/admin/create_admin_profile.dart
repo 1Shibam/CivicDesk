@@ -43,9 +43,10 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
         email == null ||
         selectedDepartment == null ||
         selectedPost == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields.')),
-      );
+      customSnackbar(
+          message: 'Please Fill all the fileds',
+          context: context,
+          iconName: Icons.error);
       return;
     }
 
@@ -168,7 +169,9 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                   items: departments
                       .map((dep) => DropdownMenuItem(
                             value: dep,
-                            child: Text(dep, style: AppTextStyles.regular(16)),
+                            child: Text(dep,
+                                style: AppTextStyles.regular(16)
+                                    .copyWith(color: AppColors.darkest)),
                           ))
                       .toList(),
                   onChanged: (val) {
@@ -215,7 +218,9 @@ class _CreateAdminProfileState extends State<CreateAdminProfile> {
                   items: posts
                       .map((post) => DropdownMenuItem(
                             value: post,
-                            child: Text(post, style: AppTextStyles.regular(16)),
+                            child: Text(post,
+                                style: AppTextStyles.regular(16)
+                                    .copyWith(color: AppColors.darkest)),
                           ))
                       .toList(),
                   onChanged: (val) {

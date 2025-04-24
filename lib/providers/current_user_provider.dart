@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //? current user provider
-final currentUserProvider = StreamProvider.autoDispose<UserModel>((ref) {
+final currentUserProvider = StreamProvider<UserModel>((ref) {
   try {
     final FirebaseAuth user = FirebaseAuth.instance;
     final String currentUseId = user.currentUser!.uid;

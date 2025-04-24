@@ -66,7 +66,7 @@ class FirestoreServices {
 
     final userInfo = AdminModel(
       uid: user.uid,
-      name: user.displayName ?? '',
+      name: capitalizeEachWord(name),
       email: user.email ?? '',
       department: department,
       post: post,
@@ -79,8 +79,8 @@ class FirestoreServices {
 
   //update profile picture in firestore --
 
-  Future<void> updateProfilePicture(
-      String userId, ImageSource source, BuildContext context) async {
+  Future<void> updateProfilePicture(String userId, ImageSource source,
+      BuildContext context, bool isAdmin) async {
     File? image = await pickImage(source, context);
     if (image == null) return;
     if (!context.mounted) return;
@@ -88,9 +88,10 @@ class FirestoreServices {
     String? imageUrl = await uploadImageToImgur(context, image);
     if (imageUrl != null && context.mounted) {
       await updateUserData(
+        isAdmin: isAdmin,
         userID: userId,
         context: context,
-        updates: {'profile_url': imageUrl},
+        updates: isAdmin ? {'profileUrl': imageUrl} : {'profile_url': imageUrl},
       );
     }
   }
@@ -98,10 +99,13 @@ class FirestoreServices {
   // Single method to update user Data - this method finalizes updates
   Future<void> updateUserData(
       {required String userID,
+      required bool isAdmin,
       required Map<String, dynamic> updates,
       required BuildContext context}) async {
     try {
-      await firestore.collection('users').doc(userID).update(updates);
+      isAdmin
+          ? await firestore.collection('admins').doc(userID).update(updates)
+          : await firestore.collection('users').doc(userID).update(updates);
       if (context.mounted) {
         context.pop();
       }

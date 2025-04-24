@@ -7,8 +7,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageSourceOptions extends StatelessWidget {
-  const ImageSourceOptions({super.key, required this.userData});
+  const ImageSourceOptions(
+      {super.key, required this.userData, required this.isAdmin});
   final UserModel userData;
+  final bool isAdmin;
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +45,8 @@ class ImageSourceOptions extends StatelessWidget {
                             await ref
                                 .read(firestoreServiceStateNotifierProvider
                                     .notifier)
-                                .changeProfilePicture(
-                                    context, userData.id, ImageSource.camera);
+                                .changeProfilePicture(context, userData.id,
+                                    ImageSource.camera, isAdmin);
                           },
                           icon: Icon(
                             Icons.camera_alt_rounded,
@@ -67,8 +69,8 @@ class ImageSourceOptions extends StatelessWidget {
                             await ref
                                 .read(firestoreServiceStateNotifierProvider
                                     .notifier)
-                                .changeProfilePicture(
-                                    context, userData.id, ImageSource.gallery);
+                                .changeProfilePicture(context, userData.id,
+                                    ImageSource.gallery, isAdmin);
                           },
                           icon: Icon(
                             Icons.image,

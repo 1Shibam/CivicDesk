@@ -10,10 +10,10 @@ final firestoreServiceProvider =
 class FirestoreServiceNotifier extends StateNotifier<FirestoreServices> {
   FirestoreServiceNotifier(super.services);
 
-  Future<bool> changeProfilePicture(
-      BuildContext context, String userID, ImageSource imageSource) async {
+  Future<bool> changeProfilePicture(BuildContext context, String userID,
+      ImageSource imageSource, bool isAdmin) async {
     try {
-      await state.updateProfilePicture(userID, imageSource, context);
+      await state.updateProfilePicture(userID, imageSource, context, isAdmin);
       if (context.mounted) {
         customSnackbar(
             context: context,
@@ -30,10 +30,11 @@ class FirestoreServiceNotifier extends StateNotifier<FirestoreServices> {
   Future<bool> changeUserData(
       {required BuildContext context,
       required Map<String, dynamic> changes,
-      required String userID}) async {
+      required String userID,
+      required bool isAdmin}) async {
     try {
       await state.updateUserData(
-          userID: userID, updates: changes, context: context);
+          userID: userID, updates: changes, context: context, isAdmin: isAdmin);
       return true;
     } catch (e) {
       return false;

@@ -5,16 +5,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final currentAdminProvider = StreamProvider.autoDispose<AdminModel>((ref) {
-  try {
-    final FirebaseAuth user = FirebaseAuth.instance;
-    final String currentUseId = user.currentUser!.uid;
+final currentAdminProvider = StreamProvider<AdminModel>((ref) {
+  final user = FirebaseAuth.instance.currentUser;
 
+  if (user == null) {
+    // Return an empty stream that immediately completes (won't throw)
+    return const Stream<AdminModel>.empty();
+  }
+
+  try {
     return FirebaseFirestore.instance
         .collection('admins')
-        .doc(currentUseId)
+        .doc(user.uid)
         .snapshots()
-        .map((doc) => AdminModel.fromJson(doc.data()!));
+        .map((doc) {
+      final data = doc.data();
+      if (data == null) throw Exception("Admin data is null");
+      return AdminModel.fromJson(data);
+    });
   } on FirebaseException catch (e, stackTrace) {
     debugPrint(e.message);
     debugPrintStack(stackTrace: stackTrace);
