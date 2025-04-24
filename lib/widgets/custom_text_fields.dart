@@ -47,6 +47,8 @@ class CustomTextFields extends StatelessWidget {
         }
       },
       decoration: InputDecoration(
+        errorStyle:
+            AppTextStyles.regular(14).copyWith(color: AppColors.darkPinkAccent),
         labelText: labelText,
         prefixIcon: Icon(prefixIcon, color: AppColors.textColor),
         suffixIcon: suffixIcon,

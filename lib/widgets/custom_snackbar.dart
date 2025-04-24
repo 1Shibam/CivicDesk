@@ -11,6 +11,7 @@ void customSnackbar(
     Color bgColor = AppColors.darkPinkAccent}) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: ListTile(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       leading: Icon(
         iconName,
         size: 24.sp,
@@ -23,6 +24,7 @@ void customSnackbar(
       ),
     ),
     backgroundColor: Colors.transparent,
+    elevation: 0,
     duration: Duration(seconds: duration),
   ));
 }

@@ -26,6 +26,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final FocusNode passwordFocusNode = FocusNode();
   final FocusNode adminKeyFocusNode = FocusNode();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool hidePassword = true;
+  bool hideAdminKey = true;
 
   @override
   void dispose() {
@@ -77,21 +79,50 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   controller: emailController,
                   validator: ValidationType.email,
                   focusNode: emailFocusNode,
+                  nextFocusNode: passwordFocusNode,
                 ),
                 SizedBox(height: 16.h),
                 CustomTextFields(
                   labelText: 'Password',
                   prefixIcon: Icons.lock,
+                  obscureText: hidePassword,
                   controller: passwordController,
-                  focusNode: passwordFocusNode,
                   validator: ValidationType.password,
+                  focusNode: passwordFocusNode,
+                  nextFocusNode: adminKeyFocusNode,
+                  suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          hidePassword = !hidePassword;
+                        });
+                      },
+                      icon: Icon(
+                        hidePassword ? Icons.visibility_off : Icons.visibility,
+                        color: hidePassword
+                            ? AppColors.lightGrey
+                            : AppColors.textColor,
+                      )),
                 ),
                 SizedBox(height: 16.h),
                 CustomTextFields(
                   labelText: 'Admin Key',
                   prefixIcon: Icons.key,
+                  obscureText: hideAdminKey,
                   controller: adminKeyController,
                   focusNode: adminKeyFocusNode,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        hideAdminKey = !hideAdminKey;
+                      });
+                    },
+                    icon: Icon(
+                      hideAdminKey ? Icons.visibility_off : Icons.visibility,
+                      color: hideAdminKey
+                          ? AppColors.lightGrey
+                          : AppColors.textColor,
+                    ),
+                  ),
                 ),
                 SizedBox(height: 24.h),
                 Consumer(
