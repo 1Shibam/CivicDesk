@@ -11,6 +11,7 @@ class CustomTextFields extends StatelessWidget {
   final FocusNode? nextFocusNode;
   final ValidationType validator;
   final TextInputType textType;
+  final bool obscureText;
 
   const CustomTextFields({
     super.key,
@@ -19,6 +20,7 @@ class CustomTextFields extends StatelessWidget {
     required this.controller,
     required this.focusNode,
     this.nextFocusNode,
+    this.obscureText = false,
     this.validator = ValidationType.none,
     this.textType = TextInputType.name,
     this.suffixIcon,
@@ -31,6 +33,8 @@ class CustomTextFields extends StatelessWidget {
       style: AppTextStyles.regular(16),
       controller: controller,
       focusNode: focusNode,
+      obscureText: obscureText,
+      obscuringCharacter: '*',
       keyboardType: textType,
       validator: (value) => validateInput(value, validator),
       textInputAction:

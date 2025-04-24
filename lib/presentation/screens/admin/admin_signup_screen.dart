@@ -30,6 +30,9 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
   final FocusNode adminKeyFocusNode = FocusNode();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool agreeToTerms = false;
+  bool hidePassword = true;
+  bool hideConfirmPassword = true;
+  bool hideAdminKey = true;
 
   @override
   void dispose() {
@@ -82,28 +85,77 @@ class _AdminSignupScreenState extends State<AdminSignupScreen> {
                     controller: emailController,
                     validator: ValidationType.email,
                     focusNode: emailFocusNode,
+                    nextFocusNode: passwordFocusNode,
                   ),
                   SizedBox(height: 16.h),
                   CustomTextFields(
                     labelText: 'Password',
                     prefixIcon: Icons.lock,
+                    obscureText: hidePassword,
                     controller: passwordController,
                     validator: ValidationType.password,
                     focusNode: passwordFocusNode,
+                    nextFocusNode: confirmPasswordFocusNode,
+                    suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            hidePassword = !hidePassword;
+                          });
+                        },
+                        icon: Icon(
+                          hidePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: hidePassword
+                              ? AppColors.lightGrey
+                              : AppColors.textColor,
+                        )),
                   ),
                   SizedBox(height: 16.h),
                   CustomTextFields(
-                      labelText: 'Confirm Password',
-                      prefixIcon: Icons.lock,
-                      controller: confirmPasswordController,
-                      focusNode: confirmPasswordFocusNode,
-                      validator: ValidationType.password),
+                    labelText: 'Confirm Password',
+                    prefixIcon: Icons.lock,
+                    obscureText: hideConfirmPassword,
+                    controller: confirmPasswordController,
+                    focusNode: confirmPasswordFocusNode,
+                    nextFocusNode: adminKeyFocusNode,
+                    validator: ValidationType.password,
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          hideConfirmPassword = !hideConfirmPassword;
+                        });
+                      },
+                      icon: Icon(
+                        hideConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: hideConfirmPassword
+                            ? AppColors.lightGrey
+                            : AppColors.textColor,
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 16.h),
                   CustomTextFields(
                     labelText: 'Admin Key',
                     prefixIcon: Icons.key,
+                    obscureText: hideAdminKey,
                     controller: adminKeyController,
                     focusNode: adminKeyFocusNode,
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          hideAdminKey = !hideAdminKey;
+                        });
+                      },
+                      icon: Icon(
+                        hideAdminKey ? Icons.visibility_off : Icons.visibility,
+                        color: hideAdminKey
+                            ? AppColors.lightGrey
+                            : AppColors.textColor,
+                      ),
+                    ),
                   ),
                   SizedBox(height: 20.h),
                   Row(
