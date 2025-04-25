@@ -2,6 +2,7 @@ import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class ComplaintDetailScreen extends StatelessWidget {
   final ComplaintModel complaint;
@@ -11,92 +12,245 @@ class ComplaintDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkest,
       appBar: AppBar(
-          title: Text(
-        "Complaint Details",
-        style: AppTextStyles.bold(24),
-      )),
-      body: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(complaint.title, style: AppTextStyles.bold(24)),
-            SizedBox(height: 8.h),
-            // Row(
-            //   children: [
-            //     Icon(Icons.category, size: 20.sp),
-            //     SizedBox(width: 8.w),
-            //     Text("Category: ${complaint.category}",
-            //         style: AppTextStyles.medium(18)),
-            //   ],
-            // ),
-            ListTile(
-              title: Text("Category: ", style: AppTextStyles.medium(24)),
-              subtitle:
-                  Text(complaint.category, style: AppTextStyles.regular(20)),
-              trailing: Icon(
+        backgroundColor: AppColors.darkBlueGrey,
+        shadowColor: AppColors.darkest,
+        elevation: 4,
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            size: 22.sp,
+            color: AppColors.textColor,
+          ),
+        ),
+        title: Text(
+          "Complaint Details",
+          style: AppTextStyles.bold(22),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title section with status indicator
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      complaint.title,
+                      style: AppTextStyles.bold(24),
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: complaint.status == "Resolved"
+                          ? Colors.green.withValues(alpha: 0.2)
+                          : Colors.yellow.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(16.r),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          complaint.status == "Resolved"
+                              ? Icons.check_circle
+                              : Icons.pending,
+                          size: 16.sp,
+                          color: complaint.status == "Resolved"
+                              ? Colors.green
+                              : Colors.yellow,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          complaint.status,
+                          style: AppTextStyles.medium(
+                            14,
+                            color: complaint.status == "Resolved"
+                                ? Colors.green
+                                : Colors.yellow,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 24.h),
+
+              // Category section
+              _buildInfoSection(
+                "Category",
+                complaint.category,
                 Icons.category,
-                size: 32.sp,
-                color: AppColors.textColor,
+                AppColors.textColor,
               ),
-            ),
-            ListTile(
-              title: Text("Status: ", style: AppTextStyles.medium(24)),
-              subtitle:
-                  Text(complaint.status, style: AppTextStyles.regular(20)),
-              trailing: Icon(
-                complaint.status == "Resolved"
-                    ? Icons.check_circle
-                    : Icons.pending,
-                size: 32.sp,
-                color: complaint.status == "Resolved"
-                    ? Colors.green
-                    : Colors.yellow,
-              ),
-            ),
-            ListTile(
-              title: Text("Description: ",
-                  style: AppTextStyles.medium(
-                    24,
-                  )),
-              subtitle:
-                  Text(complaint.description, style: AppTextStyles.regular(20)),
-              trailing: Icon(
+
+              Divider(
+                  color: AppColors.lightGrey.withValues(alpha: 0.3),
+                  height: 24.h),
+
+              // Description section
+              _buildInfoSection(
+                "Description",
+                complaint.description,
                 Icons.description,
-                size: 32.sp,
-                color: AppColors.textColor,
+                AppColors.textColor,
+                expandContent: true,
               ),
-            ),
-            ListTile(
-              title: Text("Attachments: ",
-                  style: AppTextStyles.medium(
-                    24,
-                  )),
-              trailing: Icon(
-                Icons.description,
-                size: 32.sp,
-                color: AppColors.textColor,
-              ),
-            ),
-            Expanded(
-                child: ListView(
-              children: [
-                Image.asset(
-                  'asets/images/light.png',
-                  width: double.infinity,
-                  height: 200.h,
+
+              Divider(
+                  color: AppColors.lightGrey.withValues(alpha: 0.3),
+                  height: 24.h),
+
+              // Attachments section
+              Text("Attachments", style: AppTextStyles.medium(20)),
+              SizedBox(height: 12.h),
+
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
+                  color: AppColors.darkBlueGrey.withValues(alpha: 0.5),
                 ),
-              ],
-            )),
-            SizedBox(height: 40.h),
-            // CustomButton(
-            //     onTap: () {
-            //       //Approve the complaint
-            //     },
-            //     buttonText: 'Approve',
-            //     imageUrl:
-            //         'asets/images/approve-basic-checklist-svgrepo-com copy.svg')
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: Image.asset(
+                    'asets/images/light.png',
+                    width: double.infinity,
+                    height: 200.h,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 200.h,
+                      color: AppColors.darkBlueGrey.withValues(alpha: 0.3),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.broken_image,
+                                size: 48.sp, color: AppColors.lightGrey),
+                            SizedBox(height: 8.h),
+                            Text("Image not found",
+                                style: AppTextStyles.regular(14)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 32.h),
+
+              // Action buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildActionButton(
+                      onTap: () {
+                        // Approve the complaint
+                      },
+                      text: 'Approve',
+                      icon: Icons.check_circle_outline,
+                      backgroundColor: AppColors.darkPink,
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Expanded(
+                    child: _buildActionButton(
+                      onTap: () {
+                        // Reject the complaint
+                      },
+                      text: 'Reject',
+                      icon: Icons.cancel_outlined,
+                      backgroundColor: AppColors.darkBlueGrey,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16.h),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection(
+    String title,
+    String content,
+    IconData icon,
+    Color iconColor, {
+    bool expandContent = false,
+  }) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+      decoration: BoxDecoration(
+          color: AppColors.darkBlueGrey,
+          borderRadius: BorderRadius.circular(20.r)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 22.sp, color: iconColor),
+              SizedBox(width: 8.w),
+              Text(title, style: AppTextStyles.medium(20)),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          Padding(
+            padding: EdgeInsets.only(left: 30.w),
+            child: Text(
+              content,
+              style: AppTextStyles.regular(16),
+              textAlign: expandContent ? TextAlign.justify : TextAlign.start,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required VoidCallback onTap,
+    required String text,
+    required IconData icon,
+    required Color backgroundColor,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(8.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: AppColors.textColor, size: 20.sp),
+            SizedBox(width: 8.w),
+            Text(
+              text,
+              style: AppTextStyles.medium(16),
+            ),
           ],
         ),
       ),

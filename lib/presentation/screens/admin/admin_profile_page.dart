@@ -4,6 +4,7 @@ import 'package:complaints/providers/current_admin_provider.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/presentation/widgets/profile_image_section.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -78,7 +79,7 @@ class AdminProfilePage extends ConsumerWidget {
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    // await FirebaseAuth.instance.signOut();
+                                    await FirebaseAuth.instance.signOut();
                                     if (context.mounted) {
                                       context.go(RouterNames.splash);
                                     }

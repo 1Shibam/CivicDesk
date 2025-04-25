@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
+import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
 import 'package:complaints/providers/current_admin_provider.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     ComplaintModel(
       complaintId: '1',
       title: 'Water Leakage',
-      description: 'There is a water leakage issue in the main pipe.',
+      description:
+          'There is a water leakage issue in the main pipe. all the people living around there went missing rumors says they drowned in that water ',
       category: 'Infrastructure',
       userId: 'user789',
       userName: 'Alice Johnson',
@@ -159,7 +161,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 : spamComplaints[index];
             return GestureDetector(
               onTap: () {
-                context.push('/');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ComplaintDetailScreen(complaint: complaint)));
               },
               child: Card(
                 color: AppColors.darkPinkAccent,
