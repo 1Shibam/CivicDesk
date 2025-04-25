@@ -18,24 +18,74 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   int _selectedIndex = 0;
+  String _selectedFilter = 'All';
   final String emptyProfile = 'https://i.imgur.com/PcvwDlW.png';
+
+  // Filter options
+  final List<String> filterOptions = [
+    'All',
+    'Infrastructure',
+    'Sanitation',
+    'Security',
+    'Other'
+  ];
 
   final List<ComplaintModel> primaryComplaints = [
     ComplaintModel(
       complaintId: '1',
       title: 'Water Leakage',
       description:
-          'There is a water leakage issue in the main pipe. all the people living around there went missing rumors says they drowned in that water ',
+          'There is a water leakage issue in the main pipe. All the people living around there went missing, rumors say they drowned in that water.',
       category: 'Infrastructure',
       userId: 'user789',
       userName: 'Alice Johnson',
       userEmail: 'alice@example.com',
-      attachments: [],
-      status: 'pending',
+      attachments: [
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJaJMavZR97wfX32yXgE0xzaXC_Q2K9wmj8g&s',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJaJMavZR97wfX32yXgE0xzaXC_Q2K9wmj8g&s',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJaJMavZR97wfX32yXgE0xzaXC_Q2K9wmj8g&s',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJaJMavZR97wfX32yXgE0xzaXC_Q2K9wmj8g&s'
+      ],
+      status: 'Pending',
       isSpam: false,
       adminId: 'admin123',
       submittedAt: DateTime.now().subtract(const Duration(days: 3)),
       updatedAt: DateTime.now().subtract(const Duration(days: 1)),
+      userNotified: false,
+      adminNotified: false,
+    ),
+    ComplaintModel(
+      complaintId: '3',
+      title: 'Broken Street Light',
+      description:
+          'Street light in main avenue has been non-functional for a week.',
+      category: 'Infrastructure',
+      userId: 'user456',
+      userName: 'John Smith',
+      userEmail: 'john@example.com',
+      attachments: [],
+      status: 'Pending',
+      isSpam: false,
+      adminId: 'admin123',
+      submittedAt: DateTime.now().subtract(const Duration(days: 2)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 1)),
+      userNotified: false,
+      adminNotified: false,
+    ),
+    ComplaintModel(
+      complaintId: '4',
+      title: 'Garbage Collection Issue',
+      description: 'Garbage hasn\'t been collected for three days.',
+      category: 'Sanitation',
+      userId: 'user222',
+      userName: 'Mary Wilson',
+      userEmail: 'mary@example.com',
+      attachments: [],
+      status: 'Pending',
+      isSpam: false,
+      adminId: 'admin123',
+      submittedAt: DateTime.now().subtract(const Duration(days: 1)),
+      updatedAt: DateTime.now(),
       userNotified: false,
       adminNotified: false,
     ),
@@ -51,7 +101,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       userName: 'Unknown',
       userEmail: 'unknown@example.com',
       attachments: [],
-      status: 'review',
+      status: 'Review',
       isSpam: true,
       adminId: 'admin123',
       submittedAt: DateTime.now().subtract(const Duration(days: 5)),
@@ -59,153 +109,520 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       userNotified: false,
       adminNotified: false,
     ),
+    ComplaintModel(
+      complaintId: '5',
+      title: 'Suspicious Activity',
+      description: 'This is likely a spam report with no real issue.',
+      category: 'Security',
+      userId: 'user333',
+      userName: 'Anonymous',
+      userEmail: 'anon@example.com',
+      attachments: [],
+      status: 'Review',
+      isSpam: true,
+      adminId: 'admin123',
+      submittedAt: DateTime.now().subtract(const Duration(days: 4)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 1)),
+      userNotified: false,
+      adminNotified: false,
+    ),
+  ];
+
+  final List<ComplaintModel> approvedComplaints = [
+    ComplaintModel(
+      complaintId: '6',
+      title: 'Park Maintenance',
+      description: 'The local park needs better maintenance and cleaning.',
+      category: 'Sanitation',
+      userId: 'user444',
+      userName: 'Robert Brown',
+      userEmail: 'robert@example.com',
+      attachments: [],
+      status: 'Approved',
+      isSpam: false,
+      adminId: 'admin123',
+      submittedAt: DateTime.now().subtract(const Duration(days: 10)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+      userNotified: true,
+      adminNotified: true,
+    ),
+    ComplaintModel(
+      complaintId: '7',
+      title: 'Security Camera Installation',
+      description:
+          'Request for installation of security cameras in the building lobby.',
+      category: 'Security',
+      userId: 'user555',
+      userName: 'Jennifer Lee',
+      userEmail: 'jennifer@example.com',
+      attachments: [],
+      status: 'Approved',
+      isSpam: false,
+      adminId: 'admin123',
+      submittedAt: DateTime.now().subtract(const Duration(days: 15)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 8)),
+      userNotified: true,
+      adminNotified: true,
+    ),
   ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _selectedFilter = 'All'; // Reset filter when changing tabs
     });
   }
 
+  List<ComplaintModel> _getFilteredComplaints() {
+    List<ComplaintModel> complaints;
+
+    switch (_selectedIndex) {
+      case 0:
+        complaints = primaryComplaints;
+        break;
+      case 1:
+        complaints = spamComplaints;
+        break;
+      case 2:
+        complaints = approvedComplaints;
+        break;
+      default:
+        complaints = primaryComplaints;
+    }
+
+    if (_selectedFilter == 'All') {
+      return complaints;
+    } else {
+      return complaints
+          .where((complaint) => complaint.category == _selectedFilter)
+          .toList();
+    }
+  }
+
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60.h),
-        child: AppBar(
-          elevation: 4,
-          shadowColor: AppColors.darkest,
-          title: Consumer(
-            builder: (context, ref, child) {
-              final adminProvider = ref.watch(currentAdminProvider);
-              return adminProvider.when(
-                  data: (admin) {
-                    return Text(admin.name, style: AppTextStyles.bold(20));
-                  },
-                  error: (error, stackTrace) {
-                    return Center(
-                      child: Text(
-                        'No user',
-                        style: AppTextStyles.bold(20),
-                      ),
+    final filteredComplaints = _getFilteredComplaints();
+
+    return SafeArea(
+      child: Stack(
+        children: [
+          Scaffold(
+            backgroundColor: AppColors.darkest,
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(60.h),
+              child: AppBar(
+                elevation: 4,
+                shadowColor: AppColors.darkest,
+                title: Consumer(
+                  builder: (context, ref, child) {
+                    final adminProvider = ref.watch(currentAdminProvider);
+                    return adminProvider.when(
+                      data: (admin) {
+                        return Text(admin.name, style: AppTextStyles.bold(20));
+                      },
+                      error: (error, stackTrace) {
+                        return Text('No user', style: AppTextStyles.bold(20));
+                      },
+                      loading: () => const CircularProgressIndicator(
+                          color: AppColors.darkPink),
                     );
                   },
-                  loading: () => const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.darkPink,
+                ),
+                backgroundColor: AppColors.darkBlueGrey,
+                actions: [
+                  IconButton(
+                    icon: Stack(
+                      children: [
+                        Icon(Icons.notifications,
+                            color: AppColors.textColor, size: 28.sp),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 10.w,
+                            height: 10.w,
+                            decoration: const BoxDecoration(
+                              color: AppColors.darkPink,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                         ),
-                      ));
-            },
-          ),
-          backgroundColor: AppColors.darkBlueGrey,
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.notifications,
-                color: AppColors.textColor,
-                size: 32.sp,
-              ),
-              onPressed: () {
-                context.push(RouterNames.notificationScreen);
-              },
-            ),
-            SizedBox(
-              width: 8.w,
-            ),
-            Consumer(
-              builder: (context, ref, child) {
-                final currentUser = ref.watch(currentAdminProvider);
-                return currentUser.when(
-                    data: (admin) {
-                      String url = admin.profileUrl == ''
-                          ? emptyProfile
-                          : admin.profileUrl;
-                      return GestureDetector(
-                        onTap: () {
-                          context.push(RouterNames.adminProfile);
+                      ],
+                    ),
+                    onPressed: () {
+                      context.push(RouterNames.notificationScreen);
+                    },
+                  ),
+                  SizedBox(width: 12.w),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final currentUser = ref.watch(currentAdminProvider);
+                      return currentUser.when(
+                        data: (admin) {
+                          String url = admin.profileUrl.isEmpty
+                              ? emptyProfile
+                              : admin.profileUrl;
+                          return GestureDetector(
+                            onTap: () {
+                              context.push(RouterNames.adminProfile);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: AppColors.darkPink, width: 2.w),
+                              ),
+                              child: CircleAvatar(
+                                radius: 16.r,
+                                backgroundImage:
+                                    CachedNetworkImageProvider(url),
+                              ),
+                            ),
+                          );
                         },
-                        child: CircleAvatar(
-                          radius: 18.r,
-                          backgroundImage: CachedNetworkImageProvider(url),
+                        error: (error, stackTrace) => Text(
+                          'Error',
+                          style: AppTextStyles.bold(16),
                         ),
+                        loading: () => const CircularProgressIndicator(
+                            color: AppColors.darkPink),
                       );
                     },
-                    error: (error, stackTrace) => Center(
-                          child: Text(
-                            'Something went wrong',
-                            style: AppTextStyles.bold(16),
+                  ),
+                  SizedBox(width: 12.w),
+                ],
+              ),
+            ),
+            body: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 4.w),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 16.h,
+                  ),
+                  // Filter section
+                  Container(
+                    decoration: BoxDecoration(
+                        color: AppColors.darkBlueGrey.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20.r),
+                            bottomLeft: Radius.circular(20.r))),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _selectedIndex == 0
+                                  ? "Primary Complaints"
+                                  : _selectedIndex == 1
+                                      ? "Spam Reports"
+                                      : "Approved Complaints",
+                              style: AppTextStyles.bold(18),
+                            ),
+                            Text(
+                              "${filteredComplaints.length} found",
+                              style: AppTextStyles.regular(14),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: filterOptions.map((filter) {
+                              final isSelected = _selectedFilter == filter;
+                              return Padding(
+                                padding: EdgeInsets.only(right: 8.w),
+                                child: FilterChip(
+                                  label: Text(
+                                    filter,
+                                    style: AppTextStyles.medium(12,
+                                        color: isSelected
+                                            ? AppColors.textColor
+                                            : AppColors.lightGrey),
+                                  ),
+                                  selected: isSelected,
+                                  onSelected: (selected) {
+                                    setState(() {
+                                      _selectedFilter = filter;
+                                    });
+                                  },
+                                  backgroundColor: AppColors.darkBlueGrey,
+                                  selectedColor: AppColors.darkPink,
+                                  checkmarkColor: AppColors.textColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    side: BorderSide(
+                                      color: isSelected
+                                          ? AppColors.darkPink
+                                          : AppColors.lightGrey,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
                         ),
-                    loading: () => const Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.darkPink,
-                          ),
-                        ));
-              },
-            ),
-            SizedBox(
-              width: 8.w,
-            )
-          ],
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: ListView.builder(
-          itemCount: _selectedIndex == 0
-              ? primaryComplaints.length
-              : spamComplaints.length,
-          itemBuilder: (context, index) {
-            final complaint = _selectedIndex == 0
-                ? primaryComplaints[index]
-                : spamComplaints[index];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ComplaintDetailScreen(complaint: complaint)));
-              },
-              child: Card(
-                color: AppColors.darkPinkAccent,
-                child: Padding(
-                  padding: EdgeInsets.all(12.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(complaint.title, style: AppTextStyles.bold(16)),
-                      SizedBox(height: 4.h),
-                      Text("Category: ${complaint.category}",
-                          style: AppTextStyles.medium(14)),
-                      SizedBox(height: 4.h),
-                      Text("Status: ${complaint.status}",
-                          style: AppTextStyles.medium(14)),
-                    ],
+                      ],
+                    ),
                   ),
+                  SizedBox(
+                    height: 16.h,
+                  ),
+
+                  // Complaints list
+                  Expanded(
+                    child: filteredComplaints.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 64.sp,
+                                  color: AppColors.lightGrey,
+                                ),
+                                SizedBox(height: 16.h),
+                                Text(
+                                  "No complaints found",
+                                  style: AppTextStyles.medium(16,
+                                      color: AppColors.lightGrey),
+                                ),
+                                SizedBox(height: 8.h),
+                                Text(
+                                  "Try changing your filter",
+                                  style: AppTextStyles.regular(14,
+                                      color: AppColors.lightGrey),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredComplaints.length,
+                            itemBuilder: (context, index) {
+                              final complaint = filteredComplaints[index];
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 12.h),
+                                child: _buildComplaintCard(complaint, context),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: AppColors.darkPink,
+              onPressed: () async {
+                setState(() {
+                  isLoading = true;
+                });
+
+                await Future.delayed(const Duration(seconds: 2));
+                setState(() {
+                  isLoading = false;
+                });
+              },
+              child: const Icon(Icons.refresh, color: AppColors.textColor),
+            ),
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                  color: AppColors.darkBlueGrey,
+                  borderRadius: BorderRadius.circular(20.r)),
+              child: BottomNavigationBar(
+                selectedIconTheme: IconThemeData(size: 32.sp),
+                backgroundColor: Colors.transparent,
+                selectedItemColor: AppColors.darkPinkAccent,
+                unselectedItemColor: AppColors.lightGrey,
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.list),
+                    label: 'Primary',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.warning),
+                    label: 'Spam',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.check_circle),
+                    label: 'Approved',
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isLoading) ...[
+            Container(
+              height: double.infinity,
+              color: AppColors.darkest.withValues(alpha: 0.7),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.darkPink,
                 ),
               ),
-            );
-          },
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.darkBlueGrey,
-        selectedItemColor: AppColors.darkPink,
-        unselectedItemColor: AppColors.lightGrey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Primary',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.warning),
-            label: 'Spam',
-          ),
+            )
+          ]
         ],
       ),
     );
+  }
+
+  Widget _buildComplaintCard(ComplaintModel complaint, BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ComplaintDetailScreen(complaint: complaint),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(12.r),
+      child: Card(
+        elevation: 4,
+        shadowColor: Colors.black.withValues(alpha: 0.3),
+        color: _getCardColor(complaint),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      complaint.title,
+                      style: AppTextStyles.bold(16),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor(complaint.status),
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    child: Text(
+                      complaint.status,
+                      style: AppTextStyles.medium(12),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8.h),
+              Row(
+                children: [
+                  Icon(
+                    _getCategoryIcon(complaint.category),
+                    size: 16.sp,
+                    color: AppColors.textColor.withValues(alpha: 0.8),
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    complaint.category,
+                    style: AppTextStyles.medium(14,
+                        color: AppColors.textColor.withValues(alpha: 0.8)),
+                  ),
+                ],
+              ),
+              SizedBox(height: 4.h),
+              Row(
+                children: [
+                  Icon(
+                    Icons.person_outline,
+                    size: 16.sp,
+                    color: AppColors.textColor.withValues(alpha: 0.8),
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    complaint.userName,
+                    style: AppTextStyles.regular(14,
+                        color: AppColors.textColor.withValues(alpha: 0.8)),
+                  ),
+                ],
+              ),
+              SizedBox(height: 4.h),
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 16.sp,
+                    color: AppColors.textColor.withValues(alpha: 0.8),
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    _formatDate(complaint.submittedAt),
+                    style: AppTextStyles.regular(14,
+                        color: AppColors.textColor.withValues(alpha: 0.8)),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                complaint.description,
+                style: AppTextStyles.regular(14),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _getCardColor(ComplaintModel complaint) {
+    if (_selectedIndex == 1) {
+      return AppColors.darkBlueGrey;
+    } else if (_selectedIndex == 2) {
+      return AppColors.darkGreen.withValues(alpha: 0.4);
+    } else {
+      return AppColors.darkPinkAccent;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return Colors.amber.withValues(alpha: 0.8);
+      case 'approved':
+        return Colors.green.withValues(alpha: 0.8);
+      case 'review':
+        return Colors.orange.withValues(alpha: 0.8);
+      default:
+        return Colors.grey.withValues(alpha: 0.8);
+    }
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'infrastructure':
+        return Icons.build;
+      case 'sanitation':
+        return Icons.cleaning_services;
+      case 'security':
+        return Icons.security;
+      default:
+        return Icons.help_outline;
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day}/${date.month}/${date.year}";
   }
 }

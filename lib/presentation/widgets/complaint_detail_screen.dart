@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
+import 'package:complaints/presentation/widgets/full_screen_image_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -115,38 +117,66 @@ class ComplaintDetailScreen extends StatelessWidget {
               Text("Attachments", style: AppTextStyles.medium(20)),
               SizedBox(height: 12.h),
 
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.r),
-                  color: AppColors.darkBlueGrey.withValues(alpha: 0.5),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.r),
-                  child: Image.asset(
-                    'asets/images/light.png',
-                    width: double.infinity,
-                    height: 200.h,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: double.infinity,
+              complaint.attachments.isEmpty
+                  ? Text("No attachments available.",
+                      style: AppTextStyles.regular(14))
+                  : SizedBox(
                       height: 200.h,
-                      color: AppColors.darkBlueGrey.withValues(alpha: 0.3),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.broken_image,
-                                size: 48.sp, color: AppColors.lightGrey),
-                            SizedBox(height: 8.h),
-                            Text("Image not found",
-                                style: AppTextStyles.regular(14)),
-                          ],
-                        ),
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: complaint.attachments.length,
+                        separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                        itemBuilder: (context, index) {
+                          final imageUrl = complaint.attachments[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => FullScreenGalleryView(
+                                      imageUrls: complaint.attachments),
+                                ),
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: Container(
+                                width: 300.w,
+                                color: AppColors.darkBlueGrey
+                                    .withValues(alpha: 0.5),
+                                child: CachedNetworkImage(
+                                  imageUrl: imageUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.textColor,
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Container(
+                                    color: AppColors.darkBlueGrey
+                                        .withValues(alpha: 0.3),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.broken_image,
+                                              size: 48.sp,
+                                              color: AppColors.lightGrey),
+                                          SizedBox(height: 8.h),
+                                          Text("Image not found",
+                                              style: AppTextStyles.regular(14)),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  ),
-                ),
-              ),
 
               SizedBox(height: 32.h),
 

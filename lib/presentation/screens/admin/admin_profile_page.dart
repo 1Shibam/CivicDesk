@@ -20,6 +20,14 @@ class AdminProfilePage extends ConsumerWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          'Profile',
+          style: AppTextStyles.bold(24),
+        ),
+        elevation: 4,
+        backgroundColor: AppColors.darkBlueGrey,
+        shadowColor: AppColors.darkest,
         leading: IconButton(
           onPressed: () => context.pop(),
           icon: Icon(
