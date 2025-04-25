@@ -9,6 +9,7 @@ class AppFonts {
 
 class AppColors {
   static const Color darkPink = Color(0xffd90429);
+  static const Color darkGreen = Color.fromARGB(255, 15, 143, 30);
   static const Color darkPinkAccent = Color(0xffef233c);
   static const Color darkBlueGrey = Color(0xff2b2d42);
   static const Color darkest = Color.fromARGB(255, 21, 24, 33);
