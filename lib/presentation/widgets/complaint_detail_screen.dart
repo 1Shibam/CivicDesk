@@ -125,7 +125,7 @@ class ComplaintDetailScreen extends StatelessWidget {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: complaint.attachments.length,
-                        separatorBuilder: (_, __) => SizedBox(width: 12.w),
+                        separatorBuilder: (_, __) => SizedBox(width: 16.w),
                         itemBuilder: (context, index) {
                           final imageUrl = complaint.attachments[index];
                           return GestureDetector(

@@ -8,14 +8,15 @@ class ComplaintModel {
   final String userId;
   final String userName;
   final String userEmail;
-  final List<String> attachments; 
-  final String status; 
+  final String? userProfileUrl; // <-- new field
+  final List<String> attachments;
+  final String status;
   final bool isSpam;
-  final String? adminId; 
+  final String? adminId;
   final DateTime submittedAt;
   final DateTime updatedAt;
-  final bool userNotified; 
-  final bool adminNotified; 
+  final bool userNotified;
+  final bool adminNotified;
 
   ComplaintModel({
     required this.complaintId,
@@ -25,6 +26,7 @@ class ComplaintModel {
     required this.userId,
     required this.userName,
     required this.userEmail,
+    this.userProfileUrl, // <-- added to constructor
     required this.attachments,
     required this.status,
     required this.isSpam,
@@ -35,7 +37,6 @@ class ComplaintModel {
     required this.adminNotified,
   });
 
-  // Convert Firestore document to model
   factory ComplaintModel.fromMap(Map<String, dynamic> data, String documentId) {
     return ComplaintModel(
       complaintId: documentId,
@@ -45,6 +46,7 @@ class ComplaintModel {
       userId: data['userId'] ?? '',
       userName: data['userName'] ?? '',
       userEmail: data['userEmail'] ?? '',
+      userProfileUrl: data['userProfileUrl'], // <-- added here
       attachments: List<String>.from(data['attachments'] ?? []),
       status: data['status'] ?? 'pending',
       isSpam: data['isSpam'] ?? false,
@@ -56,7 +58,6 @@ class ComplaintModel {
     );
   }
 
-  // Convert model to Firestore document
   Map<String, dynamic> toMap() {
     return {
       'title': title,
@@ -65,6 +66,7 @@ class ComplaintModel {
       'userId': userId,
       'userName': userName,
       'userEmail': userEmail,
+      'userProfileUrl': userProfileUrl, // <-- added here
       'attachments': attachments,
       'status': status,
       'isSpam': isSpam,
