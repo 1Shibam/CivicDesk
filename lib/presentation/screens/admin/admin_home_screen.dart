@@ -360,112 +360,123 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          // Filter section
-          Container(
-            color: AppColors.darkBlueGrey.withValues(alpha: 0.7),
-            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      _getScreenTitle(),
-                      style: AppTextStyles.bold(18),
-                    ),
-                    Text(
-                      "${filteredComplaints.length} found",
-                      style:
-                          AppTextStyles.regular(14, color: AppColors.lightGrey),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: filterOptions.map((filter) {
-                      final isSelected = _selectedFilter == filter;
-                      return Padding(
-                        padding: EdgeInsets.only(right: 8.w),
-                        child: FilterChip(
-                          label: Text(
-                            filter,
-                            style: AppTextStyles.medium(12,
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
+        child: Column(
+          children: [
+            SizedBox(
+              height: 16.h,
+            ),
+            // Filter section
+            Container(
+              decoration: BoxDecoration(
+                  color: AppColors.darkBlueGrey.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.r),
+                      bottomLeft: Radius.circular(20.r))),
+              padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _getScreenTitle(),
+                        style: AppTextStyles.bold(18),
+                      ),
+                      Text(
+                        "${filteredComplaints.length} found",
+                        style: AppTextStyles.regular(14,
+                            color: AppColors.lightGrey),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: filterOptions.map((filter) {
+                        final isSelected = _selectedFilter == filter;
+                        return Padding(
+                          padding: EdgeInsets.only(right: 8.w),
+                          child: FilterChip(
+                            label: Text(
+                              filter,
+                              style: AppTextStyles.medium(12,
+                                  color: isSelected
+                                      ? AppColors.textColor
+                                      : AppColors.lightGrey),
+                            ),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              setState(() {
+                                _selectedFilter = filter;
+                              });
+                            },
+                            backgroundColor: AppColors.darkBlueGrey,
+                            selectedColor: AppColors.darkPink,
+                            checkmarkColor: AppColors.textColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r),
+                              side: BorderSide(
                                 color: isSelected
-                                    ? AppColors.textColor
-                                    : AppColors.lightGrey),
-                          ),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() {
-                              _selectedFilter = filter;
-                            });
-                          },
-                          backgroundColor: AppColors.darkBlueGrey,
-                          selectedColor: AppColors.darkPink,
-                          checkmarkColor: AppColors.textColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.r),
-                            side: BorderSide(
-                              color: isSelected
-                                  ? AppColors.darkPink
-                                  : AppColors.lightGrey,
-                              width: 1.w,
+                                    ? AppColors.darkPink
+                                    : AppColors.lightGrey,
+                                width: 1.w,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Complaints list
-          Expanded(
-            child: filteredComplaints.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search_off,
-                          size: 64.sp,
-                          color: AppColors.lightGrey,
-                        ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          "No complaints found",
-                          style: AppTextStyles.medium(16,
-                              color: AppColors.lightGrey),
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          "Try changing your filter",
-                          style: AppTextStyles.regular(14,
-                              color: AppColors.lightGrey),
-                        ),
-                      ],
+                        );
+                      }).toList(),
                     ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.all(16.w),
-                    itemCount: filteredComplaints.length,
-                    itemBuilder: (context, index) {
-                      final complaint = filteredComplaints[index];
-                      return Container(
-                        margin: EdgeInsets.only(bottom: 12.h),
-                        child: _buildComplaintCard(complaint, context),
-                      );
-                    },
                   ),
-          ),
-        ],
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 16.h,
+            ),
+            // Complaints list
+            Expanded(
+              child: filteredComplaints.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 64.sp,
+                            color: AppColors.lightGrey,
+                          ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            "No complaints found",
+                            style: AppTextStyles.medium(16,
+                                color: AppColors.lightGrey),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            "Try changing your filter",
+                            style: AppTextStyles.regular(14,
+                                color: AppColors.lightGrey),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredComplaints.length,
+                      itemBuilder: (context, index) {
+                        final complaint = filteredComplaints[index];
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 12.h),
+                          child: _buildComplaintCard(complaint, context),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.darkPink,
@@ -480,31 +491,36 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         },
         child: const Icon(Icons.refresh, color: AppColors.textColor),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: AppColors.darkBlueGrey,
-        selectedItemColor: AppColors.darkPink,
-        unselectedItemColor: AppColors.lightGrey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Important for 4+ items
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Primary',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.warning),
-            label: 'Spam',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.thumb_up),
-            label: 'Approved',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.check_circle),
-            label: 'Resolved',
-          ),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+            color: AppColors.darkBlueGrey,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20.r))),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          selectedItemColor: AppColors.darkPink,
+          unselectedItemColor: AppColors.lightGrey,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          type: BottomNavigationBarType.fixed, // Important for 4+ items
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list),
+              label: 'Primary',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.warning),
+              label: 'Spam',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.thumb_up),
+              label: 'Approved',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.check_circle),
+              label: 'Resolved',
+            ),
+          ],
+        ),
       ),
     );
   }

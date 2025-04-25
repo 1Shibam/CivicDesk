@@ -33,24 +33,21 @@ class _SplashScreenState extends State<SplashScreen> {
     try {
       // Check ADMIN status first
       final adminDoc = await FirebaseFirestore.instance
-          .collection('admins') // Double-check spelling ('admins'?)
+          .collection('admins')
           .doc(user.uid)
           .get();
       if (!mounted) return;
 
       if (adminDoc.exists) {
         context.go(RouterNames.adminHome);
-        return; // Exit after admin handling
-      } else {
-        // User is admin but needs profile creation
-        context.go(RouterNames.adminProfileCreation);
-        return; // 🚨 Critical fix: Add return to prevent further execution
+        return;
       }
+      // If not admin, continue to check regular user
     } catch (e) {
       debugPrint('Admin check error: $e');
     }
 
-    // Only check REGULAR USER if not an admin
+    // Check REGULAR USER
     try {
       final userDoc = await FirebaseFirestore.instance
           .collection('users')

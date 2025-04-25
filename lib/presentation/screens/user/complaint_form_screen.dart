@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:complaints/core/constants.dart';
-import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/providers/image_provider.dart';
+import 'package:complaints/widgets/custom_text_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,6 +21,9 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final otherCategoryController = TextEditingController();
+  final FocusNode titleFocus = FocusNode();
+  final FocusNode otherFocus = FocusNode();
+  final FocusNode descFocus = FocusNode();
   final formKey = GlobalKey<FormState>();
   String? selectedCategory;
   final picker = ImagePicker();
@@ -170,237 +173,279 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     final selectedImages = ref.watch(imageListProvider);
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text('File a Complaint',
             style: AppTextStyles.bold(20, color: AppColors.textColor)),
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.darkest,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.textColor),
       ),
       body: Padding(
-        padding: EdgeInsets.all(20.w),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
         child: Form(
           key: formKey,
           child: SingleChildScrollView(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                'Use voice input to describe the issue—it will auto-fill the title and description.',
-                style: AppTextStyles.regular(16),
-              ),
-              SizedBox(height: 12.h),
-              Center(
-                child: Container(
-                  padding: EdgeInsets.all(10.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Voice Input Section
+                Container(
+                  padding: EdgeInsets.all(16.w),
                   decoration: BoxDecoration(
-                      color: AppColors.darkPink,
-                      borderRadius: BorderRadius.circular(100.r)),
-                  child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.mic,
-                          size: 40.sp, color: AppColors.textColor)),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                        child: Divider(
-                            color: AppColors.lightGrey,
-                            thickness: 2,
-                            endIndent: 20.w)),
-                    Text('OR', style: AppTextStyles.bold(24)),
-                    Expanded(
-                        child: Divider(
-                            color: AppColors.lightGrey,
-                            thickness: 2,
-                            indent: 20.w)),
-                  ],
-                ),
-              ),
-
-              /// Title
-              TextFormField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.title),
-                  labelText: 'Title of Complaint',
-                  labelStyle:
-                      AppTextStyles.medium(16, color: AppColors.textColor),
-                  filled: true,
-                  fillColor: AppColors.darkBlueGrey,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r)),
-                ),
-                validator: (value) => value!.isEmpty ? 'Enter a title' : null,
-              ),
-              SizedBox(height: 16.h),
-
-              /// Category Dropdown
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.category_outlined),
-                  labelText: 'Category',
-                  labelStyle:
-                      AppTextStyles.medium(16, color: AppColors.textColor),
-                  filled: true,
-                  fillColor: AppColors.darkBlueGrey,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r)),
-                ),
-                dropdownColor: AppColors.darkPinkAccent,
-                value: selectedCategory,
-                items: categories.map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Text(category, style: AppTextStyles.medium(16)),
+                    color: AppColors.darkest.withValues(alpha: 0.7),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: AppColors.lightGrey.withValues(alpha: 0.3),
                     ),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() => selectedCategory = value),
-                validator: (value) =>
-                    value == null ? 'Select a category' : null,
-              ),
-              if (selectedCategory == 'Other')
-                Padding(
-                  padding: EdgeInsets.only(top: 8.h),
-                  child: TextFormField(
-                    controller: otherCategoryController,
-                    decoration: InputDecoration(
-                      labelText: 'Specify Other Category',
-                      labelStyle:
-                          AppTextStyles.medium(16, color: AppColors.textColor),
-                      filled: true,
-                      fillColor: AppColors.darkBlueGrey,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.r)),
-                    ),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Enter category' : null,
                   ),
-                ),
-              SizedBox(height: 16.h),
-
-              /// Description
-              TextFormField(
-                controller: descriptionController,
-                decoration: InputDecoration(
-                  alignLabelWithHint: true,
-                  labelText: 'Description',
-                  labelStyle:
-                      AppTextStyles.medium(16, color: AppColors.textColor),
-                  filled: true,
-                  fillColor: AppColors.darkBlueGrey,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r)),
-                ),
-                maxLines: 3,
-                validator: (value) =>
-                    value!.isEmpty ? 'Enter a description' : null,
-              ),
-              SizedBox(height: 16.h),
-
-              /// Upload Images
-              /// Upload Images UI
-              //button only show up if the total selected images are less that 10
-              if (selectedImages.length < 10) ...[
-                Center(
-                  child: ElevatedButton.icon(
-                    onPressed: showImageSourceSheet,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.darkPink,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 24.w, vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.r),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Use voice input to describe your issue',
+                        style: AppTextStyles.medium(16),
+                        textAlign: TextAlign.center,
                       ),
-                      elevation: 4,
-                    ),
-                    icon: Icon(Icons.add_a_photo,
-                        color: AppColors.textColor, size: 22.sp),
-                    label: Text('Upload Images',
-                        style: AppTextStyles.medium(16,
-                            color: AppColors.textColor)),
-                  ),
-                ),
-              ],
-              if (selectedImages.isNotEmpty)
-                Padding(
-                  padding: EdgeInsets.only(top: 12.h),
-                  child: Text('${selectedImages.length} selected',
-                      style:
-                          AppTextStyles.medium(14, color: AppColors.lightGrey)),
-                ),
-
-              SizedBox(height: 12.h),
-
-              /// Thumbnails Grid
-              if (selectedImages.isNotEmpty)
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  child: Wrap(
-                    spacing: 8.w,
-                    runSpacing: 8.h,
-                    children: List.generate(selectedImages.length, (index) {
-                      final file = File(selectedImages[index].path);
-                      return GestureDetector(
-                        onTap: () => showImagePreview(file),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8.r),
-                              child: Image.file(
-                                file,
-                                height: 80.h,
-                                width: 80.w,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Positioned(
-                              top: -6,
-                              right: -6,
-                              child: GestureDetector(
-                                onTap: () => ref
-                                    .read(imageListProvider.notifier)
-                                    .removeImage(index),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.black.withValues(alpha: 0.6),
-                                  ),
-                                  padding: const EdgeInsets.all(4),
-                                  child: Icon(Icons.close,
-                                      color: Colors.white, size: 16.sp),
-                                ),
-                              ),
+                      SizedBox(height: 12.h),
+                      Container(
+                        padding: EdgeInsets.all(12.w),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            colors: [
+                              AppColors.darkPink,
+                              AppColors.darkPinkAccent,
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.darkPink.withValues(alpha: 0.4),
+                              blurRadius: 8,
+                              spreadRadius: 2,
                             ),
                           ],
                         ),
-                      );
-                    }),
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.mic,
+                              size: 32.sp, color: AppColors.textColor),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                SizedBox(height: 24.h),
 
-              SizedBox(height: 20.h),
+                // OR Divider
+                Row(
+                  children: [
+                    const Expanded(child: Divider(color: AppColors.lightGrey)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      child: Text('OR', style: AppTextStyles.medium(16)),
+                    ),
+                    const Expanded(child: Divider(color: AppColors.lightGrey)),
+                  ],
+                ),
+                SizedBox(height: 24.h),
 
-              /// Submit
-              CustomButton(
-                onTap: () {
-                  // submit logic
-                },
-                buttonText: 'Submit',
-                imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg',
-              ),
-            ]),
+                // Form Fields
+                CustomTextFields(
+                  labelText: 'Title of Complaint',
+                  prefixIcon: Icons.title,
+                  controller: titleController,
+                  focusNode: titleFocus,
+                  validator: ValidationType.required,
+                ),
+                SizedBox(height: 16.h),
+
+                // Category Dropdown
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    prefixIcon:
+                        const Icon(Icons.category, color: AppColors.textColor),
+                    labelText: 'Category',
+                    labelStyle: AppTextStyles.medium(16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: false,
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                  ),
+                  dropdownColor: AppColors.darkPinkAccent,
+                  value: selectedCategory,
+                  style: AppTextStyles.medium(16),
+                  icon: const Icon(Icons.arrow_drop_down,
+                      color: AppColors.textColor),
+                  items: categories.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) =>
+                      setState(() => selectedCategory = value),
+                  validator: (value) =>
+                      value == null ? 'Select a category' : null,
+                ),
+                SizedBox(height: 16.h),
+
+                if (selectedCategory == 'Other') ...[
+                  CustomTextFields(
+                    labelText: 'Specify Other Category',
+                    prefixIcon: Icons.edit,
+                    controller: otherCategoryController,
+                    focusNode: otherFocus,
+                    validator: ValidationType.required,
+                  ),
+                  SizedBox(height: 16.h),
+                ],
+
+                // Description
+                CustomTextFields(
+                    focusNode: descFocus,
+                    controller: descriptionController,
+                    maxLines: 5,
+                    labelText: 'Description',
+                    validator: ValidationType.required),
+                SizedBox(height: 24.h),
+
+                // Image Upload Section
+                if (selectedImages.length < 10)
+                  GestureDetector(
+                    onTap: showImageSourceSheet,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 16.h, horizontal: 20.w),
+                      decoration: BoxDecoration(
+                        color: AppColors.darkest.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          color: AppColors.lightGrey.withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_photo_alternate,
+                              color: AppColors.textColor, size: 24.sp),
+                          SizedBox(width: 12.w),
+                          Text(
+                            'Add Images (${10 - selectedImages.length} remaining)',
+                            style: AppTextStyles.medium(16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                if (selectedImages.isNotEmpty) ...[
+                  SizedBox(height: 16.h),
+                  Text('Selected Images (${selectedImages.length}/10)',
+                      style: AppTextStyles.medium(14)),
+                  SizedBox(height: 12.h),
+                  SizedBox(
+                    height: 100.h,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: selectedImages.length,
+                      itemBuilder: (context, index) {
+                        final file = File(selectedImages[index].path);
+                        return Padding(
+                          padding: EdgeInsets.only(right: 12.w),
+                          child: Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8.r),
+                                child: Image.file(
+                                  file,
+                                  height: 100.h,
+                                  width: 100.w,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: GestureDetector(
+                                  onTap: () => ref
+                                      .read(imageListProvider.notifier)
+                                      .removeImage(index),
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.darkPinkAccent,
+                                    ),
+                                    padding: EdgeInsets.all(4.w),
+                                    child: Icon(Icons.close,
+                                        color: Colors.white, size: 16.sp),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+                SizedBox(height: 32.h),
+
+                // Submit Button
+                Center(
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.r),
+                      gradient: const LinearGradient(
+                        colors: [
+                          AppColors.darkPink,
+                          AppColors.darkPinkAccent,
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.darkPink.withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12.r),
+                        onTap: () {
+                          if (formKey.currentState!.validate()) {
+                            // Submit logic
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.send,
+                                  color: AppColors.textColor),
+                              SizedBox(width: 12.w),
+                              Text('Submit Complaint',
+                                  style: AppTextStyles.bold(18)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24.h),
+              ],
+            ),
           ),
         ),
       ),
-      backgroundColor: AppColors.darkBlueGrey,
     );
   }
 }

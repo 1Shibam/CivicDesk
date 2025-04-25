@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 //custom text field for  more control over all the textfields in the application
 class CustomTextFields extends StatelessWidget {
   final String labelText;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
   final Widget? suffixIcon;
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -12,14 +12,16 @@ class CustomTextFields extends StatelessWidget {
   final ValidationType validator;
   final TextInputType textType;
   final bool obscureText;
+  final int maxLines;
 
   const CustomTextFields({
     super.key,
     required this.labelText,
-    required this.prefixIcon,
+    this.prefixIcon,
     required this.controller,
     required this.focusNode,
     this.nextFocusNode,
+    this.maxLines = 1,
     this.obscureText = false,
     this.validator = ValidationType.none,
     this.textType = TextInputType.name,
@@ -32,6 +34,7 @@ class CustomTextFields extends StatelessWidget {
       cursorColor: AppColors.textColor,
       style: AppTextStyles.regular(16),
       controller: controller,
+      maxLines: maxLines,
       focusNode: focusNode,
       obscureText: obscureText,
       obscuringCharacter: '*',
@@ -47,10 +50,13 @@ class CustomTextFields extends StatelessWidget {
         }
       },
       decoration: InputDecoration(
+        alignLabelWithHint: true,
         errorStyle:
             AppTextStyles.regular(14).copyWith(color: AppColors.darkPinkAccent),
         labelText: labelText,
-        prefixIcon: Icon(prefixIcon, color: AppColors.textColor),
+        prefixIcon: prefixIcon == null
+            ? null
+            : Icon(prefixIcon, color: AppColors.textColor),
         suffixIcon: suffixIcon,
         border: const OutlineInputBorder(),
       ),
