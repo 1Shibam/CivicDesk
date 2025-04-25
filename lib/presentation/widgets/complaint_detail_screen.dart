@@ -235,31 +235,69 @@ class ComplaintDetailScreen extends StatelessWidget {
               SizedBox(height: 32.h),
 
               // Action buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildActionButton(
-                      onTap: () {
-                        // Approve the complaint
-                      },
-                      text: 'Approve',
-                      icon: Icons.check_circle_outline,
-                      backgroundColor: AppColors.darkPink,
+              // Action buttons or resolution message
+              complaint.status == 'Resolved'
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(16.w),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: .15),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.check_circle,
+                                  color: Colors.green, size: 24.sp),
+                              SizedBox(width: 12.w),
+                              Expanded(
+                                child: Text(
+                                  "This issue has been resolved. You can upload it as a success story post!",
+                                  style: AppTextStyles.regular(14,
+                                      color: Colors.green.shade300),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                        _buildActionButton(
+                          onTap: () {
+                            // Add your upload post logic here
+                          },
+                          text: "Upload as Post",
+                          icon: Icons.upload_rounded,
+                          backgroundColor: AppColors.darkPink,
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: _buildActionButton(
+                            onTap: () {
+                              // Approve the complaint
+                            },
+                            text: 'Approve',
+                            icon: Icons.check_circle_outline,
+                            backgroundColor: AppColors.darkPink,
+                          ),
+                        ),
+                        SizedBox(width: 16.w),
+                        Expanded(
+                          child: _buildActionButton(
+                            onTap: () {
+                              // Reject the complaint
+                            },
+                            text: 'Reject',
+                            icon: Icons.cancel_outlined,
+                            backgroundColor: AppColors.darkBlueGrey,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(width: 16.w),
-                  Expanded(
-                    child: _buildActionButton(
-                      onTap: () {
-                        // Reject the complaint
-                      },
-                      text: 'Reject',
-                      icon: Icons.cancel_outlined,
-                      backgroundColor: AppColors.darkBlueGrey,
-                    ),
-                  ),
-                ],
-              ),
+
               SizedBox(height: 16.h),
             ],
           ),
