@@ -5,6 +5,7 @@ import 'package:complaints/presentation/widgets/full_screen_image_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class ComplaintDetailScreen extends StatelessWidget {
   final ComplaintModel complaint;
@@ -13,6 +14,7 @@ class ComplaintDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const String emptyProfile = 'https://i.imgur.com/PcvwDlW.png';
     return Scaffold(
       backgroundColor: AppColors.darkest,
       appBar: AppBar(
@@ -40,6 +42,58 @@ class ComplaintDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // User Info Section
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 28.r,
+                    backgroundColor: AppColors.darkBlueGrey,
+                    child: ClipOval(
+                      child: CachedNetworkImage(
+                        imageUrl: complaint.userProfileUrl ?? emptyProfile,
+                        fit: BoxFit.cover,
+                        width: 56.r,
+                        height: 56.r,
+                        placeholder: (context, url) =>
+                            const CircularProgressIndicator(
+                          color: AppColors.textColor,
+                          strokeWidth: 2,
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/images/default_profile.png',
+                          fit: BoxFit.cover,
+                          width: 56.r,
+                          height: 56.r,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 16.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        complaint.userName,
+                        style: AppTextStyles.bold(18),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        complaint.userEmail,
+                        style: AppTextStyles.regular(14,
+                            color: AppColors.lightGrey),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        "Submitted on: ${DateFormat('dd MMMM, yyyy').format(complaint.submittedAt)}",
+                        style: AppTextStyles.regular(14,
+                            color: AppColors.lightGrey),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 24.h),
+
               // Title section with status indicator
               Row(
                 children: [
