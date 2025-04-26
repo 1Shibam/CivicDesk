@@ -185,6 +185,44 @@ class FirestoreServices {
       rethrow; // optional: rethrow if you want to handle it at the UI level
     }
   }
+
+  Future<void> updateComplaint({
+    required String complaintId,
+    List<String>? attachmentsResolved,
+    String? status,
+    bool? isSpam,
+    bool? isPosted,
+  }) async {
+    try {
+      final complaintRef =
+          FirebaseFirestore.instance.collection('complaints').doc(complaintId);
+
+      Map<String, dynamic> updateData = {};
+
+      if (attachmentsResolved != null) {
+        updateData['attachments_resolved'] = attachmentsResolved;
+      }
+      if (status != null) {
+        updateData['status'] = status;
+      }
+      if (isSpam != null) {
+        updateData['isSpam'] = isSpam;
+      }
+      if (isPosted != null) {
+        updateData['is_posted'] = isPosted;
+      }
+
+      if (updateData.isNotEmpty) {
+        await complaintRef.update(updateData);
+        print('Complaint updated successfully!');
+      } else {
+        print('No fields to update.');
+      }
+    } catch (e) {
+      print('Error updating complaint: $e');
+      rethrow;
+    }
+  }
 }
 
 String formatTimestamp(Timestamp timestamp) {
