@@ -43,7 +43,6 @@ dependencies:
   photo_view: ^0.15.0
   cloudinary: ^1.2.0
   speech_to_text: ^7.0.0
-  
 
 dev_dependencies:
   flutter_test:
