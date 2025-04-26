@@ -213,12 +213,12 @@ class FirestoreServices {
 
       if (updateData.isNotEmpty) {
         await complaintRef.update(updateData);
-        print('Complaint updated successfully!');
+        debugPrint('Complaint updated successfully!');
       } else {
-        print('No fields to update.');
+        debugPrint('No fields to update.');
       }
     } catch (e) {
-      print('Error updating complaint: $e');
+      debugPrint('Error updating complaint: $e');
       rethrow;
     }
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 
 void streamChatGPT(List<Map<String, String>> messages) async {
@@ -28,7 +29,7 @@ void streamChatGPT(List<Map<String, String>> messages) async {
           final jsonData = json.decode(data);
           final delta = jsonData['choices'][0]['delta'];
           if (delta.containsKey('content')) {
-            print(delta['content']); // Show token-by-token output
+            debugPrint(delta['content']); // Show token-by-token output
           }
         }
       }

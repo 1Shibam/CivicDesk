@@ -26,7 +26,7 @@ class SpeechService {
         },
         listenFor: const Duration(seconds: 30),
         pauseFor: const Duration(seconds: 5),
-        partialResults: true, // Get real-time partial results
+        listenOptions: SpeechListenOptions(partialResults: true),
       );
       _isListening = success;
       return _lastWords;
