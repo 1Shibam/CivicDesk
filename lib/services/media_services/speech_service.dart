@@ -1,20 +1,24 @@
-import 'package:flutter/rendering.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class SpeechService {
   final SpeechToText _speech = SpeechToText();
+  bool _isInitialized = false; // Track initialization state
   bool _isListening = false;
   String _lastWords = '';
 
   Future<bool> initialize() async {
-    bool available = await _speech.initialize(
-      onStatus: (status) => debugPrint('Status: $status'),
-      onError: (error) => debugPrint('Error: $error'),
+    _isInitialized = await _speech.initialize(
+      onStatus: (status) => print('Status: $status'),
+      onError: (error) => print('Error: $error'),
     );
-    return available;
+    return _isInitialized;
   }
 
   Future<String?> listen() async {
+    if (!_isInitialized) {
+      // Check initialization
+      throw Exception("SpeechToText not initialized");
+    }
     if (!_isListening) {
       _lastWords = '';
       bool success = await _speech.listen(
@@ -24,9 +28,6 @@ class SpeechService {
             _isListening = false;
           }
         },
-        listenFor: const Duration(seconds: 30),
-        pauseFor: const Duration(seconds: 5),
-        listenOptions: SpeechListenOptions(partialResults: true),
       );
       _isListening = success;
       return _lastWords;

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/models/user_model.dart';
+import 'package:complaints/presentation/screens/user/speech_screen.dart';
 import 'package:complaints/providers/current_user_provider.dart';
 import 'package:complaints/services/db_services/firestore_services.dart';
 import 'package:complaints/widgets/custom_button.dart';
@@ -254,7 +255,14 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                           ],
                         ),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => const AlertDialog(
+                                content: SpeechScreen(),
+                              ),
+                            );
+                          },
                           icon: Icon(Icons.mic,
                               size: 32.sp, color: AppColors.textColor),
                         ),
