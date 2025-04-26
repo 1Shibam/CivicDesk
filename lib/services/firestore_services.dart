@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/admin_model.dart';
+import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/models/user_model.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/services/pick_image.dart';
@@ -154,6 +156,34 @@ class FirestoreServices {
     final doc =
         await FirebaseFirestore.instance.collection(collection).doc(uid).get();
     return doc.exists;
+  }
+
+  Future<void> submitComplaint(
+      ComplaintModel complaint, BuildContext context) async {
+    try {
+      final complaintRef = FirebaseFirestore.instance
+          .collection('complaints')
+          .doc(complaint.complaintId);
+
+      await complaintRef.set(complaint.toMap());
+
+      if (context.mounted) {
+        customSnackbar(
+            message: 'Complaint Submitted Successfully',
+            context: context,
+            iconName: Icons.done,
+            bgColor: AppColors.darkGreen);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        customSnackbar(
+            message: 'Complaint Submission failed',
+            context: context,
+            iconName: Icons.done,
+            bgColor: Colors.red);
+      }
+      rethrow; // optional: rethrow if you want to handle it at the UI level
+    }
   }
 }
 
