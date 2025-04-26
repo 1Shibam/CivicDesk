@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 void streamChatGPT(List<Map<String, String>> messages) async {
   final url = Uri.parse('https://api.openai.com/v1/chat/completions');
   final request = http.Request('POST', url);
+  final openAiApi = dotenv.env['CHAT_API_KEY'];
 
   request.headers.addAll({
-    'Authorization': 'Bearer YOUR_OPENAI_API_KEY',
+    'Authorization': 'Bearer $openAiApi',
     'Content-Type': 'application/json',
   });
 
