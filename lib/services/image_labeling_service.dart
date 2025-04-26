@@ -1,33 +1,21 @@
-// import 'dart:io';
-// // code for labeling images
-// import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
-// import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 
-// class ImageLabelerService {
-//   final ImageLabeler _labeler = ImageLabeler(options: ImageLabelerOptions());
+Future<Map<String, List<String>>> labelImages(List<File> images) async {
+  final ImageLabeler labeler = ImageLabeler(
+    options: ImageLabelerOptions(confidenceThreshold: 0.5),
+  );
 
-//   Future<List<String>> getLabels(File imageFile) async {
-//     final inputImage = InputImage.fromFile(imageFile);
-//     final labels = await _labeler.processImage(inputImage);
+  final Map<String, List<String>> results = {};
 
-//     return labels.map((label) => label.label).toList();
-//   }
-// }
+  for (int i = 0; i < images.length; i++) {
+    final inputImage = InputImage.fromFile(images[i]);
+    final List<ImageLabel> labels = await labeler.processImage(inputImage);
 
-// //scannign list of images
-// Future<void> scanImages() async {
-//   final picker = ImagePicker();
-//   final List<XFile>? images = await picker.pickMultiImage();
+    final List<String> labelTexts = labels.map((label) => label.label).toList();
+    results['image${i + 1}'] = labelTexts;
+  }
 
-//   if (images == null) return;
-
-//   final labelerService = ImageLabelerService();
-//   int i = 1;
-
-//   for (final image in images) {
-//     final file = File(image.path);
-//     final labels = await labelerService.getLabels(file);
-//     print('Image $i: ${labels.join(", ")}');
-//     i++;
-//   }
-// }
+  await labeler.close();
+  return results;
+}
