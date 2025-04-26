@@ -51,5 +51,7 @@
 		<string>We need camera access to analyze images</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>We need photo access to analyze images</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>This app needs microphone access to convert speech to text</string>
 	</dict>
 </plist>
