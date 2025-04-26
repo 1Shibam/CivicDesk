@@ -1,8 +1,15 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/core/constants.dart';
+import 'package:complaints/models/complaint_model.dart';
+import 'package:complaints/models/user_model.dart';
+import 'package:complaints/providers/current_user_provider.dart';
+import 'package:complaints/services/firestore_services.dart';
+import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/providers/image_provider.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -468,53 +475,13 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                   ),
                 ],
                 SizedBox(height: 32.h),
-
-                // Submit Button
-                Center(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                      gradient: const LinearGradient(
-                        colors: [
-                          AppColors.darkPink,
-                          AppColors.darkPinkAccent,
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.darkPink.withValues(alpha: 0.4),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12.r),
-                        onTap: () {
-                          if (formKey.currentState!.validate()) {
-                            // Submit logic
-                          }
-                        },
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.send,
-                                  color: AppColors.textColor),
-                              SizedBox(width: 12.w),
-                              Text('Submit Complaint',
-                                  style: AppTextStyles.bold(18)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                CustomButton(
+                    onTap: () async {
+                      final user = ref.read(currentUserProvider).value!;
+                      await submitTheForm(user);
+                    },
+                    buttonText: 'Submit Complaint',
+                    imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg'),
                 SizedBox(height: 24.h),
               ],
             ),
@@ -522,6 +489,30 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
         ),
       ),
     );
+  }
+
+  Future<void> submitTheForm(UserModel user) async {
+    final newComplaint = ComplaintModel(
+      complaintId: FirebaseFirestore.instance.collection('complaints').doc().id,
+      title: titleController.text.trim(),
+      description: descriptionController.text.trim(),
+      category: selectedCategory == null ? 'other' : selectedCategory!,
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      userProfileUrl: user.profileUrl,
+      attachments: [],
+      attachmentsResolved: [],
+      status: 'Pending',
+      isSpam: false,
+      submittedAt: DateTime.now(),
+      userNotified: false,
+      adminNotified: false,
+      isPosted: false,
+    );
+
+// Call the submit function
+    await FirestoreServices().submitComplaint(newComplaint, context);
   }
 }
 

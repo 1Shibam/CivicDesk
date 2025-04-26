@@ -13,7 +13,6 @@ class ComplaintModel {
   final List<String> attachmentsResolved;
   final String status;
   final bool isSpam;
-  final String? adminId;
   final DateTime submittedAt;
   final bool userNotified;
   final bool adminNotified;
@@ -32,7 +31,6 @@ class ComplaintModel {
       required this.attachmentsResolved,
       required this.status,
       required this.isSpam,
-      this.adminId,
       required this.submittedAt,
       required this.userNotified,
       required this.adminNotified,
@@ -53,7 +51,6 @@ class ComplaintModel {
             List<String>.from(data['attachments_resolved'] ?? []),
         status: data['status'] ?? 'pending',
         isSpam: data['isSpam'] ?? false,
-        adminId: data['adminId'],
         submittedAt: (data['submittedAt'] as Timestamp).toDate(),
         userNotified: data['userNotified'] ?? false,
         adminNotified: data['adminNotified'] ?? false,
@@ -73,7 +70,6 @@ class ComplaintModel {
       'attachments_resolved': attachmentsResolved,
       'status': status,
       'isSpam': isSpam,
-      'adminId': adminId,
       'submittedAt': submittedAt,
       'userNotified': userNotified,
       'adminNotified': adminNotified,
