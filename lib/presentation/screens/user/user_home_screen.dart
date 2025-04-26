@@ -2,9 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
+import 'package:complaints/providers/current_user_complaints_provider.dart';
 import 'package:complaints/providers/current_user_provider.dart';
 import 'package:complaints/routes/router_names.dart';
-import 'package:complaints/services/ai_implementation/spam_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -169,134 +169,169 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             Text("My Recent Complaints",
                 style: AppTextStyles.bold(18, color: AppColors.textColor)),
             SizedBox(height: 10.h),
-            Expanded(
-              child: complaints.isEmpty
-                  ? Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'No Recent Complaints',
-                            style: AppTextStyles.regular(16),
-                          ),
-                          SizedBox(
-                            height: 8.h,
-                          ),
-                          ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.darkPinkAccent,
-                                  elevation: 4,
-                                  shadowColor: AppColors.darkest,
-                                  foregroundColor: AppColors.textColor,
-                                  overlayColor: AppColors.textColor),
-                              onPressed: () async {
-                                // context.push(RouterNames.complaintScreen);
-                                checkSpamExample();
-                              },
-                              child: Text(
-                                'Make first Complaint',
-                                style: AppTextStyles.regular(16),
-                              ))
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount:
-                          complaints.length, // Replace with complaint list
-                      itemBuilder: (context, index) {
-                        final complaint = complaints[index];
-                        return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ComplaintDetailScreen(
-                                        complaint: complaint),
-                                  ));
-                            },
-                            child: Card(
-                              color: Colors.transparent,
-                              elevation: 6,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16.r)),
-                              margin: EdgeInsets.symmetric(vertical: 8.h),
-                              child: ListTile(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16.r)),
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16.w, vertical: 12.h),
-                                tileColor: AppColors.darkPinkAccent
-                                    .withValues(alpha: 0.9),
-                                leading: Icon(Icons.report_problem_rounded,
-                                    size: 32.sp, color: Colors.white),
-                                title: Text(
-                                  complaint.title,
-                                  style: AppTextStyles.bold(16),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 6.h),
-                                    Text("Category: ${complaint.category}",
-                                        style: AppTextStyles.medium(13)),
-                                    SizedBox(height: 4.h),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          complaint.status.toLowerCase() ==
-                                                  "resolved"
-                                              ? Icons.check_circle
-                                              : Icons.hourglass_top,
-                                          size: 16.sp,
-                                          color:
-                                              complaint.status.toLowerCase() ==
-                                                      "resolved"
-                                                  ? Colors.green
-                                                  : Colors.orange,
-                                        ),
-                                        SizedBox(width: 6.w),
-                                        Text("Status: ${complaint.status}",
-                                            style: AppTextStyles.medium(13)),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                trailing: Icon(Icons.arrow_forward_ios,
-                                    size: 16.sp, color: Colors.white),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ComplaintDetailScreen(
-                                              complaint: complaint),
-                                    ),
-                                  );
-                                },
+            Consumer(
+              builder: (context, ref, child) {
+                final userComplaints = ref.watch(currentUserComplaintsProvider);
+                return userComplaints.when(
+                  data: (complaint) {
+                    print(complaint.length);
+                    return Expanded(
+                      child: complaint.isEmpty
+                          ? Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'No Recent Complaints',
+                                    style: AppTextStyles.regular(16),
+                                  ),
+                                  SizedBox(
+                                    height: 8.h,
+                                  ),
+                                  ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              AppColors.darkPinkAccent,
+                                          elevation: 4,
+                                          shadowColor: AppColors.darkest,
+                                          foregroundColor: AppColors.textColor,
+                                          overlayColor: AppColors.textColor),
+                                      onPressed: () async {
+                                        context
+                                            .push(RouterNames.complaintScreen);
+                                      },
+                                      child: Text(
+                                        'Make first Complaint',
+                                        style: AppTextStyles.regular(16),
+                                      ))
+                                ],
                               ),
-                            ));
-                      },
+                            )
+                          : ListView.builder(
+                              itemCount: complaint.length,
+                              itemBuilder: (context, index) {
+                                final usercomplaint = complaint[index];
+                                return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ComplaintDetailScreen(
+                                                    complaint: usercomplaint),
+                                          ));
+                                    },
+                                    child: Card(
+                                      color: Colors.transparent,
+                                      elevation: 6,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16.r)),
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 8.h),
+                                      child: ListTile(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16.r)),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            horizontal: 16.w, vertical: 12.h),
+                                        tileColor: AppColors.darkPinkAccent
+                                            .withValues(alpha: 0.9),
+                                        leading: Icon(
+                                            Icons.report_problem_rounded,
+                                            size: 32.sp,
+                                            color: Colors.white),
+                                        title: Text(
+                                          usercomplaint.title,
+                                          style: AppTextStyles.bold(16),
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 6.h),
+                                            Text(
+                                                "Category: ${usercomplaint.category}",
+                                                style:
+                                                    AppTextStyles.medium(13)),
+                                            SizedBox(height: 4.h),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  usercomplaint.status
+                                                              .toLowerCase() ==
+                                                          "resolved"
+                                                      ? Icons.check_circle
+                                                      : Icons.hourglass_top,
+                                                  size: 16.sp,
+                                                  color: usercomplaint.status
+                                                              .toLowerCase() ==
+                                                          "resolved"
+                                                      ? Colors.green
+                                                      : Colors.orange,
+                                                ),
+                                                SizedBox(width: 6.w),
+                                                Text(
+                                                    "Status: ${usercomplaint.status}",
+                                                    style: AppTextStyles.medium(
+                                                        13)),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        trailing: Icon(Icons.arrow_forward_ios,
+                                            size: 16.sp, color: Colors.white),
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ComplaintDetailScreen(
+                                                      complaint: usercomplaint),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ));
+                              },
+                            ),
+                    );
+                  },
+                  error: (error, stackTrace) {
+                    return Center(
+                      child: Text(
+                        'Error loading your complaints',
+                        style: AppTextStyles.bold(20),
+                      ),
+                    );
+                  },
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.darkPink,
                     ),
-            ),
+                  ),
+                );
+              },
+            )
           ],
         ),
       ),
     );
   }
 
-  void checkSpamExample() async {
-    final spamChecker = SpamChecker(); // Don't forget to add your key
+  // void checkSpamExample() async {
+  //   final spamChecker = SpamChecker(); // Don't forget to add your key
 
-    final result = await spamChecker.checkSpam(
-      title: 'i am having trouble shitting and my cheeks hurts',
-      category: 'health',
-      description: 'my ass cheeks are unable to produce the shits',
-      imageData: ['balls', 'football'],
-    );
+  //   final result = await spamChecker.checkSpam(
+  //     title: 'i am having trouble shitting and my cheeks hurts',
+  //     category: 'health',
+  //     description: 'my ass cheeks are unable to produce the shits',
+  //     imageData: ['balls', 'football'],
+  //   );
 
-    print('Is spam: $result');
-  }
+  //   print('Is spam: $result');
+  // }
 
   Drawer _userHomeScreenDrawer(BuildContext context) {
     return Drawer(
