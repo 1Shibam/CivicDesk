@@ -6,6 +6,7 @@ import 'package:complaints/widgets/custom_text_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ComplaintFormScreen extends ConsumerStatefulWidget {
@@ -27,6 +28,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
   final formKey = GlobalKey<FormState>();
   String? selectedCategory;
   final picker = ImagePicker();
+  bool containsImages = false;
 
   final List<String> categories = [
     'Billing',
@@ -190,7 +192,11 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text('File a Complaint',
+        centerTitle: true,
+        leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: const Icon(Icons.arrow_back_ios)),
+        title: Text('File Complaint',
             style: AppTextStyles.bold(20, color: AppColors.textColor)),
         backgroundColor: AppColors.darkBlueGrey,
         shadowColor: AppColors.darkest,
@@ -277,6 +283,8 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
 
                 // Category Dropdown
                 DropdownButtonFormField<String>(
+                  menuMaxHeight: 240.h,
+                  borderRadius: BorderRadius.circular(16.r),
                   decoration: InputDecoration(
                     prefixIcon:
                         const Icon(Icons.category, color: AppColors.textColor),
@@ -328,35 +336,75 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                     validator: ValidationType.required),
                 SizedBox(height: 24.h),
 
-                // Image Upload Section
-                if (selectedImages.length < 10)
+                if (!containsImages) ...[
+                  ListTile(
+                    tileColor: AppColors.darkest.withValues(alpha: 0.3),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.r)),
+                    title: Text(
+                      'You have images any regarding this issue ?',
+                      style: AppTextStyles.regular(16),
+                    ),
+                    trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.darkPinkAccent),
+                        onPressed: () => setState(() {
+                              containsImages = true;
+                            }),
+                        child: Text(
+                          'Yes',
+                          style: AppTextStyles.regular(16),
+                        )),
+                  )
+                ],
+                if (selectedImages.length < 10 && containsImages) ...[
                   GestureDetector(
                     onTap: showImageSourceSheet,
                     child: Container(
+                      width: double.infinity,
                       padding: EdgeInsets.symmetric(
                           vertical: 16.h, horizontal: 20.w),
                       decoration: BoxDecoration(
-                        color: AppColors.darkest.withValues(alpha: 0.7),
-                        borderRadius: BorderRadius.circular(8.r),
+                        color: AppColors.darkest.withValues(alpha: .7),
+                        borderRadius: BorderRadius.circular(12.r),
                         border: Border.all(
-                          color: AppColors.lightGrey.withValues(alpha: 0.3),
+                          color: AppColors.lightGrey.withValues(alpha: .3),
                           width: 1.5,
                         ),
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.add_photo_alternate,
-                              color: AppColors.textColor, size: 24.sp),
-                          SizedBox(width: 12.w),
+                          Icon(
+                            Icons.add_photo_alternate,
+                            color: AppColors.textColor,
+                            size: 24.sp,
+                          ),
+                          SizedBox(width: 10.w),
                           Text(
-                            'Add Images (${10 - selectedImages.length} remaining)',
+                            'Add Images',
                             style: AppTextStyles.medium(16),
+                          ),
+                          SizedBox(width: 8.w),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 8.w, vertical: 4.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.darkPinkAccent,
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Text(
+                              '${10 - selectedImages.length} left',
+                              style: AppTextStyles.regular(12)
+                                  .copyWith(color: Colors.white),
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
+                ],
 
                 if (selectedImages.isNotEmpty) ...[
                   SizedBox(height: 16.h),
@@ -374,13 +422,24 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                           padding: EdgeInsets.only(right: 12.w),
                           child: Stack(
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8.r),
-                                child: Image.file(
-                                  file,
-                                  height: 100.h,
-                                  width: 100.w,
-                                  fit: BoxFit.cover,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          FullImageView(imageFile: file),
+                                    ),
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  child: Image.file(
+                                    file,
+                                    height: 100.h,
+                                    width: 100.w,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                               Positioned(
@@ -461,6 +520,27 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class FullImageView extends StatelessWidget {
+  final File imageFile;
+
+  const FullImageView({super.key, required this.imageFile});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
+      body: Center(
+        child: Image.file(imageFile),
       ),
     );
   }
