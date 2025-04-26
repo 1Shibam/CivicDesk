@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:complaints/core/constants.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ContactUsPage extends StatelessWidget {
   const ContactUsPage({super.key});
@@ -42,27 +41,21 @@ class ContactUsPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 32.h),
-            _buildContactItem(
-              context,
-              Icons.email_outlined,
-              'Email Us',
-              'support@complaintsapp.com',
-              () => _launchEmail('shivam55.dev@gmail.com',
-                  'Question about Complaints App', ''),
-            ),
+            _buildContactItem(context, Icons.email_outlined, 'Email Us',
+                'support@complaintsapp.com', () => () {}),
             _buildContactItem(
               context,
               Icons.phone_outlined,
               'Call Us',
               '+1 (555) 123-4567',
-              () => _launchPhone('+15551234567'),
+              () {},
             ),
             _buildContactItem(
               context,
               Icons.web_outlined,
               'Visit Our Website',
               'www.complaintsapp.com',
-              () => _launchURL('https://www.complaintsapp.com'),
+              () {},
             ),
             SizedBox(height: 24.h),
             Text(
@@ -92,8 +85,7 @@ class ContactUsPage extends StatelessWidget {
                   ),
                   SizedBox(height: 12.h),
                   GestureDetector(
-                    onTap: () =>
-                        _launchMaps('123 Main Street, City, State 12345'),
+                    onTap: () {},
                     child: Row(
                       children: [
                         Icon(Icons.map_outlined,
@@ -186,44 +178,5 @@ class ContactUsPage extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _launchEmail(String email, String subject, String body) async {
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: email,
-      queryParameters: {
-        'subject': subject,
-        'body': body,
-      },
-    );
-
-    if (await canLaunchUrl(emailUri)) {
-      await launchUrl(emailUri);
-    }
-  }
-
-  Future<void> _launchPhone(String phoneNumber) async {
-    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
-
-    if (await canLaunchUrl(phoneUri)) {
-      await launchUrl(phoneUri);
-    }
-  }
-
-  Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
-
-  Future<void> _launchMaps(String address) async {
-    final Uri mapsUri = Uri.parse('https://maps.google.com/?q=$address');
-
-    if (await canLaunchUrl(mapsUri)) {
-      await launchUrl(mapsUri, mode: LaunchMode.externalApplication);
-    }
   }
 }
