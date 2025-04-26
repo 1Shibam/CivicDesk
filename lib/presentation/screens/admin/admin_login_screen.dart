@@ -1,5 +1,5 @@
-import 'package:complaints/services/firebase_auth_service.dart';
-import 'package:complaints/services/firestore_services.dart';
+import 'package:complaints/services/firebase_auth/firebase_auth_service.dart';
+import 'package:complaints/services/db_services/firestore_services.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';

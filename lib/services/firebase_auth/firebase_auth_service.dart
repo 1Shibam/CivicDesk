@@ -1,6 +1,6 @@
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/routes/router_names.dart';
-import 'package:complaints/services/firestore_services.dart';
+import 'package:complaints/services/db_services/firestore_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

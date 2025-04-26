@@ -1,6 +1,6 @@
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/routes/router_names.dart';
-import 'package:complaints/services/firestore_services.dart';
+import 'package:complaints/services/db_services/firestore_services.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/widgets/custom_text_fields.dart';

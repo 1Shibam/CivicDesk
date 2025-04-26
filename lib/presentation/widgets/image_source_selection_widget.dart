@@ -1,5 +1,5 @@
 import 'package:complaints/core/constants.dart';
-import 'package:complaints/services/firestore_services.dart';
+import 'package:complaints/services/db_services/firestore_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

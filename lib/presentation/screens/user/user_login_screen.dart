@@ -1,7 +1,7 @@
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/widgets/circular_loader.dart';
 import 'package:complaints/widgets/custom_button.dart';
-import 'package:complaints/services/firebase_auth_service.dart';
+import 'package:complaints/services/firebase_auth/firebase_auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';

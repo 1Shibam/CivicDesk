@@ -4,7 +4,7 @@ import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/models/user_model.dart';
 import 'package:complaints/providers/current_user_provider.dart';
-import 'package:complaints/services/firestore_services.dart';
+import 'package:complaints/services/db_services/firestore_services.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/providers/image_provider.dart';
