@@ -11,18 +11,22 @@ final currentUserProvider = StreamProvider<UserModel>((ref) {
     final FirebaseAuth user = FirebaseAuth.instance;
     final String currentUseId = user.currentUser!.uid;
 
-    return FirebaseFirestore.instance
+    final data = FirebaseFirestore.instance
         .collection('users')
         .doc(currentUseId)
         .snapshots()
         .map((doc) => UserModel.fromJson(doc.data()!));
+
+    return data;
   } on FirebaseException catch (e, stackTrace) {
     debugPrint(e.message);
     debugPrintStack(stackTrace: stackTrace);
+
     rethrow;
   } catch (e, stackTrace) {
     debugPrint("Unexpected Error: $e");
     debugPrintStack(stackTrace: stackTrace);
+
     rethrow;
   }
 });

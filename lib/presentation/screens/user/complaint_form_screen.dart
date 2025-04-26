@@ -35,6 +35,21 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     'Product Quality',
     'Delivery',
     'Customer Support',
+    'Infrastructure',
+    'Cleanliness',
+    'Safety',
+    'Public Transport',
+    'Water Supply',
+    'Electricity',
+    'Internet',
+    'Noise Pollution',
+    'Road Conditions',
+    'Traffic Management',
+    'Healthcare',
+    'Waste Management',
+    'Education',
+    'Parking',
+    'Environment',
     'Other'
   ];
 
@@ -177,8 +192,9 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
       appBar: AppBar(
         title: Text('File a Complaint',
             style: AppTextStyles.bold(20, color: AppColors.textColor)),
-        backgroundColor: AppColors.darkest,
-        elevation: 0,
+        backgroundColor: AppColors.darkBlueGrey,
+        shadowColor: AppColors.darkest,
+        elevation: 4,
         iconTheme: const IconThemeData(color: AppColors.textColor),
       ),
       body: Padding(

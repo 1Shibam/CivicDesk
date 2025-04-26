@@ -31,31 +31,31 @@ GoRouter appRoutes = GoRouter(
     customTransitionRoute(
         RouterNames.initial, const DecideScreen(), PageTransitionType.fade),
 
-    // Authentication screens with scale transition
+    // Authentication screens with fade transition
     customTransitionRoute(RouterNames.userLogin, const UserLoginScreen(),
-        PageTransitionType.slide),
+        PageTransitionType.fade),
     customTransitionRoute(RouterNames.adminLogin, const AdminLoginScreen(),
-        PageTransitionType.slide),
+        PageTransitionType.fade),
     customTransitionRoute(RouterNames.adminSignup, const AdminSignupScreen(),
-        PageTransitionType.slide),
+        PageTransitionType.fade),
 
-    // Main screens with slide transition
+    // Main screens with fade transition
     customTransitionRoute(
-        RouterNames.userHome, const UserHomeScreen(), PageTransitionType.slide),
+        RouterNames.userHome, const UserHomeScreen(), PageTransitionType.fade),
     customTransitionRoute(RouterNames.adminHome, const AdminHomeScreen(),
-        PageTransitionType.slide),
+        PageTransitionType.fade),
     customTransitionRoute(RouterNames.complaintScreen,
-        const ComplaintFormScreen(), PageTransitionType.slide),
+        const ComplaintFormScreen(), PageTransitionType.fade),
     customTransitionRoute(RouterNames.aiChatScreen, const AiChatScreen(),
-        PageTransitionType.slide),
+        PageTransitionType.fade),
 
-    // Profile and notification screens with rotation transition
+    // Profile and notification screens with fade transition
     customTransitionRoute(RouterNames.userProfile, const UserProfilePage(),
-        PageTransitionType.rotation),
+        PageTransitionType.fade),
     customTransitionRoute(RouterNames.adminProfile, const AdminProfilePage(),
-        PageTransitionType.rotation),
+        PageTransitionType.fade),
     customTransitionRoute(RouterNames.notificationScreen,
-        const NotificationScreen(), PageTransitionType.rotation),
+        const NotificationScreen(), PageTransitionType.fade),
 
     // Information pages with fade transition
     customTransitionRoute(

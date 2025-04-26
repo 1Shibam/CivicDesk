@@ -8,6 +8,7 @@ class UserModel {
   final int age;
   final String gender;
   final int totalComplaints;
+  final int pendingComplaints;
   final int resolvedComplaints;
 
   UserModel(
@@ -20,6 +21,7 @@ class UserModel {
       required this.occupation,
       required this.gender,
       required this.totalComplaints,
+      required this.pendingComplaints,
       required this.resolvedComplaints});
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class UserModel {
         age: json['age'],
         gender: json['gender'],
         totalComplaints: json['total_complaints'],
+        pendingComplaints: json['pending_complaints'],
         resolvedComplaints: json['resolved_complaints']);
   }
 
@@ -47,6 +50,7 @@ class UserModel {
       'age': age,
       'gender': gender,
       'total_complaints': totalComplaints,
+      'pending_complaints': pendingComplaints,
       'resolved_complaints': resolvedComplaints
     };
   }

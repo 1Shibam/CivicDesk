@@ -1,8 +1,9 @@
 import 'package:complaints/presentation/widgets/all_profile_tile.dart';
-import 'package:complaints/widgets/custom_button.dart';
+
 import 'package:complaints/presentation/widgets/profile_image_section.dart';
 import 'package:complaints/providers/current_user_provider.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/widgets/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,142 +21,334 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   bool isLoading = false;
+  final String emptyProfile = 'https://i.imgur.com/PcvwDlW.png';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          leading: IconButton(
-              onPressed: () => context.pop(),
-              icon: Icon(
-                Icons.clear,
-                size: 40.sp,
-                color: AppColors.textColor,
-              )),
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: AppColors.darkBlueGrey,
+        elevation: 4,
+        shadowColor: AppColors.darkest,
+        title: Text("My Profile", style: AppTextStyles.bold(20)),
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: Icon(
+            Icons.arrow_back_ios_rounded,
+            size: 24.sp,
+            color: AppColors.textColor,
+          ),
         ),
-        body: Stack(
-          children: [
-            Consumer(
-              builder: (context, ref, child) {
-                final userAsync = ref.watch(currentUserProvider);
+      ),
+      body: Stack(
+        children: [
+          Consumer(
+            builder: (context, ref, child) {
+              final userAsync = ref.watch(currentUserProvider);
 
-                return userAsync.when(
+              return userAsync.when(
+                // when data is available
+                data: (userData) {
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        // Header with background gradient
+                        _buildProfileHeader(userData),
 
-                    // when data is available
-                    data: (data) {
-                      final userData = data;
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 32.w),
-                        child: SingleChildScrollView(
+                        // Profile details section
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              //Image and and image edit section --
-                              ProfileImageSection(
-                                profileUrl: userData.profileUrl,
-                                uid: userData.id,
-                              ),
-                              SizedBox(
-                                height: 2.h,
-                              ),
+                              SizedBox(height: 20.h),
 
-                              SizedBox(
-                                height: 16.h,
-                              ),
+                              // Profile Statistics Card
+                              _buildProfileStatsCard(),
 
-                              //profile details tiles- name , username etc..
+                              SizedBox(height: 24.h),
+
+                              // Personal Information Section
+                              _buildSectionHeader("Personal Information"),
+                              SizedBox(height: 12.h),
                               AllProfileTiles(
                                 email: userData.email,
                                 name: userData.name,
                                 joinedAt: userData.joinedAt,
-                                age: data.age,
-                                occupation: data.occupation,
+                                age: userData.age,
+                                occupation: userData.occupation,
                               ),
-                              SizedBox(
-                                height: 24.h,
-                              ),
+
+                              SizedBox(height: 24.h),
+
+                              // Account Actions Section
+
+                              // Logout Button
+                              // _buildLogoutButton(context),
                               CustomButton(
                                   onTap: () async {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            backgroundColor: AppColors.darkPink,
-                                            title: Text('Logout !? ',
-                                                style: AppTextStyles.bold(24)),
-                                            content: Text(
-                                              'Are you sure you want to logout?',
-                                              style: AppTextStyles.regular(24),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(
-                                                    context), // Cancel
-                                                child: Text(
-                                                  'Cancel',
-                                                  style:
-                                                      AppTextStyles.regular(20),
-                                                ),
-                                              ),
-                                              Consumer(
-                                                builder: (context, ref, child) {
-                                                  return TextButton(
-                                                    onPressed: () async {
-                                                      await FirebaseAuth
-                                                          .instance
-                                                          .signOut();
+                                    setState(() => isLoading = true);
+                                    await FirebaseAuth.instance.signOut();
+                                    setState(() => isLoading = false);
 
-                                                      if (context.mounted) {
-                                                        context.go(
-                                                            RouterNames.splash);
-                                                      }
-                                                    },
-                                                    child: Text(
-                                                      'Yes',
-                                                      style:
-                                                          AppTextStyles.regular(
-                                                              20),
-                                                    ),
-                                                  );
-                                                },
-                                              )
-                                            ],
-                                          );
-                                        });
+                                    if (context.mounted) {
+                                      context.go(RouterNames.splash);
+                                    }
                                   },
-                                  buttonText: 'Log out',
+                                  buttonText: 'Log Out',
                                   imageUrl:
-                                      'asets/images/logout-svgrepo-com.svg')
+                                      'asets/images/logout-svgrepo-com.svg'),
+
+                              SizedBox(height: 40.h),
                             ],
                           ),
                         ),
-                      );
-                    },
+                      ],
+                    ),
+                  );
+                },
 
-                    //Errror state -
-                    error: (error, stackTrace) => Center(
-                          child: Text(
-                            'Something went wrong',
-                            style: AppTextStyles.medium(20),
+                //Error state
+                error: (error, stackTrace) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline_rounded,
+                        size: 64.sp,
+                        color: Colors.red,
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        'Something went wrong',
+                        style: AppTextStyles.medium(20),
+                      ),
+                      SizedBox(height: 16.h),
+                      ElevatedButton(
+                        onPressed: () {
+                          // ignore: unused_result
+                          ref.refresh(currentUserProvider);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.darkPink,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24.w, vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
                         ),
+                        child: Text("Retry", style: AppTextStyles.medium(16)),
+                      ),
+                    ],
+                  ),
+                ),
 
-                    //loading state -
-                    loading: () => const CircularProgressIndicator());
-              },
+                //Loading state
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: AppColors.darkPink),
+                ),
+              );
+            },
+          ),
+          if (isLoading)
+            Container(
+              color: AppColors.darkest.withValues(alpha: 0.5),
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.darkPink,
+                  strokeWidth: 3.w,
+                ),
+              ),
             ),
-            if (isLoading) ...[
-              Container(
-                  color: AppColors.darkest.withValues(alpha: 0.2),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.darkPink,
-                    ),
-                  ))
-            ]
-          ],
-        ));
+        ],
+      ),
+    );
   }
+
+  Widget _buildProfileHeader(dynamic userData) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.darkPinkAccent, AppColors.darkPink],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(28.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.darkest.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          SizedBox(height: 30.h),
+          // Profile Image Section with enhanced styling
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: ProfileImageSection(
+              profileUrl: userData.profileUrl.isEmpty
+                  ? emptyProfile
+                  : userData.profileUrl,
+              uid: userData.id,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          // User name
+          Text(
+            userData.name,
+            style: AppTextStyles.bold(24, color: Colors.white),
+          ),
+          SizedBox(height: 8.h),
+          // User email
+          Text(
+            userData.email,
+            style: AppTextStyles.regular(16,
+                color: Colors.white.withValues(alpha: 0.9)),
+          ),
+          // User occupation if available
+          if (userData.occupation != null && userData.occupation.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(top: 4.h),
+              child: Text(
+                userData.occupation,
+                style: AppTextStyles.medium(14,
+                    color: Colors.white.withValues(alpha: 0.8)),
+              ),
+            ),
+          SizedBox(height: 30.h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileStatsCard() {
+    return Container(
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        color: AppColors.darkBlueGrey,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.darkest.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatItem("0", "Complaints"),
+          _buildVerticalDivider(),
+          _buildStatItem("0", "Resolved"),
+          _buildVerticalDivider(),
+          _buildStatItem("0", "Pending"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String count, String label) {
+    return Column(
+      children: [
+        Text(
+          count,
+          style: AppTextStyles.bold(24, color: AppColors.darkPink),
+        ),
+        SizedBox(height: 8.h),
+        Text(
+          label,
+          style: AppTextStyles.medium(14, color: AppColors.lightGrey),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVerticalDivider() {
+    return Container(
+      height: 40.h,
+      width: 1,
+      color: AppColors.lightGrey.withValues(alpha: 0.3),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: AppTextStyles.bold(18, color: AppColors.textColor),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Container(
+            height: 1,
+            color: AppColors.lightGrey.withValues(alpha: 0.5),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Widget _buildLogoutButton(BuildContext context) {
+  //   return Container(
+  //     width: double.infinity,
+  //     decoration: BoxDecoration(
+  //       gradient: const LinearGradient(
+  //         colors: [Colors.redAccent, Colors.red],
+  //         begin: Alignment.topLeft,
+  //         end: Alignment.bottomRight,
+  //       ),
+  //       borderRadius: BorderRadius.circular(16.r),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.red.withValues(alpha: 0.3),
+  //           blurRadius: 8,
+  //           offset: const Offset(0, 4),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Material(
+  //       color: Colors.transparent,
+  //       child: InkWell(
+  //         onTap: () => _showLogoutDialog(context),
+  //         borderRadius: BorderRadius.circular(16.r),
+  //         child: Padding(
+  //           padding: EdgeInsets.symmetric(vertical: 16.h),
+  //           child: Row(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Icon(Icons.logout_rounded, color: Colors.white, size: 24.sp),
+  //               SizedBox(width: 12.w),
+  //               Text(
+  //                 "Log Out",
+  //                 style: AppTextStyles.bold(18, color: Colors.white),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

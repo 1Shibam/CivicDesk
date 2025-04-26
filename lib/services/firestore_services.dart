@@ -47,6 +47,7 @@ class FirestoreServices {
         joinedAt: formatTimestamp(Timestamp.now()),
         profileUrl: '',
         totalComplaints: 0,
+        pendingComplaints: 0,
         resolvedComplaints: 0);
 
     await userDocRef.set(userInfo.toJson());
