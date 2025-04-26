@@ -1,3 +1,4 @@
+import 'package:complaints/models/user_model.dart';
 import 'package:complaints/presentation/widgets/all_profile_tile.dart';
 
 import 'package:complaints/presentation/widgets/profile_image_section.dart';
@@ -70,7 +71,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               SizedBox(height: 20.h),
 
                               // Profile Statistics Card
-                              _buildProfileStatsCard(),
+                              _buildProfileStatsCard(userData),
 
                               SizedBox(height: 24.h),
 
@@ -172,7 +173,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildProfileHeader(dynamic userData) {
+  Widget _buildProfileHeader(UserModel userData) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -221,12 +222,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
           SizedBox(height: 8.h),
           // User email
           Text(
-            userData.email,
+            obscureEmail(userData.email),
             style: AppTextStyles.regular(16,
                 color: Colors.white.withValues(alpha: 0.9)),
           ),
           // User occupation if available
-          if (userData.occupation != null && userData.occupation.isNotEmpty)
+          if (userData.occupation.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(top: 4.h),
               child: Text(
@@ -241,7 +242,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildProfileStatsCard() {
+  Widget _buildProfileStatsCard(UserModel user) {
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
@@ -258,11 +259,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem("0", "Complaints"),
+          _buildStatItem(user.totalComplaints.toString(), "Complaints"),
           _buildVerticalDivider(),
-          _buildStatItem("0", "Resolved"),
+          _buildStatItem(user.resolvedComplaints.toString(), "Resolved"),
           _buildVerticalDivider(),
-          _buildStatItem("0", "Pending"),
+          _buildStatItem(user.pendingComplaints.toString(), "Pending"),
         ],
       ),
     );
