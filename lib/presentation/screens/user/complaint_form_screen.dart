@@ -512,6 +512,10 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
 
 // Call the submit function
     await FirestoreServices().submitComplaint(newComplaint, context);
+    //close after submission
+    if (mounted) {
+      context.pop();
+    }
   }
 }
 
