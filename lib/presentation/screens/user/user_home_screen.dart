@@ -4,6 +4,7 @@ import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
 import 'package:complaints/providers/current_user_provider.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/services/ai_implementation/spam_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -189,8 +190,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                   shadowColor: AppColors.darkest,
                                   foregroundColor: AppColors.textColor,
                                   overlayColor: AppColors.textColor),
-                              onPressed: () {
-                                context.push(RouterNames.complaintScreen);
+                              onPressed: () async {
+                                // context.push(RouterNames.complaintScreen);
+                                checkSpamExample();
                               },
                               child: Text(
                                 'Make first Complaint',
@@ -281,6 +283,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         ),
       ),
     );
+  }
+
+  void checkSpamExample() async {
+    final spamChecker = SpamChecker(); // Don't forget to add your key
+
+    final result = await spamChecker.checkSpam(
+      title: 'i am having trouble shitting and my cheeks hurts',
+      category: 'health',
+      description: 'my ass cheeks are unable to produce the shits',
+      imageData: ['balls', 'football'],
+    );
+
+    print('Is spam: $result');
   }
 
   Drawer _userHomeScreenDrawer(BuildContext context) {

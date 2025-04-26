@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,30 +13,28 @@ class SpamChecker {
     required List<String> imageData,
   }) async {
     final apiKey = dotenv.env['GEMENI_API'];
-    final prompt = '''
-    Act as a spam detection system for user reports. Analyze the following report data and 
-    return ONLY a JSON object with "isSpam" boolean value. 
-
-    Spam criteria:
-    - Trivial/non-serious complaints (e.g., lost pen)
-    - Troll-like language (e.g., "lmao", sarcasm)
-    - Irrelevant image descriptions
-    - Non-constructive complaints
-
-    Examples of spam:
-    Title: "my pen got lost"
-    Description: "lmao you just believe that are you serious"
-    Images: [laughing emoji]
-
-    Input data to analyze:
-    {
-      "title": "$title",
-      "category": "$category",
-      "description": "$description",
-      "image_data": ${jsonEncode(imageData)}
+    if (apiKey == null || apiKey.isEmpty) {
+      print('GEMENI_API key is missing!');
+      return false;
     }
 
-    Respond ONLY with valid JSON format: {"isSpam": true|false}
+    final prompt = '''
+    Analyze this report and determine if it's spam. 
+    Respond ONLY with pure JSON format: {"isSpam": true|false} 
+    without any code block or extra text.
+
+    Spam indicators:
+    - Trivial/non-serious complaints
+    - Troll-like language
+    - Obscene/vulgar content
+    - Non-constructive reports
+    - Personal issues that can be solved individually
+
+    Report to analyze:
+    Title: "$title"
+    Category: "$category"
+    Description: "$description"
+    Images: ${imageData.join(", ")}
     ''';
 
     try {
@@ -57,15 +54,28 @@ class SpamChecker {
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        debugPrint(responseBody);
-        final generatedText =
-            responseBody['candidates'][0]['content']['parts'][0]['text'];
-        final result = jsonDecode(generatedText);
-        return result['isSpam'] ?? false;
+        final generatedText = responseBody['candidates']?[0]['content']
+                ?['parts']?[0]['text'] ??
+            '';
+
+        try {
+          final cleanedText = generatedText
+              .replaceAll('```json', '')
+              .replaceAll('```', '')
+              .trim();
+
+          final result = jsonDecode(cleanedText);
+          return result['isSpam'] == true;
+        } catch (e) {
+          print('Failed to parse Gemini response: $generatedText');
+          return false;
+        }
+      } else {
+        print('API request failed with status: ${response.statusCode}');
+        return false;
       }
-      return false;
     } catch (e) {
-      debugPrint('Error checking spam: $e');
+      print('Error checking spam: $e');
       return false;
     }
   }
