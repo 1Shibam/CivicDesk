@@ -14,7 +14,6 @@ import 'package:complaints/presentation/screens/spalsh_screen.dart';
 import 'package:complaints/presentation/screens/user/ai_chat_help_screen.dart';
 import 'package:complaints/presentation/screens/user/complaint_form_screen.dart';
 import 'package:complaints/presentation/screens/user/create_user_profile.dart';
-import 'package:complaints/presentation/screens/user/notificaitons_screen.dart';
 import 'package:complaints/presentation/screens/user/user_home_screen.dart';
 import 'package:complaints/presentation/screens/user/user_login_screen.dart';
 import 'package:complaints/presentation/screens/user/user_profile_page.dart';
@@ -54,8 +53,6 @@ GoRouter appRoutes = GoRouter(
         PageTransitionType.fade),
     customTransitionRoute(RouterNames.adminProfile, const AdminProfilePage(),
         PageTransitionType.fade),
-    customTransitionRoute(RouterNames.notificationScreen,
-        const NotificationScreen(), PageTransitionType.fade),
 
     // Information pages with fade transition
     customTransitionRoute(

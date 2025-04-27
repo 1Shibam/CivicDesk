@@ -79,16 +79,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           ),
           backgroundColor: AppColors.darkBlueGrey,
           actions: [
-            IconButton(
-              icon: Icon(
-                Icons.notifications,
-                color: AppColors.textColor,
-                size: 28.sp,
-              ),
-              onPressed: () {
-                context.push(RouterNames.notificationScreen);
-              },
-            ),
             SizedBox(width: 8.w),
             Consumer(
               builder: (context, ref, child) {
@@ -782,18 +772,41 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Row(
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(3.w),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2.w),
-                      ),
-                      child: CircleAvatar(
-                        radius: 35.r,
-                        backgroundImage: const CachedNetworkImageProvider(
-                          'https://i.imgur.com/PcvwDlW.png',
-                        ),
-                      ),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final user = ref.watch(currentUserProvider);
+                        return user.when(
+                          data: (data) {
+                            return Container(
+                              padding: EdgeInsets.all(3.w),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 2.w),
+                              ),
+                              child: CircleAvatar(
+                                radius: 35.r,
+                                backgroundImage: CachedNetworkImageProvider(
+                                  data.profileUrl == ''
+                                      ? 'https://i.imgur.com/PcvwDlW.png'
+                                      : data.profileUrl,
+                                ),
+                              ),
+                            );
+                          },
+                          error: (error, stackTrace) {
+                            return Text(
+                              'NO user',
+                              style: AppTextStyles.bold(20),
+                            );
+                          },
+                          loading: () => const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(width: 16.w),
                     Expanded(
@@ -815,14 +828,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   SizedBox(height: 4.h),
-                                  Text(
-                                    'View Profile',
-                                    style: AppTextStyles.regular(
-                                      14,
-                                      color:
-                                          Colors.white.withValues(alpha: 0.8),
-                                    ),
-                                  ),
                                 ],
                               );
                             },

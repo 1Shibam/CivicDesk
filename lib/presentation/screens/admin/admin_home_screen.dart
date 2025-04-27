@@ -298,29 +298,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           ),
           backgroundColor: AppColors.darkBlueGrey,
           actions: [
-            IconButton(
-              icon: Stack(
-                children: [
-                  Icon(Icons.notifications,
-                      color: AppColors.textColor, size: 28.sp),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      width: 10.w,
-                      height: 10.w,
-                      decoration: const BoxDecoration(
-                        color: AppColors.darkPink,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              onPressed: () {
-                context.push(RouterNames.notificationScreen);
-              },
-            ),
             SizedBox(width: 12.w),
             Consumer(
               builder: (context, ref, child) {
