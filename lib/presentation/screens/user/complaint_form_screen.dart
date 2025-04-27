@@ -6,6 +6,7 @@ import 'package:complaints/models/user_model.dart';
 import 'package:complaints/presentation/screens/user/speech_screen.dart';
 import 'package:complaints/providers/current_user_provider.dart';
 import 'package:complaints/services/db_services/firestore_services.dart';
+import 'package:complaints/services/media_services/image_labeling_service.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/providers/image_provider.dart';
@@ -163,6 +164,106 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
         ),
       ),
     );
+  }
+
+  Future<void> scanImages() async {
+    final selectedImages = ref.read(imageListProvider);
+    if (selectedImages.isEmpty) {
+      customSnackbar(
+        context: context,
+        message: 'No images to scan',
+        iconName: Icons.image_not_supported,
+      );
+      return;
+    }
+
+    try {
+      final results = await labelImages(
+          selectedImages.map((file) => File(file.path)).toList());
+      print('Image scan results: $results');
+
+      if (mounted) {
+        customSnackbar(
+          context: context,
+          message: 'Images scanned successfully',
+          iconName: Icons.check_circle,
+        );
+      }
+    } catch (e) {
+      print('Error scanning images: $e');
+      if (mounted) {
+        customSnackbar(
+          context: context,
+          message: 'Error scanning images',
+          iconName: Icons.error,
+        );
+      }
+    }
+  }
+
+  Future<void> submitTheForm(UserModel user) async {
+    if (titleController.text.trim().isEmpty) {
+      customSnackbar(
+        context: context,
+        message: 'Please enter a title for your complaint',
+        iconName: Icons.error,
+      );
+      return;
+    }
+
+    if (descriptionController.text.trim().isEmpty) {
+      customSnackbar(
+        context: context,
+        message: 'Please describe your complaint',
+        iconName: Icons.error,
+      );
+      return;
+    }
+
+    if (selectedCategory == null) {
+      customSnackbar(
+        context: context,
+        message: 'Please select a category',
+        iconName: Icons.error,
+      );
+      return;
+    }
+
+    if (selectedCategory == 'Other' &&
+        otherCategoryController.text.trim().isEmpty) {
+      customSnackbar(
+        context: context,
+        message: 'Please specify the category',
+        iconName: Icons.error,
+      );
+      return;
+    }
+
+    final newComplaint = ComplaintModel(
+      complaintId: FirebaseFirestore.instance.collection('complaints').doc().id,
+      title: titleController.text.trim(),
+      description: descriptionController.text.trim(),
+      category: selectedCategory == 'Other'
+          ? otherCategoryController.text.trim()
+          : selectedCategory!,
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      userProfileUrl: user.profileUrl,
+      attachments: [],
+      attachmentsResolved: [],
+      status: 'Pending',
+      isSpam: false,
+      submittedAt: DateTime.now(),
+      userNotified: false,
+      adminNotified: false,
+      isPosted: false,
+    );
+
+    await FirestoreServices().submitComplaint(newComplaint, context);
+    if (mounted) {
+      context.pop();
+    }
   }
 
   void showImagePreview(File imageFile) {
@@ -482,13 +583,19 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                   ),
                 ],
                 SizedBox(height: 32.h),
-                CustomButton(
-                    onTap: () async {
-                      final user = ref.read(currentUserProvider).value!;
-                      await submitTheForm(user);
-                    },
-                    buttonText: 'Submit Complaint',
-                    imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg'),
+                selectedImages.isNotEmpty
+                    ? CustomButton(
+                        onTap: scanImages,
+                        buttonText: 'Scan Images',
+                        bgColor: AppColors.darkGreen,
+                        imageUrl: 'asets/images/scan-svgrepo-com.svg')
+                    : CustomButton(
+                        onTap: () async {
+                          final user = ref.read(currentUserProvider).value!;
+                          await submitTheForm(user);
+                        },
+                        buttonText: 'Submit Complaint',
+                        imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg'),
                 SizedBox(height: 24.h),
               ],
             ),
@@ -496,34 +603,6 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
         ),
       ),
     );
-  }
-
-  Future<void> submitTheForm(UserModel user) async {
-    final newComplaint = ComplaintModel(
-      complaintId: FirebaseFirestore.instance.collection('complaints').doc().id,
-      title: titleController.text.trim(),
-      description: descriptionController.text.trim(),
-      category: selectedCategory == null ? 'other' : selectedCategory!,
-      userId: user.id,
-      userName: user.name,
-      userEmail: user.email,
-      userProfileUrl: user.profileUrl,
-      attachments: [],
-      attachmentsResolved: [],
-      status: 'Pending',
-      isSpam: false,
-      submittedAt: DateTime.now(),
-      userNotified: false,
-      adminNotified: false,
-      isPosted: false,
-    );
-
-// Call the submit function
-    await FirestoreServices().submitComplaint(newComplaint, context);
-    //close after submission
-    if (mounted) {
-      context.pop();
-    }
   }
 }
 

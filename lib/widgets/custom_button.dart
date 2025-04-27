@@ -8,10 +8,12 @@ class CustomButton extends StatefulWidget {
       {super.key,
       required this.onTap,
       required this.buttonText,
-      required this.imageUrl});
+      required this.imageUrl,
+      this.bgColor = AppColors.darkPinkAccent});
   final VoidCallback onTap;
   final String buttonText;
   final String imageUrl;
+  final Color bgColor;
 
   @override
   State<CustomButton> createState() => _CustomButtonState();
@@ -36,8 +38,8 @@ class _CustomButtonState extends State<CustomButton> {
         child: Container(
           decoration: BoxDecoration(
             color: _scale == 0.95
-                ? AppColors.darkPinkAccent.withValues(alpha: 0.8)
-                : AppColors.darkPinkAccent,
+                ? widget.bgColor.withValues(alpha: 0.8)
+                : widget.bgColor,
             borderRadius: BorderRadius.circular(20.r),
             boxShadow: [
               const BoxShadow(
