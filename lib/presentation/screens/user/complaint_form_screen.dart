@@ -19,7 +19,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 
 class ComplaintFormScreen extends ConsumerStatefulWidget {
   const ComplaintFormScreen({super.key});
@@ -361,13 +360,16 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
       // 4. Submit to Firestore
       if (!mounted) return;
       await FirestoreServices().submitComplaint(newComplaint, context);
-      await ref.read(firestoreServiceProvider).updateUserData(
-          userID: user.id,
-          isAdmin: false,
-          updates: {
-            'total_complaints': user.totalComplaints + 1,
-          },
-          context: context);
+
+      if (mounted) {
+        await ref.read(firestoreServiceProvider).updateUserData(
+            userID: user.id,
+            isAdmin: false,
+            updates: {
+              'total_complaints': user.totalComplaints + 1,
+            },
+            context: context);
+      }
 
       if (mounted) {
         Navigator.of(context, rootNavigator: true)
@@ -449,33 +451,6 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     super.dispose();
   }
 
-  bool speechEnabled = false;
-  String wordsSpoken = '';
-  double confidenceLevel = 0;
-
-  final SpeechToText speechToText = SpeechToText();
-  @override
-  void initState() {
-    super.initState();
-    initSpeech();
-  }
-
-  void initSpeech() async {
-    speechEnabled = await speechToText.initialize();
-    setState(() {});
-  }
-
-  void startListening() async {
-    await speechToText.listen(onResult: onSpeechResult);
-  }
-
-  void onSpeechResult(result) {
-    setState(() {
-      wordsSpoken = "${result.recognizedWords}";
-      confidenceLevel = result.confidence;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final selectedImages = ref.watch(imageListProvider);
@@ -519,69 +494,8 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Voice Input Section
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.darkest.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                        color: AppColors.lightGrey.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Use voice input to describe your issue',
-                          style: AppTextStyles.medium(16),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 12.h),
-                        Container(
-                          padding: EdgeInsets.all(12.w),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [
-                                AppColors.darkPink,
-                                AppColors.darkPinkAccent,
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color:
-                                    AppColors.darkPink.withValues(alpha: 0.4),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              //implement voice fill
-                            },
-                            icon: Icon(Icons.mic,
-                                size: 32.sp, color: AppColors.textColor),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 24.h),
-
                   // OR Divider
-                  Row(
-                    children: [
-                      const Expanded(
-                          child: Divider(color: AppColors.lightGrey)),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w),
-                        child: Text('OR', style: AppTextStyles.medium(16)),
-                      ),
-                      const Expanded(
-                          child: Divider(color: AppColors.lightGrey)),
-                    ],
-                  ),
+
                   SizedBox(height: 24.h),
 
                   // Form Fields

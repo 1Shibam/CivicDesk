@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
+import 'package:complaints/presentation/screens/user/resolved_complaints_posts.dart';
 import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
 import 'package:complaints/providers/current_user_complaints_provider.dart';
 import 'package:complaints/providers/current_user_provider.dart';
@@ -128,7 +129,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         ),
       ),
       drawer: _userHomeScreenDrawer(context),
-      body: _currentIndex == 0 ? _buildHomeBody() : _buildPostsPlaceholder(),
+      body:
+          _currentIndex == 0 ? _buildHomeBody() : const ComplaintsPostsScreen(),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -164,35 +166,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPostsPlaceholder() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.article_rounded,
-            size: 80.sp,
-            color: AppColors.darkPink.withValues(alpha: 0.7),
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            'Posts Placeholder',
-            style: AppTextStyles.bold(24, color: AppColors.textColor),
-          ),
-          SizedBox(height: 8.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 32.w),
-            child: Text(
-              'This section will contain posts in the future',
-              textAlign: TextAlign.center,
-              style: AppTextStyles.medium(16, color: AppColors.lightGrey),
-            ),
-          ),
-        ],
       ),
     );
   }
