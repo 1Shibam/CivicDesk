@@ -1,6 +1,7 @@
 import 'package:complaints/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
@@ -42,7 +43,15 @@ class NotificationScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Notifications',
             style: AppTextStyles.bold(20, color: AppColors.textColor)),
-        backgroundColor: AppColors.darkPink,
+        backgroundColor: AppColors.darkBlueGrey,
+        shadowColor: AppColors.darkest,
+        elevation: 4,
+        leading: IconButton(
+            onPressed: () => context.pop(),
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              size: 24.sp,
+            )),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -57,7 +66,7 @@ class NotificationScreen extends StatelessWidget {
                 style: AppTextStyles.medium(16)),
             subtitle: Text('Tap to view details',
                 style: AppTextStyles.regular(14,
-                    color: AppColors.textColor.withValues(alpha:0.8))),
+                    color: AppColors.textColor.withValues(alpha: 0.8))),
             tileColor: AppColors.darkPinkAccent,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.r)),

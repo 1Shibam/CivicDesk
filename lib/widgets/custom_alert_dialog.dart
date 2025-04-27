@@ -19,9 +19,9 @@ class CustomAlertDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.darkest,
+      backgroundColor: AppColors.darkBlueGrey,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       title: Text(
         title,
@@ -29,27 +29,27 @@ class CustomAlertDialog extends StatelessWidget {
       ),
       content: Text(
         subtitle,
-        style: AppTextStyles.regular(14, color: AppColors.lightGrey),
+        style: AppTextStyles.regular(16),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Cancel',
-            style: AppTextStyles.medium(14, color: AppColors.darkPinkAccent),
+            style: AppTextStyles.medium(14, color: AppColors.lightGrey),
           ),
         ),
         ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context); // First close the dialog
-            onConfirmPressed(); // Then perform the action
-          },
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.darkGreen,
+            backgroundColor: AppColors.darkPink,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.r),
             ),
           ),
+          onPressed: () {
+            Navigator.pop(context); // close dialog first
+            onConfirmPressed(); // then execute main action
+          },
           child: Text(
             confirmText,
             style: AppTextStyles.medium(14),

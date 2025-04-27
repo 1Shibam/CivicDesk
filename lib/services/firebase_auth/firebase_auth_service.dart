@@ -48,14 +48,6 @@ class FirebaseAuthServices {
         final profileExists =
             await FirestoreServices().checkIfProfileExists(user.uid);
 
-        if (context.mounted) {
-          customSnackbar(
-            context: context,
-            message: 'Welcome, ${user.displayName}!',
-            iconName: Icons.gpp_good_sharp,
-            bgColor: Colors.blue,
-          );
-        }
         if (!context.mounted) return;
         if (profileExists) {
           context.go(RouterNames.userHome);
@@ -121,7 +113,7 @@ class FirebaseAuthServices {
       if (context.mounted) {
         customSnackbar(
             context: context,
-            message: 'Something went wrong!!',
+            message: e.message.toString(),
             bgColor: Colors.red,
             iconName: Icons.error);
       }
