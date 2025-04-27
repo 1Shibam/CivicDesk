@@ -1,6 +1,7 @@
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/presentation/widgets/all_profile_tile.dart';
 import 'package:complaints/providers/current_admin_provider.dart';
+import 'package:complaints/widgets/custom_alert_dialog.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/presentation/widgets/profile_image_section.dart';
 import 'package:complaints/routes/router_names.dart';
@@ -69,35 +70,15 @@ class AdminProfilePage extends ConsumerWidget {
                         showDialog(
                           context: context,
                           builder: (context) {
-                            return AlertDialog(
-                              backgroundColor: AppColors.darkPink,
-                              title: Text('Logout !?',
-                                  style: AppTextStyles.bold(24)),
-                              content: Text(
-                                'Are you sure you want to logout?',
-                                style: AppTextStyles.regular(24),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    'Cancel',
-                                    style: AppTextStyles.regular(20),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    await FirebaseAuth.instance.signOut();
-                                    if (context.mounted) {
-                                      context.go(RouterNames.splash);
-                                    }
-                                  },
-                                  child: Text(
-                                    'Yes',
-                                    style: AppTextStyles.regular(20),
-                                  ),
-                                ),
-                              ],
+                            return CustomAlertDialog(
+                              title: 'Logout!?',
+                              subtitle: 'Are you sure you want to logout?',
+                              onConfirmPressed: () async {
+                                await FirebaseAuth.instance.signOut();
+                                if (context.mounted) {
+                                  context.go(RouterNames.splash);
+                                }
+                              },
                             );
                           },
                         );

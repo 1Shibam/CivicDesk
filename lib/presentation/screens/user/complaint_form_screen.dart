@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/models/user_model.dart';
-import 'package:complaints/presentation/screens/user/speech_screen.dart';
 import 'package:complaints/providers/current_user_provider.dart';
 import 'package:complaints/services/ai_implementation/spam_checker.dart';
 import 'package:complaints/services/db_services/cloudinary_services.dart';
@@ -19,6 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 class ComplaintFormScreen extends ConsumerStatefulWidget {
   const ComplaintFormScreen({super.key});
@@ -441,6 +441,33 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     super.dispose();
   }
 
+  bool speechEnabled = false;
+  String wordsSpoken = '';
+  double confidenceLevel = 0;
+
+  final SpeechToText speechToText = SpeechToText();
+  @override
+  void initState() {
+    super.initState();
+    initSpeech();
+  }
+
+  void initSpeech() async {
+    speechEnabled = await speechToText.initialize();
+    setState(() {});
+  }
+
+  void startListening() async {
+    await speechToText.listen(onResult: onSpeechResult);
+  }
+
+  void onSpeechResult(result) {
+    setState(() {
+      wordsSpoken = "${result.recognizedWords}";
+      confidenceLevel = result.confidence;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedImages = ref.watch(imageListProvider);
@@ -523,12 +550,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                           ),
                           child: IconButton(
                             onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => const AlertDialog(
-                                  content: SpeechScreen(),
-                                ),
-                              );
+                              //implement voice fill
                             },
                             icon: Icon(Icons.mic,
                                 size: 32.sp, color: AppColors.textColor),

@@ -4,6 +4,7 @@ import 'package:complaints/presentation/widgets/all_profile_tile.dart';
 import 'package:complaints/presentation/widgets/profile_image_section.dart';
 import 'package:complaints/providers/current_user_provider.dart';
 import 'package:complaints/routes/router_names.dart';
+import 'package:complaints/widgets/custom_alert_dialog.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -94,13 +95,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               // _buildLogoutButton(context),
                               CustomButton(
                                   onTap: () async {
-                                    setState(() => isLoading = true);
-                                    await FirebaseAuth.instance.signOut();
-                                    setState(() => isLoading = false);
-
-                                    if (context.mounted) {
-                                      context.go(RouterNames.splash);
-                                    }
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return CustomAlertDialog(
+                                          title: 'Logout!?',
+                                          subtitle:
+                                              'Are you sure you want to logout?',
+                                          onConfirmPressed: () async {
+                                            await FirebaseAuth.instance
+                                                .signOut();
+                                            if (context.mounted) {
+                                              context.go(RouterNames.splash);
+                                            }
+                                          },
+                                        );
+                                      },
+                                    );
                                   },
                                   buttonText: 'Log Out',
                                   imageUrl:
@@ -310,46 +321,4 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ],
     );
   }
-
-  // Widget _buildLogoutButton(BuildContext context) {
-  //   return Container(
-  //     width: double.infinity,
-  //     decoration: BoxDecoration(
-  //       gradient: const LinearGradient(
-  //         colors: [Colors.redAccent, Colors.red],
-  //         begin: Alignment.topLeft,
-  //         end: Alignment.bottomRight,
-  //       ),
-  //       borderRadius: BorderRadius.circular(16.r),
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: Colors.red.withValues(alpha: 0.3),
-  //           blurRadius: 8,
-  //           offset: const Offset(0, 4),
-  //         ),
-  //       ],
-  //     ),
-  //     child: Material(
-  //       color: Colors.transparent,
-  //       child: InkWell(
-  //         onTap: () => _showLogoutDialog(context),
-  //         borderRadius: BorderRadius.circular(16.r),
-  //         child: Padding(
-  //           padding: EdgeInsets.symmetric(vertical: 16.h),
-  //           child: Row(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Icon(Icons.logout_rounded, color: Colors.white, size: 24.sp),
-  //               SizedBox(width: 12.w),
-  //               Text(
-  //                 "Log Out",
-  //                 style: AppTextStyles.bold(18, color: Colors.white),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 }

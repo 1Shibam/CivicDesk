@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:complaints/models/admin_model.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/models/user_model.dart';
+import 'package:complaints/services/db_services/cloudinary_services.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/services/media_services/pick_image.dart';
-import 'package:complaints/services/media_services/upload_image_to_imgur.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,12 +82,23 @@ class FirestoreServices {
 
   Future<void> updateProfilePicture(String userId, ImageSource source,
       BuildContext context, bool isAdmin) async {
+    // Pick image
     File? image = await pickImage(source, context);
     if (image == null) return;
     if (!context.mounted) return;
 
-    String? imageUrl = await uploadImageToImgur(context, image);
-    if (imageUrl != null && context.mounted) {
+    // Cloudinary service instance
+    final CloudinaryService cloudinaryService = CloudinaryService();
+    final imagePath = image.path;
+
+    // Upload image as a list (even if it's only one image)
+    List<String> imagePaths = [imagePath];
+    List<String> imageUrls = await cloudinaryService.uploadImages(imagePaths);
+
+    // Get the URL of the uploaded image (from the returned list)
+    String imageUrl = imageUrls.isNotEmpty ? imageUrls[0] : '';
+
+    if (imageUrl.isNotEmpty && context.mounted) {
       await updateUserData(
         isAdmin: isAdmin,
         userID: userId,
