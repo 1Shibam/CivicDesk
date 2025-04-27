@@ -18,8 +18,6 @@ final currentUserComplaintsProvider =
       .snapshots()
       .map((snapshot) {
     // For debugging, print the number of complaints fetched
-    print(
-        'Fetched ${snapshot.docs.length} complaints for user ${currentUser.uid}');
 
     return snapshot.docs
         .map((doc) => ComplaintModel.fromMap(doc.data(), doc.id))

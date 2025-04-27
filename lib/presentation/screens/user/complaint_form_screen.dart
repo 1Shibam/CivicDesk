@@ -235,7 +235,6 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
         );
       }
     } catch (e) {
-      print('Error scanning images: $e');
       setState(() {
         isScanning = false;
       });
@@ -446,6 +445,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
   Widget build(BuildContext context) {
     final selectedImages = ref.watch(imageListProvider);
 
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         if (hasFormData) {

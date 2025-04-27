@@ -14,7 +14,6 @@ class SpamChecker {
   }) async {
     final apiKey = dotenv.env['GEMENI_API'];
     if (apiKey == null || apiKey.isEmpty) {
-      print('GEMENI_API key is missing!');
       return false;
     }
 
@@ -68,15 +67,12 @@ class SpamChecker {
           final result = jsonDecode(cleanedText);
           return result['isSpam'] == true;
         } catch (e) {
-          print('Failed to parse Gemini response: $generatedText');
           return false;
         }
       } else {
-        print('API request failed with status: ${response.statusCode}');
         return false;
       }
     } catch (e) {
-      print('Error checking spam: $e');
       return false;
     }
   }

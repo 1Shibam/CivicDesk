@@ -37,6 +37,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     'Pending': 2,
     'Rejected': 3
   };
+  // ignore: unused_element
   int _getStatusPriority(String status) {
     return _statusOrder[status] ?? 3; // Default to Rejected if unknown status
   }

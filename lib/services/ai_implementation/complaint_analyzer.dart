@@ -37,7 +37,6 @@ class ComplaintAnalyzer {
   }) async {
     final apiKey = dotenv.env['GEMENI_API'];
     if (apiKey == null || apiKey.isEmpty) {
-      print('GEMENI_API key is missing!');
       return _defaultResponse(description);
     }
 
@@ -94,15 +93,12 @@ class ComplaintAnalyzer {
 
           return result;
         } catch (e) {
-          print('Failed to parse Gemini response: $generatedText');
           return _defaultResponse(description);
         }
       } else {
-        print('API request failed with status: ${response.statusCode}');
         return _defaultResponse(description);
       }
     } catch (e) {
-      print('Error analyzing complaint: $e');
       return _defaultResponse(description);
     }
   }

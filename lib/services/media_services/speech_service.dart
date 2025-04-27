@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class SpeechService {
@@ -8,8 +9,8 @@ class SpeechService {
 
   Future<bool> initialize() async {
     _isInitialized = await _speech.initialize(
-      onStatus: (status) => print('Status: $status'),
-      onError: (error) => print('Error: $error'),
+      onStatus: (status) => debugPrint('Status: $status'),
+      onError: (error) => debugPrint('Error: $error'),
     );
     return _isInitialized;
   }
