@@ -320,19 +320,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     );
   }
 
-  // void checkSpamExample() async {
-  //   final spamChecker = SpamChecker(); // Don't forget to add your key
-
-  //   final result = await spamChecker.checkSpam(
-  //     title: 'i am having trouble shitting and my cheeks hurts',
-  //     category: 'health',
-  //     description: 'my ass cheeks are unable to produce the shits',
-  //     imageData: ['balls', 'football'],
-  //   );
-
-  //   print('Is spam: $result');
-  // }
-
   Drawer _userHomeScreenDrawer(BuildContext context) {
     return Drawer(
       backgroundColor: AppColors.darkBlueGrey,
