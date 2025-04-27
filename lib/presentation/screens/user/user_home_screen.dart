@@ -220,51 +220,57 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           ),
           SizedBox(height: 20.h),
           // Inside _buildHomeBody's Column children, modify the Row with "My Recent Complaints":
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(Icons.history_rounded,
-                  color: AppColors.textColor, size: 32.sp),
-              Expanded(
-                child: Text(
-                  "Recent Complaints",
-                  style: AppTextStyles.bold(16, color: AppColors.textColor),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkBlueGrey,
-                    borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(color: AppColors.darkPink),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.r),
+                color: AppColors.lightGrey.withValues(alpha: 0.2)),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.history_rounded,
+                    color: AppColors.textColor, size: 32.sp),
+                Expanded(
+                  child: Text(
+                    "Recent Complaints",
+                    style: AppTextStyles.bold(16, color: AppColors.textColor),
                   ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedFilter,
-                      icon: Icon(Icons.filter_list_rounded,
-                          size: 18.sp, color: AppColors.darkPink),
-                      borderRadius: BorderRadius.circular(12.r),
-                      dropdownColor: AppColors.darkBlueGrey,
-                      style:
-                          AppTextStyles.medium(14, color: AppColors.textColor),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedFilter = newValue!;
-                        });
-                      },
-                      items: _filterOptions
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.darkBlueGrey,
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: AppColors.darkPink),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedFilter,
+                        icon: Icon(Icons.filter_list_rounded,
+                            size: 24.sp, color: AppColors.textColor),
+                        borderRadius: BorderRadius.circular(12.r),
+                        dropdownColor: AppColors.darkBlueGrey,
+                        style: AppTextStyles.medium(14,
+                            color: AppColors.textColor),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedFilter = newValue!;
+                          });
+                        },
+                        items: _filterOptions
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           SizedBox(height: 16.h),
           _buildComplaintsList(),
