@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 class UserHomeScreen extends StatefulWidget {
   const UserHomeScreen({super.key});
@@ -22,6 +23,23 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   final List<ComplaintModel> complaints = [];
   final String emptyProfile = 'https://i.imgur.com/PcvwDlW.png';
   int _currentIndex = 0;
+  String _selectedFilter = 'All';
+  final List<String> _filterOptions = [
+    'All',
+    'Pending',
+    'Approved',
+    'Resolved',
+    'Rejected'
+  ];
+  final Map<String, int> _statusOrder = {
+    'Resolved': 0,
+    'Approved': 1,
+    'Pending': 2,
+    'Rejected': 3
+  };
+  int _getStatusPriority(String status) {
+    return _statusOrder[status] ?? 3; // Default to Rejected if unknown status
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,14 +219,50 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             thickness: 1.5,
           ),
           SizedBox(height: 20.h),
+          // Inside _buildHomeBody's Column children, modify the Row with "My Recent Complaints":
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(Icons.history_rounded,
-                  color: AppColors.darkPink, size: 24.sp),
-              SizedBox(width: 8.w),
-              Text(
-                "My Recent Complaints",
-                style: AppTextStyles.bold(18, color: AppColors.textColor),
+                  color: AppColors.textColor, size: 32.sp),
+              Expanded(
+                child: Text(
+                  "Recent Complaints",
+                  style: AppTextStyles.bold(16, color: AppColors.textColor),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkBlueGrey,
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: AppColors.darkPink),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedFilter,
+                      icon: Icon(Icons.filter_list_rounded,
+                          size: 18.sp, color: AppColors.darkPink),
+                      borderRadius: BorderRadius.circular(12.r),
+                      dropdownColor: AppColors.darkBlueGrey,
+                      style:
+                          AppTextStyles.medium(14, color: AppColors.textColor),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedFilter = newValue!;
+                        });
+                      },
+                      items: _filterOptions
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -348,11 +402,25 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         builder: (context, ref, child) {
           final userComplaints = ref.watch(currentUserComplaintsProvider);
           return userComplaints.when(
-            data: (complaint) {
-              print(complaint.length);
-              return complaint.isEmpty
+            data: (complaints) {
+              // Apply filtering
+              List<ComplaintModel> filteredComplaints = _selectedFilter == 'All'
+                  ? List.from(complaints)
+                  : complaints
+                      .where((c) =>
+                          c.status.toLowerCase() ==
+                          _selectedFilter.toLowerCase())
+                      .toList();
+
+              // Apply sorting
+              filteredComplaints.sort((a, b) {
+                return _statusOrder[a.status]!
+                    .compareTo(_statusOrder[b.status]!);
+              });
+
+              return filteredComplaints.isEmpty
                   ? _buildEmptyComplaints()
-                  : _buildComplaintsListView(complaint);
+                  : _buildComplaintsListView(filteredComplaints);
             },
             error: (error, stackTrace) {
               return Center(
@@ -449,154 +517,230 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return ListView.builder(
       itemCount: complaints.length,
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 8.w),
       itemBuilder: (context, index) {
-        final userComplaint = complaints[index];
+        final complaint = complaints[index];
+        final isResolved = complaint.status.toLowerCase() == "resolved";
+        final isRejected = complaint.status.toLowerCase() == "rejected";
+
         return Padding(
-          padding: EdgeInsets.only(bottom: 12.h),
-          child: Card(
-            elevation: 6,
-            shadowColor: AppColors.darkest.withValues(alpha: 0.4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16.r),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ComplaintDetailScreen(
-                      complaint: userComplaint,
-                      isAdmin: false,
-                    ),
+          padding: EdgeInsets.only(
+            bottom: 16.h,
+          ),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ComplaintDetailScreen(
+                    complaint: complaint,
+                    isAdmin: false,
                   ),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.darkPinkAccent.withValues(alpha: 0.9),
-                      AppColors.darkPink.withValues(alpha: 0.8),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16.r),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.darkBlueGrey,
+                borderRadius: BorderRadius.circular(16.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header with status
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: isRejected
+                          ? Colors.red.withValues(alpha: 0.2)
+                          : isResolved
+                              ? Colors.green.withValues(alpha: 0.2)
+                              : AppColors.darkPink.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.r),
+                        topRight: Radius.circular(16.r),
+                      ),
+                    ),
+                    child: Row(
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(8.w),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Icon(
-                            Icons.report_problem_rounded,
-                            size: 24.sp,
-                            color: Colors.white,
-                          ),
+                        Icon(
+                          isRejected
+                              ? Icons.block
+                              : isResolved
+                                  ? Icons.check_circle
+                                  : Icons.access_time,
+                          color: isRejected
+                              ? Colors.red
+                              : isResolved
+                                  ? Colors.green
+                                  : Colors.orange,
+                          size: 20.sp,
                         ),
-                        SizedBox(width: 12.w),
+                        SizedBox(width: 8.w),
                         Expanded(
                           child: Text(
-                            userComplaint.title,
-                            style: AppTextStyles.bold(16, color: Colors.white),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 6.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                userComplaint.status.toLowerCase() == "resolved"
-                                    ? Colors.green.withValues(alpha: 0.2)
-                                    : Colors.orange.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(16.r),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                userComplaint.status.toLowerCase() == "resolved"
-                                    ? Icons.check_circle
-                                    : Icons.hourglass_top,
-                                size: 14.sp,
-                                color: userComplaint.status.toLowerCase() ==
-                                        "resolved"
-                                    ? Colors.green
-                                    : Colors.orange,
-                              ),
-                              SizedBox(width: 4.w),
-                              Text(
-                                userComplaint.status,
-                                style: AppTextStyles.medium(
-                                  12,
-                                  color: userComplaint.status.toLowerCase() ==
-                                          "resolved"
+                            complaint.status.toUpperCase(),
+                            style: AppTextStyles.bold(
+                              14,
+                              color: isRejected
+                                  ? Colors.red
+                                  : isResolved
                                       ? Colors.green
                                       : Colors.orange,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 12.h),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Text(
-                        "Category: ${userComplaint.category}",
-                        style: AppTextStyles.medium(13, color: Colors.white),
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 2.h,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(2.r),
                             ),
                           ),
                         ),
-                        SizedBox(width: 8.w),
-                        Container(
-                          padding: EdgeInsets.all(4.w),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
+                        if (complaint.isSpam)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 4.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.3),
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.warning,
+                                    size: 14.sp, color: Colors.red),
+                                SizedBox(width: 4.w),
+                                Text("SPAM",
+                                    style: AppTextStyles.bold(12,
+                                        color: Colors.red)),
+                              ],
+                            ),
                           ),
-                          child: Icon(
-                            Icons.arrow_forward,
-                            size: 16.sp,
-                            color: Colors.white,
-                          ),
+                      ],
+                    ),
+                  ),
+
+                  // Main content
+                  Padding(
+                    padding: EdgeInsets.all(16.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                complaint.title,
+                                style: AppTextStyles.bold(18,
+                                    color: AppColors.textColor),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 12.h),
+
+                        // Category and date
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8.w,
+                                vertical: 4.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.darkPink.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Text(
+                                complaint.category,
+                                style: AppTextStyles.medium(12,
+                                    color: AppColors.textColor),
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Icon(Icons.calendar_today,
+                                size: 14.sp, color: AppColors.lightGrey),
+                            SizedBox(width: 4.w),
+                            Text(
+                              DateFormat('MMM dd, yyyy')
+                                  .format(complaint.submittedAt),
+                              style: AppTextStyles.regular(12,
+                                  color: AppColors.lightGrey),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 16.h),
+
+                        // Description preview
+                        Text(
+                          complaint.description,
+                          style: AppTextStyles.regular(14,
+                              color:
+                                  AppColors.textColor.withValues(alpha: 0.8)),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+
+                        SizedBox(height: 16.h),
+
+                        // Footer with attachments and view button
+                        Row(
+                          children: [
+                            // Attachment count
+                            if (complaint.attachments.isNotEmpty)
+                              Row(
+                                children: [
+                                  Icon(Icons.photo_library,
+                                      size: 16.sp, color: AppColors.lightGrey),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    "${complaint.attachments.length}",
+                                    style: AppTextStyles.medium(12,
+                                        color: AppColors.lightGrey),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                ],
+                              ),
+
+                            const Spacer(),
+
+                            // View button
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.w,
+                                vertical: 6.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.darkPink,
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "View Details",
+                                    style: AppTextStyles.medium(12,
+                                        color: Colors.white),
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Icon(Icons.arrow_forward,
+                                      size: 14.sp, color: Colors.white),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

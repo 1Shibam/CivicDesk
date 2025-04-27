@@ -311,20 +311,23 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     }
 
     try {
-      // 1. Upload images first
-      final List<String> imagePaths =
-          selectedImages.map((xfile) => xfile.path).toList();
-      final List<String> uploadedUrls =
-          await CloudinaryService().uploadImages(imagePaths);
+      // 1. Upload images only if they exist
+      List<String> uploadedUrls = [];
+      if (selectedImages.isNotEmpty) {
+        final List<String> imagePaths =
+            selectedImages.map((xfile) => xfile.path).toList();
+        uploadedUrls = await CloudinaryService().uploadImages(imagePaths);
+      }
 
-      // 2. Check for spam
+      // 2. Check for spam (include empty image labels if no images)
       final isSpam = await SpamChecker().checkSpam(
         title: titleController.text.trim(),
         category: selectedCategory == 'Other'
             ? otherCategoryController.text.trim()
             : selectedCategory!,
         description: descriptionController.text.trim(),
-        imageData: scannedLabels, // Use the scanned image labels
+        imageData:
+            selectedImages.isNotEmpty ? scannedLabels : ["No images provided"],
       );
 
       // 3. Create complaint model
@@ -340,17 +343,18 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
         userName: user.name,
         userEmail: user.email,
         userProfileUrl: user.profileUrl,
+        submittedAt: DateTime.now(),
+        isPosted: false,
+        userNotified: false,
+        adminNotified: false,
         attachments: hasScannedImages ? uploadedUrls : [],
 
         attachmentsResolved: [],
-        status: isSpam
-            ? 'Rejected'
-            : 'Pending', // Update status based on spam check
+        // Update status based on spam check
         isSpam: isSpam,
-        submittedAt: DateTime.now(),
-        userNotified: false,
-        adminNotified: false,
-        isPosted: false,
+
+        status: isSpam ? 'Rejected' : 'Pending',
+
         rejectionReason: isSpam ? 'Marked as potential spam' : null,
       );
 
@@ -359,35 +363,33 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
       await FirestoreServices().submitComplaint(newComplaint, context);
 
       if (mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
+        Navigator.of(context, rootNavigator: true)
+            .pop(); // Close loading dialog
 
         if (isSpam) {
-          // Show spam warning
-          showDialog(
+          // Show spam warning and navigate back after dismissal
+          await showDialog(
             context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Complaint Rejected'),
-              content: const Text(
-                  'Your complaint was marked as potential spam. Please ensure your complaints are constructive and relevant.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
+            builder: (context) => CustomAlertDialog(
+              title: 'Complaint Rejected',
+              subtitle:
+                  'Your complaint was marked as potential spam. Please ensure your complaints are constructive and relevant.',
+              onConfirmPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+                _clearFormData();
+                context.pop(); // Navigate back to previous screen
+              },
             ),
           );
         } else {
-          // Success message
+          _clearFormData();
+          context.pop();
           customSnackbar(
             context: context,
             message: 'Complaint submitted successfully',
             iconName: Icons.check_circle,
           );
         }
-
-        _clearFormData();
-        context.pop();
       }
     } catch (e) {
       if (mounted) {

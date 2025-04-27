@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/admin_model.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/models/user_model.dart';
@@ -165,14 +164,6 @@ class FirestoreServices {
           .doc(complaint.complaintId);
 
       await complaintRef.set(complaint.toMap());
-
-      if (context.mounted) {
-        customSnackbar(
-            message: 'Complaint Submitted Successfully',
-            context: context,
-            iconName: Icons.done,
-            bgColor: AppColors.darkGreen);
-      }
     } catch (e) {
       if (context.mounted) {
         customSnackbar(
