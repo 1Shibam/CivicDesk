@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "216426942561",
+    "project_id": "complaintsapp-f5030",
+    "storage_bucket": "complaintsapp-f5030.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216426942561:android:434ab35214667f618f5a20",
+        "android_client_info": {
+          "package_name": "com.shivamGroupProj.complaints"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "216426942561-162utvtgc6jrvrkl8f3ej0g2u58ftiq3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shivamGroupProj.complaints",
+            "certificate_hash": "7d65ce5fff347a49c6812a9a9b4e0bd24fc01ceb"
+          }
+        },
+        {
+          "client_id": "216426942561-42o2b16qo4d8gu8idm68i6h4trqi80lr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaumsK264NKozD5Y87MeVDjbfQUTECP3o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "216426942561-42o2b16qo4d8gu8idm68i6h4trqi80lr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "216426942561-9as50u6t18i8pcoegcpe8vqhmf0ddgj2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.shivamGroupProj.complaints"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
