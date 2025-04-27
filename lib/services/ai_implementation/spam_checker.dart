@@ -29,6 +29,7 @@ class SpamChecker {
     - Obscene/vulgar content
     - Non-constructive reports
     - Personal issues that can be solved individually
+    - if the image data seem too off from the complaint title and description take into cosideration it may make mistake but ml model is labeling what is inside the image so the image cant be way too different hope you understand.
 
     Report to analyze:
     Title: "$title"

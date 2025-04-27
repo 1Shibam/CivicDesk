@@ -9,8 +9,10 @@ import 'package:intl/intl.dart';
 
 class ComplaintDetailScreen extends StatelessWidget {
   final ComplaintModel complaint;
+  final bool isAdmin;
 
-  const ComplaintDetailScreen({super.key, required this.complaint});
+  const ComplaintDetailScreen(
+      {super.key, required this.complaint, required this.isAdmin});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class ComplaintDetailScreen extends StatelessWidget {
           ),
         ),
         title: Text(
-          "Complaint Details",
+          "Complaint Detail",
           style: AppTextStyles.bold(22),
         ),
         centerTitle: true,
@@ -73,15 +75,17 @@ class ComplaintDetailScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        complaint.userName,
+                        isAdmin ? complaint.userName : 'By You',
                         style: AppTextStyles.bold(18),
                       ),
                       SizedBox(height: 4.h),
-                      Text(
-                        complaint.userEmail,
-                        style: AppTextStyles.regular(14,
-                            color: AppColors.lightGrey),
-                      ),
+                      isAdmin
+                          ? Text(
+                              complaint.userEmail,
+                              style: AppTextStyles.regular(14,
+                                  color: AppColors.lightGrey),
+                            )
+                          : const SizedBox.shrink(),
                       SizedBox(height: 4.h),
                       Text(
                         "Submitted on: ${DateFormat('dd MMMM, yyyy').format(complaint.submittedAt)}",
@@ -236,68 +240,69 @@ class ComplaintDetailScreen extends StatelessWidget {
 
               // Action buttons
               // Action buttons or resolution message
-              complaint.status == 'Resolved'
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(16.w),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha: .15),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.check_circle,
-                                  color: Colors.green, size: 24.sp),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: Text(
-                                  "This issue has been resolved. You can upload it as a success story post!",
-                                  style: AppTextStyles.regular(14,
-                                      color: Colors.green.shade300),
+              if (isAdmin) ...[
+                complaint.status == 'Resolved'
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(16.w),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withValues(alpha: .15),
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.check_circle,
+                                    color: Colors.green, size: 24.sp),
+                                SizedBox(width: 12.w),
+                                Expanded(
+                                  child: Text(
+                                    "This issue has been resolved. You can upload it as a success story post!",
+                                    style: AppTextStyles.regular(14,
+                                        color: Colors.green.shade300),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 16.h),
-                        _buildActionButton(
-                          onTap: () {
-                            // Add your upload post logic here
-                          },
-                          text: "Upload as Post",
-                          icon: Icons.upload_rounded,
-                          backgroundColor: AppColors.darkPink,
-                        ),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        Expanded(
-                          child: _buildActionButton(
+                          SizedBox(height: 16.h),
+                          _buildActionButton(
                             onTap: () {
-                              // Approve the complaint
+                              // Add your upload post logic here
                             },
-                            text: 'Approve',
-                            icon: Icons.check_circle_outline,
+                            text: "Upload as Post",
+                            icon: Icons.upload_rounded,
                             backgroundColor: AppColors.darkPink,
                           ),
-                        ),
-                        SizedBox(width: 16.w),
-                        Expanded(
-                          child: _buildActionButton(
-                            onTap: () {
-                              // Reject the complaint
-                            },
-                            text: 'Reject',
-                            icon: Icons.cancel_outlined,
-                            backgroundColor: AppColors.darkBlueGrey,
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          Expanded(
+                            child: _buildActionButton(
+                              onTap: () {
+                                // Approve the complaint
+                              },
+                              text: 'Approve',
+                              icon: Icons.check_circle_outline,
+                              backgroundColor: AppColors.darkPink,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-
+                          SizedBox(width: 16.w),
+                          Expanded(
+                            child: _buildActionButton(
+                              onTap: () {
+                                // Reject the complaint
+                              },
+                              text: 'Reject',
+                              icon: Icons.cancel_outlined,
+                              backgroundColor: AppColors.darkBlueGrey,
+                            ),
+                          ),
+                        ],
+                      ),
+              ],
               SizedBox(height: 16.h),
             ],
           ),

@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class CloudinaryService {
   final cloudinary = Cloudinary.signedConfig(
     cloudName: dotenv.env['CLOUDINARY_NAME']!,
-    apiKey: dotenv.env['998275539428773']!,
+    apiKey: dotenv.env['CLOUDINARY_API_KEY']!,
     apiSecret: dotenv.env['CLOUDINARY_API_SECRET']!,
   );
 

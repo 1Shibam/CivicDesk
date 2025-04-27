@@ -13,6 +13,7 @@ class ComplaintModel {
   final List<String> attachmentsResolved;
   final String status;
   final bool isSpam;
+  final String? rejectionReason;
   final DateTime submittedAt;
   final bool userNotified;
   final bool adminNotified;
@@ -34,6 +35,7 @@ class ComplaintModel {
     required this.attachmentsResolved,
     required this.status,
     required this.isSpam,
+    this.rejectionReason = '',
     required this.submittedAt,
     required this.userNotified,
     required this.adminNotified,

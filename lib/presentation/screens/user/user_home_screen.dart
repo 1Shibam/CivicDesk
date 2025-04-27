@@ -466,8 +466,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        ComplaintDetailScreen(complaint: userComplaint),
+                    builder: (context) => ComplaintDetailScreen(
+                      complaint: userComplaint,
+                      isAdmin: false,
+                    ),
                   ),
                 );
               },

@@ -5,8 +5,11 @@ import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/models/user_model.dart';
 import 'package:complaints/presentation/screens/user/speech_screen.dart';
 import 'package:complaints/providers/current_user_provider.dart';
+import 'package:complaints/services/ai_implementation/spam_checker.dart';
+import 'package:complaints/services/db_services/cloudinary_services.dart';
 import 'package:complaints/services/db_services/firestore_services.dart';
 import 'package:complaints/services/media_services/image_labeling_service.dart';
+import 'package:complaints/widgets/custom_alert_dialog.dart';
 import 'package:complaints/widgets/custom_button.dart';
 import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:complaints/providers/image_provider.dart';
@@ -37,6 +40,9 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
   String? selectedCategory;
   final picker = ImagePicker();
   bool containsImages = false;
+  bool isScanning = false;
+  bool hasScannedImages = false;
+  List<String> scannedLabels = [];
 
   final List<String> categories = [
     'Billing',
@@ -63,6 +69,33 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
     'Other'
   ];
 
+  bool get hasFormData {
+    return titleController.text.trim().isNotEmpty ||
+        descriptionController.text.trim().isNotEmpty ||
+        selectedCategory != null ||
+        otherCategoryController.text.trim().isNotEmpty ||
+        ref.read(imageListProvider).isNotEmpty;
+  }
+
+  void _showExitConfirmDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => CustomAlertDialog(
+        title: 'Discard Changes?',
+        subtitle: 'You have unsaved changes. Are you sure you want to exit?',
+        confirmText: 'Discard',
+        onConfirmPressed: () {
+          _clearFormData();
+          context.pop();
+        },
+      ),
+    );
+  }
+
+  void _clearFormData() {
+    ref.read(imageListProvider.notifier).clearImages();
+  }
+
   Future<void> pickImagesfromGallery() async {
     final images = await picker.pickMultiImage();
     if (images.isEmpty) return;
@@ -79,7 +112,15 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
       }
     }
 
-    ref.read(imageListProvider.notifier).addImages(images);
+    final imagesToAdd = images.take(availableSlots).toList();
+    ref.read(imageListProvider.notifier).addImages(imagesToAdd);
+
+    // Reset scan status if new images are added
+    if (hasScannedImages && imagesToAdd.isNotEmpty) {
+      setState(() {
+        hasScannedImages = false;
+      });
+    }
   }
 
   Future<void> showImageSourceSheet() async {
@@ -113,6 +154,13 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                     return;
                   }
                   ref.read(imageListProvider.notifier).addImages([picked]);
+
+                  // Reset scan status if new image is added
+                  if (hasScannedImages) {
+                    setState(() {
+                      hasScannedImages = false;
+                    });
+                  }
                 }
               },
             ),
@@ -129,23 +177,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
                   Text('Choose from Gallery', style: AppTextStyles.medium(20)),
               onTap: () async {
                 Navigator.pop(context);
-                final images = await picker.pickMultiImage();
-                if (images.isEmpty) return;
-
-                final currentImages = ref.read(imageListProvider);
-                final availableSlots = 10 - currentImages.length;
-
-                if (images.length > availableSlots) {
-                  if (mounted) {
-                    customSnackbar(
-                        context: context,
-                        message: 'You can only upload up to 10 images',
-                        iconName: Icons.image_not_supported);
-                  }
-                }
-
-                final imagesToAdd = images.take(availableSlots).toList();
-                ref.read(imageListProvider.notifier).addImages(imagesToAdd);
+                await pickImagesfromGallery();
               },
             ),
             Padding(
@@ -177,20 +209,37 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
       return;
     }
 
+    setState(() {
+      isScanning = true;
+    });
+
     try {
-      final results = await labelImages(
-          selectedImages.map((file) => File(file.path)).toList());
-      print('Image scan results: $results');
+      // Convert XFiles to Files
+      final imageFiles =
+          selectedImages.map((xfile) => File(xfile.path)).toList();
+
+      // Get all unique labels from images
+      final labels = await labelImages(imageFiles);
+
+      setState(() {
+        scannedLabels = labels; // Now this is just List<String>
+        isScanning = false;
+        hasScannedImages = true;
+      });
 
       if (mounted) {
         customSnackbar(
           context: context,
-          message: 'Images scanned successfully',
+          message: 'Found ${labels.length} relevant items in images',
           iconName: Icons.check_circle,
         );
       }
     } catch (e) {
       print('Error scanning images: $e');
+      setState(() {
+        isScanning = false;
+      });
+
       if (mounted) {
         customSnackbar(
           context: context,
@@ -239,30 +288,116 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
       return;
     }
 
-    final newComplaint = ComplaintModel(
-      complaintId: FirebaseFirestore.instance.collection('complaints').doc().id,
-      title: titleController.text.trim(),
-      description: descriptionController.text.trim(),
-      category: selectedCategory == 'Other'
-          ? otherCategoryController.text.trim()
-          : selectedCategory!,
-      userId: user.id,
-      userName: user.name,
-      userEmail: user.email,
-      userProfileUrl: user.profileUrl,
-      attachments: [],
-      attachmentsResolved: [],
-      status: 'Pending',
-      isSpam: false,
-      submittedAt: DateTime.now(),
-      userNotified: false,
-      adminNotified: false,
-      isPosted: false,
-    );
+    // Check if images need scanning before submitting
+    final selectedImages = ref.read(imageListProvider);
+    if (selectedImages.isNotEmpty && !hasScannedImages) {
+      customSnackbar(
+        context: context,
+        message: 'Please scan your images before submitting',
+        iconName: Icons.warning,
+      );
+      return;
+    }
 
-    await FirestoreServices().submitComplaint(newComplaint, context);
+    // Show loading indicator
     if (mounted) {
-      context.pop();
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    try {
+      // 1. Upload images first
+      final List<String> imagePaths =
+          selectedImages.map((xfile) => xfile.path).toList();
+      final List<String> uploadedUrls =
+          await CloudinaryService().uploadImages(imagePaths);
+
+      // 2. Check for spam
+      final isSpam = await SpamChecker().checkSpam(
+        title: titleController.text.trim(),
+        category: selectedCategory == 'Other'
+            ? otherCategoryController.text.trim()
+            : selectedCategory!,
+        description: descriptionController.text.trim(),
+        imageData: scannedLabels, // Use the scanned image labels
+      );
+
+      // 3. Create complaint model
+      final newComplaint = ComplaintModel(
+        complaintId:
+            FirebaseFirestore.instance.collection('complaints').doc().id,
+        title: titleController.text.trim(),
+        description: descriptionController.text.trim(),
+        category: selectedCategory == 'Other'
+            ? otherCategoryController.text.trim()
+            : selectedCategory!,
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email,
+        userProfileUrl: user.profileUrl,
+        attachments: hasScannedImages ? uploadedUrls : [],
+
+        attachmentsResolved: [],
+        status: isSpam
+            ? 'Rejected'
+            : 'Pending', // Update status based on spam check
+        isSpam: isSpam,
+        submittedAt: DateTime.now(),
+        userNotified: false,
+        adminNotified: false,
+        isPosted: false,
+        rejectionReason: isSpam ? 'Marked as potential spam' : null,
+      );
+
+      // 4. Submit to Firestore
+      if (!mounted) return;
+      await FirestoreServices().submitComplaint(newComplaint, context);
+
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+
+        if (isSpam) {
+          // Show spam warning
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Complaint Rejected'),
+              content: const Text(
+                  'Your complaint was marked as potential spam. Please ensure your complaints are constructive and relevant.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          // Success message
+          customSnackbar(
+            context: context,
+            message: 'Complaint submitted successfully',
+            iconName: Icons.check_circle,
+          );
+        }
+
+        _clearFormData();
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        customSnackbar(
+          context: context,
+          message: 'Error submitting complaint: ${e.toString()}',
+          iconName: Icons.error,
+        );
+      }
     }
   }
 
@@ -309,310 +444,360 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
   Widget build(BuildContext context) {
     final selectedImages = ref.watch(imageListProvider);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-            onPressed: () {
-              selectedImages.removeRange(0, selectedImages.length);
-              context.pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios)),
-        title: Text('File Complaint',
-            style: AppTextStyles.bold(20, color: AppColors.textColor)),
-        backgroundColor: AppColors.darkBlueGrey,
-        shadowColor: AppColors.darkest,
-        elevation: 4,
-        iconTheme: const IconThemeData(color: AppColors.textColor),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-        child: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Voice Input Section
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkest.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: AppColors.lightGrey.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Use voice input to describe your issue',
-                        style: AppTextStyles.medium(16),
-                        textAlign: TextAlign.center,
+    return WillPopScope(
+      onWillPop: () async {
+        if (hasFormData) {
+          _showExitConfirmDialog();
+          return false;
+        }
+        _clearFormData();
+        return true;
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          centerTitle: true,
+          leading: IconButton(
+              onPressed: () {
+                if (hasFormData) {
+                  _showExitConfirmDialog();
+                } else {
+                  _clearFormData();
+                  context.pop();
+                }
+              },
+              icon: const Icon(Icons.arrow_back_ios)),
+          title: Text('File Complaint',
+              style: AppTextStyles.bold(20, color: AppColors.textColor)),
+          backgroundColor: AppColors.darkBlueGrey,
+          shadowColor: AppColors.darkest,
+          elevation: 4,
+          iconTheme: const IconThemeData(color: AppColors.textColor),
+        ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+          child: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Voice Input Section
+                  Container(
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.darkest.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: AppColors.lightGrey.withValues(alpha: 0.3),
                       ),
-                      SizedBox(height: 12.h),
-                      Container(
-                        padding: EdgeInsets.all(12.w),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [
-                              AppColors.darkPink,
-                              AppColors.darkPinkAccent,
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Use voice input to describe your issue',
+                          style: AppTextStyles.medium(16),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 12.h),
+                        Container(
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              colors: [
+                                AppColors.darkPink,
+                                AppColors.darkPinkAccent,
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    AppColors.darkPink.withValues(alpha: 0.4),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
                             ],
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.darkPink.withValues(alpha: 0.4),
-                              blurRadius: 8,
-                              spreadRadius: 2,
-                            ),
-                          ],
+                          child: IconButton(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => const AlertDialog(
+                                  content: SpeechScreen(),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.mic,
+                                size: 32.sp, color: AppColors.textColor),
+                          ),
                         ),
-                        child: IconButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => const AlertDialog(
-                                content: SpeechScreen(),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.mic,
-                              size: 32.sp, color: AppColors.textColor),
-                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 24.h),
+
+                  // OR Divider
+                  Row(
+                    children: [
+                      const Expanded(
+                          child: Divider(color: AppColors.lightGrey)),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        child: Text('OR', style: AppTextStyles.medium(16)),
                       ),
+                      const Expanded(
+                          child: Divider(color: AppColors.lightGrey)),
                     ],
                   ),
-                ),
-                SizedBox(height: 24.h),
+                  SizedBox(height: 24.h),
 
-                // OR Divider
-                Row(
-                  children: [
-                    const Expanded(child: Divider(color: AppColors.lightGrey)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12.w),
-                      child: Text('OR', style: AppTextStyles.medium(16)),
-                    ),
-                    const Expanded(child: Divider(color: AppColors.lightGrey)),
-                  ],
-                ),
-                SizedBox(height: 24.h),
-
-                // Form Fields
-                CustomTextFields(
-                  labelText: 'Title of Complaint',
-                  prefixIcon: Icons.title,
-                  controller: titleController,
-                  focusNode: titleFocus,
-                  validator: ValidationType.required,
-                ),
-                SizedBox(height: 16.h),
-
-                // Category Dropdown
-                DropdownButtonFormField<String>(
-                  menuMaxHeight: 240.h,
-                  borderRadius: BorderRadius.circular(16.r),
-                  decoration: InputDecoration(
-                    prefixIcon:
-                        const Icon(Icons.category, color: AppColors.textColor),
-                    labelText: 'Category',
-                    labelStyle: AppTextStyles.medium(16),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.r),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: false,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                  ),
-                  dropdownColor: AppColors.darkPinkAccent,
-                  value: selectedCategory,
-                  style: AppTextStyles.medium(16),
-                  icon: const Icon(Icons.arrow_drop_down,
-                      color: AppColors.textColor),
-                  items: categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (value) =>
-                      setState(() => selectedCategory = value),
-                  validator: (value) =>
-                      value == null ? 'Select a category' : null,
-                ),
-                SizedBox(height: 16.h),
-
-                if (selectedCategory == 'Other') ...[
+                  // Form Fields
                   CustomTextFields(
-                    labelText: 'Specify Other Category',
-                    prefixIcon: Icons.edit,
-                    controller: otherCategoryController,
-                    focusNode: otherFocus,
+                    labelText: 'Title of Complaint',
+                    prefixIcon: Icons.title,
+                    controller: titleController,
+                    focusNode: titleFocus,
                     validator: ValidationType.required,
                   ),
                   SizedBox(height: 16.h),
-                ],
 
-                // Description
-                CustomTextFields(
-                    focusNode: descFocus,
-                    controller: descriptionController,
-                    maxLines: 5,
-                    labelText: 'Description',
-                    validator: ValidationType.required),
-                SizedBox(height: 24.h),
-
-                if (!containsImages) ...[
-                  ListTile(
-                    tileColor: AppColors.darkest.withValues(alpha: 0.3),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.r)),
-                    title: Text(
-                      'You have images any regarding this issue ?',
-                      style: AppTextStyles.regular(16),
+                  // Category Dropdown
+                  DropdownButtonFormField<String>(
+                    menuMaxHeight: 240.h,
+                    borderRadius: BorderRadius.circular(16.r),
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.category,
+                          color: AppColors.textColor),
+                      labelText: 'Category',
+                      labelStyle: AppTextStyles.medium(16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: false,
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.w, vertical: 16.h),
                     ),
-                    trailing: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.darkPinkAccent),
-                        onPressed: () => setState(() {
-                              containsImages = true;
-                            }),
-                        child: Text(
-                          'Yes',
-                          style: AppTextStyles.regular(16),
-                        )),
-                  )
-                ],
-                if (selectedImages.length < 10 && containsImages) ...[
-                  GestureDetector(
-                    onTap: showImageSourceSheet,
-                    child: Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                          vertical: 16.h, horizontal: 20.w),
-                      decoration: BoxDecoration(
-                        color: AppColors.darkest.withValues(alpha: .7),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: AppColors.lightGrey.withValues(alpha: .3),
-                          width: 1.5,
+                    dropdownColor: AppColors.darkPinkAccent,
+                    value: selectedCategory,
+                    style: AppTextStyles.medium(16),
+                    icon: const Icon(Icons.arrow_drop_down,
+                        color: AppColors.textColor),
+                    items: categories.map((category) {
+                      return DropdownMenuItem(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (value) =>
+                        setState(() => selectedCategory = value),
+                    validator: (value) =>
+                        value == null ? 'Select a category' : null,
+                  ),
+                  SizedBox(height: 16.h),
+
+                  if (selectedCategory == 'Other') ...[
+                    CustomTextFields(
+                      labelText: 'Specify Other Category',
+                      prefixIcon: Icons.edit,
+                      controller: otherCategoryController,
+                      focusNode: otherFocus,
+                      validator: ValidationType.required,
+                    ),
+                    SizedBox(height: 16.h),
+                  ],
+
+                  // Description
+                  CustomTextFields(
+                      focusNode: descFocus,
+                      controller: descriptionController,
+                      maxLines: 5,
+                      labelText: 'Description',
+                      validator: ValidationType.required),
+                  SizedBox(height: 24.h),
+
+                  if (!containsImages) ...[
+                    ListTile(
+                      tileColor: AppColors.darkest.withValues(alpha: 0.3),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.r)),
+                      title: Text(
+                        'You have images any regarding this issue ?',
+                        style: AppTextStyles.regular(16),
+                      ),
+                      trailing: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.darkPinkAccent),
+                          onPressed: () => setState(() {
+                                containsImages = true;
+                              }),
+                          child: Text(
+                            'Yes',
+                            style: AppTextStyles.regular(16),
+                          )),
+                    )
+                  ],
+                  if (selectedImages.length < 10 && containsImages) ...[
+                    GestureDetector(
+                      onTap: showImageSourceSheet,
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 16.h, horizontal: 20.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.darkest.withValues(alpha: .7),
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: AppColors.lightGrey.withValues(alpha: .3),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.add_photo_alternate,
+                              color: AppColors.textColor,
+                              size: 24.sp,
+                            ),
+                            SizedBox(width: 10.w),
+                            Text(
+                              'Add Images',
+                              style: AppTextStyles.medium(16),
+                            ),
+                            SizedBox(width: 8.w),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8.w, vertical: 4.h),
+                              decoration: BoxDecoration(
+                                color: AppColors.darkPinkAccent,
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Text(
+                                '${10 - selectedImages.length} left',
+                                style: AppTextStyles.regular(12)
+                                    .copyWith(color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        mainAxisSize: MainAxisSize.min,
+                    ),
+                  ],
+
+                  if (selectedImages.isNotEmpty) ...[
+                    SizedBox(height: 16.h),
+                    Text('Selected Images (${selectedImages.length}/10)',
+                        style: AppTextStyles.medium(14)),
+                    SizedBox(height: 12.h),
+                    SizedBox(
+                      height: 100.h,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: selectedImages.length,
+                        itemBuilder: (context, index) {
+                          final file = File(selectedImages[index].path);
+                          return Padding(
+                            padding: EdgeInsets.only(right: 12.w),
+                            child: Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            FullImageView(imageFile: file),
+                                      ),
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    child: Image.file(
+                                      file,
+                                      height: 100.h,
+                                      width: 100.w,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      ref
+                                          .read(imageListProvider.notifier)
+                                          .removeImage(index);
+
+                                      // If there are still images and we've scanned before,
+                                      // we need to reset scan status
+                                      if (hasScannedImages &&
+                                          ref
+                                              .read(imageListProvider)
+                                              .isNotEmpty) {
+                                        setState(() {
+                                          hasScannedImages = false;
+                                        });
+                                      }
+                                    },
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: AppColors.darkPinkAccent,
+                                      ),
+                                      padding: EdgeInsets.all(4.w),
+                                      child: Icon(Icons.close,
+                                          color: Colors.white, size: 16.sp),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 32.h),
+                  // Loading indicator when scanning
+                  if (isScanning) ...[
+                    Center(
+                      child: Column(
                         children: [
-                          Icon(
-                            Icons.add_photo_alternate,
-                            color: AppColors.textColor,
-                            size: 24.sp,
+                          const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.darkPink),
                           ),
-                          SizedBox(width: 10.w),
+                          SizedBox(height: 16.h),
                           Text(
-                            'Add Images',
+                            'Scanning images...',
                             style: AppTextStyles.medium(16),
-                          ),
-                          SizedBox(width: 8.w),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8.w, vertical: 4.h),
-                            decoration: BoxDecoration(
-                              color: AppColors.darkPinkAccent,
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            child: Text(
-                              '${10 - selectedImages.length} left',
-                              style: AppTextStyles.regular(12)
-                                  .copyWith(color: Colors.white),
-                            ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-
-                if (selectedImages.isNotEmpty) ...[
-                  SizedBox(height: 16.h),
-                  Text('Selected Images (${selectedImages.length}/10)',
-                      style: AppTextStyles.medium(14)),
-                  SizedBox(height: 12.h),
-                  SizedBox(
-                    height: 100.h,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: selectedImages.length,
-                      itemBuilder: (context, index) {
-                        final file = File(selectedImages[index].path);
-                        return Padding(
-                          padding: EdgeInsets.only(right: 12.w),
-                          child: Stack(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) =>
-                                          FullImageView(imageFile: file),
-                                    ),
-                                  );
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.r),
-                                  child: Image.file(
-                                    file,
-                                    height: 100.h,
-                                    width: 100.w,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: GestureDetector(
-                                  onTap: () => ref
-                                      .read(imageListProvider.notifier)
-                                      .removeImage(index),
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColors.darkPinkAccent,
-                                    ),
-                                    padding: EdgeInsets.all(4.w),
-                                    child: Icon(Icons.close,
-                                        color: Colors.white, size: 16.sp),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-                SizedBox(height: 32.h),
-                selectedImages.isNotEmpty
-                    ? CustomButton(
+                  ] else if (selectedImages.isNotEmpty &&
+                      !hasScannedImages) ...[
+                    CustomButton(
                         onTap: scanImages,
                         buttonText: 'Scan Images',
                         bgColor: AppColors.darkGreen,
                         imageUrl: 'asets/images/scan-svgrepo-com.svg')
-                    : CustomButton(
+                  ] else ...[
+                    CustomButton(
                         onTap: () async {
                           final user = ref.read(currentUserProvider).value!;
                           await submitTheForm(user);
                         },
                         buttonText: 'Submit Complaint',
                         imageUrl: 'asets/images/send-alt-1-svgrepo-com.svg'),
-                SizedBox(height: 24.h),
-              ],
+                  ],
+                  SizedBox(height: 24.h),
+                ],
+              ),
             ),
           ),
         ),

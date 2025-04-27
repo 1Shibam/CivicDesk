@@ -531,7 +531,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ComplaintDetailScreen(complaint: complaint),
+            builder: (context) => ComplaintDetailScreen(
+              complaint: complaint,
+              isAdmin: true,
+            ),
           ),
         );
       },
