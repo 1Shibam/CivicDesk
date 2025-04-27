@@ -273,8 +273,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
           _buildStatItem(user.totalComplaints.toString(), "Complaints"),
           _buildVerticalDivider(),
           _buildStatItem(user.resolvedComplaints.toString(), "Resolved"),
-          _buildVerticalDivider(),
-          _buildStatItem(user.pendingComplaints.toString(), "Pending"),
         ],
       ),
     );

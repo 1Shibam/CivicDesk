@@ -4,6 +4,7 @@ import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/models/user_model.dart';
 import 'package:complaints/providers/current_user_provider.dart';
+import 'package:complaints/providers/firestore_service_provider.dart';
 import 'package:complaints/services/ai_implementation/spam_checker.dart';
 import 'package:complaints/services/db_services/cloudinary_services.dart';
 import 'package:complaints/services/db_services/firestore_services.dart';
@@ -360,6 +361,13 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
       // 4. Submit to Firestore
       if (!mounted) return;
       await FirestoreServices().submitComplaint(newComplaint, context);
+      await ref.read(firestoreServiceProvider).updateUserData(
+          userID: user.id,
+          isAdmin: false,
+          updates: {
+            'total_complaints': user.totalComplaints + 1,
+          },
+          context: context);
 
       if (mounted) {
         Navigator.of(context, rootNavigator: true)

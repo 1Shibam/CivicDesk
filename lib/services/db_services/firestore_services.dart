@@ -118,9 +118,6 @@ class FirestoreServices {
       isAdmin
           ? await firestore.collection('admins').doc(userID).update(updates)
           : await firestore.collection('users').doc(userID).update(updates);
-      if (context.mounted) {
-        context.pop();
-      }
     } on FirebaseException catch (error) {
       if (context.mounted) {
         customSnackbar(
