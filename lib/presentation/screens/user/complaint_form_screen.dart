@@ -294,6 +294,18 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
   }
 
   @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    otherCategoryController.dispose();
+    titleFocus.dispose();
+    otherFocus.dispose();
+    descFocus.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final selectedImages = ref.watch(imageListProvider);
 
@@ -302,7 +314,10 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen>
       appBar: AppBar(
         centerTitle: true,
         leading: IconButton(
-            onPressed: () => context.pop(),
+            onPressed: () {
+              selectedImages.removeRange(0, selectedImages.length);
+              context.pop();
+            },
             icon: const Icon(Icons.arrow_back_ios)),
         title: Text('File Complaint',
             style: AppTextStyles.bold(20, color: AppColors.textColor)),
