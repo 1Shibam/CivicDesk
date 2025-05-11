@@ -1,9 +1,23 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Update AGP to 8.2.1 here (inside buildscript dependencies)
+        classpath 'com.android.tools.build:gradle:8.2.1'
+        // Keep other dependencies (e.g., Kotlin Gradle Plugin)
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22"
+    }
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
     }
 }
+
 
 rootProject.buildDir = "../build"
 
@@ -22,4 +36,5 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
 
