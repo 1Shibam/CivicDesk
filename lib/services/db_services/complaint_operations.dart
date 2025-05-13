@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:complaints/core/constants.dart';
+import 'package:complaints/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 
 class ComplaintOperations {
@@ -32,6 +34,32 @@ class ComplaintOperations {
     await complaintsRef.doc(complaintId).update({
       'status': newStatus,
     });
+  }
+
+  //delete a complaint on reject ---
+  Future<void> deleteComplaint(String complaintId, BuildContext context) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('complaints')
+          .doc(complaintId)
+          .delete();
+      if (context.mounted) {
+        customSnackbar(
+            message: 'Complaint rejected',
+            context: context,
+            iconName: Icons.error,
+            bgColor: AppColors.darkGreen);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        customSnackbar(
+            message: 'Unable to reject the complaint',
+            context: context,
+            iconName: Icons.error,
+            bgColor: AppColors.darkPinkAccent);
+      }
+      // You can also show a snackbar or error dialog here
+    }
   }
 
 //resolved complaint post method --

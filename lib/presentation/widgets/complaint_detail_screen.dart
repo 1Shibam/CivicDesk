@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
+import 'package:complaints/presentation/screens/admin/upload_as_post_screen.dart';
 import 'package:complaints/presentation/widgets/full_screen_image_view.dart';
+import 'package:complaints/services/db_services/complaint_operations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -271,6 +273,12 @@ class ComplaintDetailScreen extends StatelessWidget {
                           _buildActionButton(
                             onTap: () {
                               // Add your upload post logic here
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const UploadAsPostScreen(),
+                                  ));
                             },
                             text: "Upload as Post",
                             icon: Icons.upload_rounded,
@@ -282,8 +290,12 @@ class ComplaintDetailScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: _buildActionButton(
-                              onTap: () {
+                              onTap: () async {
                                 // Approve the complaint
+                                ComplaintOperations().updateComplaintStatus(
+                                    complaintId: complaint.complaintId,
+                                    newStatus: "Approved",
+                                    context: context);
                               },
                               text: 'Approve',
                               icon: Icons.check_circle_outline,
@@ -295,6 +307,8 @@ class ComplaintDetailScreen extends StatelessWidget {
                             child: _buildActionButton(
                               onTap: () {
                                 // Reject the complaint
+                                ComplaintOperations().deleteComplaint(
+                                    complaint.complaintId, context);
                               },
                               text: 'Reject',
                               icon: Icons.cancel_outlined,

@@ -321,20 +321,6 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
           child: CircularProgressIndicator(color: AppColors.darkPink),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.darkPink,
-        onPressed: () {
-          // Manually refresh the data if needed
-          ref.refresh(allComplaintsProvider);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Refreshing data...'),
-              backgroundColor: AppColors.darkBlueGrey,
-            ),
-          );
-        },
-        child: const Icon(Icons.refresh, color: AppColors.textColor),
-      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
             color: AppColors.darkBlueGrey,
