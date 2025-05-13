@@ -286,37 +286,59 @@ class ComplaintDetailScreen extends StatelessWidget {
                           ),
                         ],
                       )
-                    : Row(
-                        children: [
-                          Expanded(
-                            child: _buildActionButton(
-                              onTap: () async {
-                                // Approve the complaint
-                                ComplaintOperations().updateComplaintStatus(
-                                    complaintId: complaint.complaintId,
-                                    newStatus: "Approved",
-                                    context: context);
-                              },
-                              text: 'Approve',
-                              icon: Icons.check_circle_outline,
-                              backgroundColor: AppColors.darkPink,
-                            ),
+                    : complaint.status == "Approved"
+                        ? _buildActionButton(
+                            onTap: () async {
+                              // mark as resolved
+                              await ComplaintOperations().updateComplaintStatus(
+                                  complaintId: complaint.complaintId,
+                                  newStatus: 'Resolved',
+                                  context: context);
+                              if (context.mounted) {
+                                context.pop();
+                              }
+                            },
+                            text: 'Mark as resoslved',
+                            icon: Icons.verified,
+                            backgroundColor: AppColors.darkGreen)
+                        : Row(
+                            children: [
+                              Expanded(
+                                child: _buildActionButton(
+                                  onTap: () async {
+                                    // Approve the complaint
+                                    await ComplaintOperations()
+                                        .updateComplaintStatus(
+                                            complaintId: complaint.complaintId,
+                                            newStatus: "Approved",
+                                            context: context);
+                                    if (context.mounted) {
+                                      context.pop();
+                                    }
+                                  },
+                                  text: 'Approve',
+                                  icon: Icons.check_circle_outline,
+                                  backgroundColor: AppColors.darkPink,
+                                ),
+                              ),
+                              SizedBox(width: 16.w),
+                              Expanded(
+                                child: _buildActionButton(
+                                  onTap: () async {
+                                    // Reject the complaint
+                                    await ComplaintOperations().deleteComplaint(
+                                        complaint.complaintId, context);
+                                    if (context.mounted) {
+                                      context.pop();
+                                    }
+                                  },
+                                  text: 'Reject',
+                                  icon: Icons.cancel_outlined,
+                                  backgroundColor: AppColors.darkBlueGrey,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(width: 16.w),
-                          Expanded(
-                            child: _buildActionButton(
-                              onTap: () {
-                                // Reject the complaint
-                                ComplaintOperations().deleteComplaint(
-                                    complaint.complaintId, context);
-                              },
-                              text: 'Reject',
-                              icon: Icons.cancel_outlined,
-                              backgroundColor: AppColors.darkBlueGrey,
-                            ),
-                          ),
-                        ],
-                      ),
               ],
               SizedBox(height: 16.h),
             ],

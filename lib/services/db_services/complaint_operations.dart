@@ -34,6 +34,13 @@ class ComplaintOperations {
     await complaintsRef.doc(complaintId).update({
       'status': newStatus,
     });
+    if (context.mounted) {
+      customSnackbar(
+          message: 'Upadted complaint status to $newStatus',
+          context: context,
+          iconName: Icons.verified,
+          bgColor: AppColors.darkGreen);
+    }
   }
 
   //delete a complaint on reject ---
