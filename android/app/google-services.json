@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "216426942561-162utvtgc6jrvrkl8f3ej0g2u58ftiq3.apps.googleusercontent.com",
+          "client_id": "216426942561-u11kl7cgej2m6odkl43uhsckglq4b3jq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.shivamGroupProj.complaints",
-            "certificate_hash": "7d65ce5fff347a49c6812a9a9b4e0bd24fc01ceb"
+            "certificate_hash": "99b52c117d7950ba48c6a918ec7b6ef8c6f4e0da"
           }
         },
         {
