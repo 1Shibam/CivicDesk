@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+//app is complete finally -- some changes are still to be made but main functionalities are done
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
