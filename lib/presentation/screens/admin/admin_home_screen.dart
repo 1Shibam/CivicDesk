@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:complaints/core/constants.dart';
 import 'package:complaints/models/complaint_model.dart';
 import 'package:complaints/presentation/widgets/complaint_detail_screen.dart';
+import 'package:complaints/providers/all_complaints_provider.dart';
 import 'package:complaints/providers/current_admin_provider.dart';
 import 'package:complaints/routes/router_names.dart';
 import 'package:flutter/material.dart';
@@ -9,14 +10,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-class AdminHomeScreen extends StatefulWidget {
+class AdminHomeScreen extends ConsumerStatefulWidget {
   const AdminHomeScreen({super.key});
 
   @override
-  State<AdminHomeScreen> createState() => _AdminHomeScreenState();
+  ConsumerState<AdminHomeScreen> createState() => _AdminHomeScreenState();
 }
 
-class _AdminHomeScreenState extends State<AdminHomeScreen> {
+class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
   int _selectedIndex = 0;
   String _selectedFilter = 'All';
   final String emptyProfile = 'https://i.imgur.com/PcvwDlW.png';
@@ -30,195 +31,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     'Other'
   ];
 
-  final List<ComplaintModel> primaryComplaints = [
-    ComplaintModel(
-      complaintId: '1',
-      title: 'Water Leakage',
-      description:
-          'There is a water leakage issue in the main pipe. All the people living around there went missing, rumors say they drowned in that water.',
-      category: 'Infrastructure',
-      userId: 'user789',
-      userName: 'Alice Johnson',
-      userEmail: 'alice@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Pending',
-      isSpam: false,
-      submittedAt: DateTime.now().subtract(const Duration(days: 3)),
-      userNotified: false,
-      adminNotified: false,
-    ),
-    ComplaintModel(
-      complaintId: '3',
-      title: 'Broken Street Light',
-      description:
-          'Street light in main avenue has been non-functional for a week.',
-      category: 'Infrastructure',
-      userId: 'user456',
-      userName: 'John Smith',
-      userEmail: 'john@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Pending',
-      isSpam: false,
-      submittedAt: DateTime.now().subtract(const Duration(days: 2)),
-      userNotified: false,
-      adminNotified: false,
-    ),
-    ComplaintModel(
-      complaintId: '4',
-      title: 'Garbage Collection Issue',
-      description: 'Garbage hasn\'t been collected for three days.',
-      category: 'Sanitation',
-      userId: 'user222',
-      userName: 'Mary Wilson',
-      userEmail: 'mary@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Pending',
-      isSpam: false,
-      submittedAt: DateTime.now().subtract(const Duration(days: 1)),
-      userNotified: false,
-      adminNotified: false,
-    ),
-  ];
-
-  final List<ComplaintModel> spamComplaints = [
-    ComplaintModel(
-      complaintId: '2',
-      title: 'Fake Report',
-      description: 'This report seems to be spam.',
-      category: 'Other',
-      userId: 'user111',
-      userName: 'Unknown',
-      userEmail: 'unknown@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Review',
-      isSpam: true,
-      submittedAt: DateTime.now().subtract(const Duration(days: 5)),
-      userNotified: false,
-      adminNotified: false,
-    ),
-    ComplaintModel(
-      complaintId: '5',
-      title: 'Suspicious Activity',
-      description: 'This is likely a spam report with no real issue.',
-      category: 'Security',
-      userId: 'user333',
-      userName: 'Anonymous',
-      userEmail: 'anon@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Review',
-      isSpam: true,
-      submittedAt: DateTime.now().subtract(const Duration(days: 4)),
-      userNotified: false,
-      adminNotified: false,
-    ),
-  ];
-
-  final List<ComplaintModel> approvedComplaints = [
-    ComplaintModel(
-      complaintId: '6',
-      title: 'Park Maintenance',
-      description: 'The local park needs better maintenance and cleaning.',
-      category: 'Sanitation',
-      userId: 'user444',
-      userName: 'Robert Brown',
-      userEmail: 'robert@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Approved',
-      isSpam: false,
-      submittedAt: DateTime.now().subtract(const Duration(days: 10)),
-      userNotified: true,
-      adminNotified: true,
-    ),
-    ComplaintModel(
-      complaintId: '7',
-      title: 'Security Camera Installation',
-      description:
-          'Request for installation of security cameras in the building lobby.',
-      category: 'Security',
-      userId: 'user555',
-      userName: 'Jennifer Lee',
-      userEmail: 'jennifer@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Approved',
-      isSpam: false,
-      submittedAt: DateTime.now().subtract(const Duration(days: 15)),
-      userNotified: true,
-      adminNotified: true,
-    ),
-  ];
-
-  // New resolved complaints list
-  final List<ComplaintModel> resolvedComplaints = [
-    ComplaintModel(
-      complaintId: '8',
-      title: 'Pothole Repair',
-      description:
-          'Large pothole on Main Street has been repaired successfully.',
-      category: 'Infrastructure',
-      userId: 'user666',
-      userName: 'David Chen',
-      userEmail: 'david@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Resolved',
-      isSpam: false,
-      submittedAt: DateTime.now().subtract(const Duration(days: 30)),
-      userNotified: true,
-      adminNotified: true,
-    ),
-    ComplaintModel(
-      complaintId: '9',
-      title: 'Wi-Fi Connection Issues',
-      description:
-          'Public Wi-Fi connectivity problems in the community center have been fixed.',
-      category: 'Infrastructure',
-      userId: 'user777',
-      userName: 'Sarah Thompson',
-      userEmail: 'sarah@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Resolved',
-      isSpam: false,
-      submittedAt: DateTime.now().subtract(const Duration(days: 25)),
-      userNotified: true,
-      adminNotified: true,
-    ),
-    ComplaintModel(
-      complaintId: '10',
-      title: 'Graffiti Removal',
-      description:
-          'Graffiti on the community center wall has been successfully removed.',
-      category: 'Sanitation',
-      userId: 'user888',
-      userName: 'Michael Rodriguez',
-      userEmail: 'michael@example.com',
-      attachments: [],
-      attachmentsResolved: [],
-      isPosted: false,
-      status: 'Resolved',
-      isSpam: false,
-      submittedAt: DateTime.now().subtract(const Duration(days: 20)),
-      userNotified: true,
-      adminNotified: true,
-    ),
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -226,24 +38,42 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     });
   }
 
-  List<ComplaintModel> _getFilteredComplaints() {
+  List<ComplaintModel> _getFilteredComplaints(
+      List<ComplaintModel> allComplaints) {
     List<ComplaintModel> complaints;
 
     switch (_selectedIndex) {
-      case 0:
-        complaints = primaryComplaints;
+      case 0: // Primary (Pending)
+        complaints = allComplaints
+            .where((complaint) =>
+                complaint.status.toLowerCase() == 'pending' &&
+                !complaint.isSpam)
+            .toList();
         break;
-      case 1:
-        complaints = spamComplaints;
+      case 1: // Spam
+        complaints =
+            allComplaints.where((complaint) => complaint.isSpam).toList();
         break;
-      case 2:
-        complaints = approvedComplaints;
+      case 2: // Approved
+        complaints = allComplaints
+            .where((complaint) =>
+                complaint.status.toLowerCase() == 'approved' &&
+                !complaint.isSpam)
+            .toList();
         break;
-      case 3:
-        complaints = resolvedComplaints;
+      case 3: // Resolved
+        complaints = allComplaints
+            .where((complaint) =>
+                complaint.status.toLowerCase() == 'resolved' &&
+                !complaint.isSpam)
+            .toList();
         break;
       default:
-        complaints = primaryComplaints;
+        complaints = allComplaints
+            .where((complaint) =>
+                complaint.status.toLowerCase() == 'pending' &&
+                !complaint.isSpam)
+            .toList();
     }
 
     if (_selectedFilter == 'All') {
@@ -272,7 +102,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredComplaints = _getFilteredComplaints();
+    // Watch the allComplaintsProvider to get real-time complaints
+    final complaintsAsync = ref.watch(allComplaintsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.darkest,
@@ -337,128 +168,164 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           ],
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.w),
-        child: Column(
-          children: [
-            SizedBox(
-              height: 16.h,
-            ),
-            // Filter section
-            Container(
-              decoration: BoxDecoration(
-                  color: AppColors.darkBlueGrey.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20.r),
-                      bottomLeft: Radius.circular(20.r))),
-              padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: complaintsAsync.when(
+        data: (complaints) {
+          final filteredComplaints = _getFilteredComplaints(complaints);
+
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.w),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 16.h,
+                ),
+                // Filter section
+                Container(
+                  decoration: BoxDecoration(
+                      color: AppColors.darkBlueGrey.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.r),
+                          bottomLeft: Radius.circular(20.r))),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _getScreenTitle(),
-                        style: AppTextStyles.bold(18),
-                      ),
-                      Text(
-                        "${filteredComplaints.length} found",
-                        style: AppTextStyles.regular(14,
-                            color: AppColors.lightGrey),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8.h),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: filterOptions.map((filter) {
-                        final isSelected = _selectedFilter == filter;
-                        return Padding(
-                          padding: EdgeInsets.only(right: 8.w),
-                          child: FilterChip(
-                            label: Text(
-                              filter,
-                              style: AppTextStyles.medium(12,
-                                  color: isSelected
-                                      ? AppColors.textColor
-                                      : AppColors.lightGrey),
-                            ),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              setState(() {
-                                _selectedFilter = filter;
-                              });
-                            },
-                            backgroundColor: AppColors.darkBlueGrey,
-                            selectedColor: AppColors.darkPink,
-                            checkmarkColor: AppColors.textColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.r),
-                              side: BorderSide(
-                                color: isSelected
-                                    ? AppColors.darkPink
-                                    : AppColors.lightGrey,
-                                width: 1.w,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 16.h,
-            ),
-            // Complaints list
-            Expanded(
-              child: filteredComplaints.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 64.sp,
-                            color: AppColors.lightGrey,
-                          ),
-                          SizedBox(height: 16.h),
                           Text(
-                            "No complaints found",
-                            style: AppTextStyles.medium(16,
-                                color: AppColors.lightGrey),
+                            _getScreenTitle(),
+                            style: AppTextStyles.bold(18),
                           ),
-                          SizedBox(height: 8.h),
                           Text(
-                            "Try changing your filter",
+                            "${filteredComplaints.length} found",
                             style: AppTextStyles.regular(14,
                                 color: AppColors.lightGrey),
                           ),
                         ],
                       ),
-                    )
-                  : ListView.builder(
-                      itemCount: filteredComplaints.length,
-                      itemBuilder: (context, index) {
-                        final complaint = filteredComplaints[index];
-                        return Container(
-                          margin: EdgeInsets.only(bottom: 12.h),
-                          child: _buildComplaintCard(complaint, context),
-                        );
-                      },
-                    ),
+                      SizedBox(height: 8.h),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: filterOptions.map((filter) {
+                            final isSelected = _selectedFilter == filter;
+                            return Padding(
+                              padding: EdgeInsets.only(right: 8.w),
+                              child: FilterChip(
+                                label: Text(
+                                  filter,
+                                  style: AppTextStyles.medium(12,
+                                      color: isSelected
+                                          ? AppColors.textColor
+                                          : AppColors.lightGrey),
+                                ),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  setState(() {
+                                    _selectedFilter = filter;
+                                  });
+                                },
+                                backgroundColor: AppColors.darkBlueGrey,
+                                selectedColor: AppColors.darkPink,
+                                checkmarkColor: AppColors.textColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.r),
+                                  side: BorderSide(
+                                    color: isSelected
+                                        ? AppColors.darkPink
+                                        : AppColors.lightGrey,
+                                    width: 1.w,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 16.h,
+                ),
+                // Complaints list
+                Expanded(
+                  child: filteredComplaints.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                size: 64.sp,
+                                color: AppColors.lightGrey,
+                              ),
+                              SizedBox(height: 16.h),
+                              Text(
+                                "No complaints found",
+                                style: AppTextStyles.medium(16,
+                                    color: AppColors.lightGrey),
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                "Try changing your filter",
+                                style: AppTextStyles.regular(14,
+                                    color: AppColors.lightGrey),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: filteredComplaints.length,
+                          itemBuilder: (context, index) {
+                            final complaint = filteredComplaints[index];
+                            return Container(
+                              margin: EdgeInsets.only(bottom: 12.h),
+                              child: _buildComplaintCard(complaint, context),
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
-          ],
+          );
+        },
+        error: (error, stackTrace) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64.sp,
+                  color: Colors.red,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  "Error loading complaints",
+                  style: AppTextStyles.medium(16, color: AppColors.lightGrey),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  error.toString(),
+                  style: AppTextStyles.regular(14, color: AppColors.lightGrey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        },
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.darkPink),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.darkPink,
         onPressed: () {
-          // Add action for adding new complaint or refresh
+          // Manually refresh the data if needed
+          ref.refresh(allComplaintsProvider);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Refreshing data...'),

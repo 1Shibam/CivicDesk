@@ -61,8 +61,9 @@ class ComplaintDetailScreen extends StatelessWidget {
                           color: AppColors.textColor,
                           strokeWidth: 2,
                         ),
-                        errorWidget: (context, url, error) => Image.asset(
-                          'assets/images/default_profile.png',
+                        errorWidget: (context, url, error) =>
+                            CachedNetworkImage(
+                          imageUrl: emptyProfile,
                           fit: BoxFit.cover,
                           width: 56.r,
                           height: 56.r,
